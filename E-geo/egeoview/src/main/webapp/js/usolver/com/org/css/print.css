@@ -1,0 +1,364 @@
+BODY { FONT-SIZE: 9pt }
+TABLE { FONT-SIZE: 9pt }
+TD { FONT-SIZE: 9pt }
+UNKNOWN { FONT-SIZE: 9pt; COLOR: black; TEXT-DECORATION: none }
+
+td.C {
+	text-align: center; vertical-align:middle;
+}
+td.R {
+	text-align: right; vertical-align:middle; margin-right:20px; PADDING: 0PX 10PX;
+}
+td.L {
+	text-align: left; vertical-align:middle; margin-left:100px; PADDING: 0PX 10PX;
+}
+
+td.B {
+	text-align: center; vertical-align:middle; font-weight:bold;
+}
+
+
+
+td.Title1 {
+	FONT-SIZE:18pt; letter-spacing:20; 
+}
+
+
+
+td.Name0 {
+	HEIGHT:30px; width:170px;
+}
+
+td.Name1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px; width:170px;
+}
+
+td.Name1-1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px; width:150px;
+}
+
+
+td.Name2 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-TOP:1px solid; HEIGHT:30px; width:170px;
+}
+td.Name2-1 {
+	BORDER-BOTTOM:1px solid; BORDER-TOP:1px solid; HEIGHT:30px; width:170px;
+}
+td.Name2-2 {
+	BORDER-LEFT:1px solid;  BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+}
+td.Name2-3 {
+	BORDER-LEFT:1px solid;  BORDER-TOP:1px solid; solid; HEIGHT:30px;
+}
+td.Name2-4 {
+	BORDER-TOP:1px solid; solid; HEIGHT:30px;
+}
+td.Name2-5 {
+	BORDER-RIGHT:1px solid;  BORDER-TOP:1px solid; solid; HEIGHT:30px;
+}
+td.Name3 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px; width:200px;
+}
+td.Name4 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:120px;
+}
+td.Name4-0 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:120px; 
+}	
+td.Name4-1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:30px; 
+}
+td.Name4-2 {
+	BORDER-TOP:1px solid; BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:30px; width:170px;
+}
+td.Name4-3 {
+	BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:30px; 
+}
+td.Name4-4 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:30px; width:170px;
+}
+td.Name5 {
+	BORDER-LEFT:1px solid;  BORDER-BOTTOM:1px solid; HEIGHT:30px;
+}
+td.Name5-1 {
+	BORDER-BOTTOM:1px solid; HEIGHT:30px;
+}
+td.Name5-2 {
+	BORDER-BOTTOM:1px solid; HEIGHT:10px;
+}
+td.Name6 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:30px; width:200px; 
+}
+td.Name6-1 {
+	BORDER-BOTTOM:1px solid; HEIGHT:30px; width:200px; 
+}
+td.Name7 {
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+}
+td.Name8 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:50px;
+}
+td.Name9 {
+	BORDER-LEFT:1px solid;  HEIGHT:30px;
+}
+td.Name9-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; HEIGHT:30px;
+}
+td.Name10 {
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+}
+td.Name10-1 {
+	BORDER-LEFT:2px solid; BORDER-TOP:2px solid; BORDER-RIGHT:2px solid; BORDER-BOTTOM:2px solid;
+}
+td.Name10-2 {
+	BORDER-TOP:4px solid;
+}
+td.Name10-3 {
+	BORDER-TOP:14px solid;
+	border-color: #d9d9d9;
+}
+
+td.Name11 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:350px;
+}
+td.Name11-1 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:350px;
+}
+td.Name11-2 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:400px;
+}
+td.Name11-3 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:400px;
+}
+td.Name11-4 {
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:100px;
+}
+td.Name11-5 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:200px;
+}
+td.Name12 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px; width:80px;
+}
+td.Name13 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+td.Name14 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:18px;
+}
+td.Name14-1 {
+	BORDER-LEFT:1px solid; HEIGHT:18px;
+}
+td.Name14-2 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; HEIGHT:18px;
+}
+td.Name14-3 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:18px;
+}
+td.Name15{
+	BORDER-TOP:2px solid; BORDER-RIGHT:1px solid; HEIGHT:30px;
+}
+td.Name15-1{
+	BORDER-TOP:2px solid; HEIGHT:30px;
+}
+td.Name16{
+	BORDER-RIGHT:1px solid; HEIGHT:30px;
+}
+td.Name17{
+	HEIGHT:30px;
+}
+td.Name17-1{
+	HEIGHT:1px;
+}
+td.Name18{
+	HEIGHT:20px;
+}
+td.Name18-1{
+	BORDER-LEFT:1px solid;  BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+td.Name18-2{
+	BORDER-LEFT:1px solid;  BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+td.Name18-3{
+	BORDER-LEFT:1px solid;  BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+td.Name18-4{
+	BORDER-LEFT:1px solid;  BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+
+
+/*영수중*/
+/*제목*/
+td.NameA{
+	BORDER-RIGHT:1px dashed; HEIGHT:30px; font-size:18px;
+}
+td.NameA-1{
+	HEIGHT:30px; font-size:18px;
+}
+td.NameA-2{
+	BORDER-RIGHT:1px dashed; HEIGHT:15px; font-size:18px;
+}
+td.NameA-3{
+	HEIGHT:15px;
+}
+/*맨윗줄*/
+td.NameB{
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+td.NameB-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+td.NameB-2{
+	BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+/*일반*/
+td.NameC{
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+td.NameC-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+td.NameC-2{
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+td.NameC-3{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	font-size:10px;
+}
+/*틀*/
+td.NameD{
+	HEIGHT:1px;
+}
+
+/*여백*/
+td.NameE{
+	HEIGHT:24px;
+	font-size:10px;
+}
+td.NameE-1{
+	HEIGHT:24px;
+	font-size:10px;
+}
+td.NameE-2{
+	HEIGHT:17px;
+	font-size:10px;
+}
+
+
+
+
+/*맨윗줄*/
+td.NameBB{
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameBB-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameBB-2{
+	BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameBB-20{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameBB-21{
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+/*일반*/
+td.NameCC{
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-2{
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-3{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-4{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+	padding:30px;
+}
+td.NameCC-5{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+	padding : 7px;
+}
+td.NameCC-6{
+	BORDER-BOTTOM:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-7{
+	BORDER-LEFT:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameCC-8{
+	BORDER-RIGHT:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+}
+td.NameDD{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; HEIGHT:30px;
+	BORDER-COLOR : #7A7A7A; 
+	font-size:11px;
+	padding : 7px;
+}
+td.NameD-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid;
+	BORDER-COLOR : #7A7A7A; 
+	HEIGHT:3px;
+}
+
+/*TYPE1*/
+td.NRM-35 {
+	border-width:1; border-color:black; border-style:solid;
+	font-face:바탕;font-size:10px;
+	HEIGHT:35px;
+}
+td.NRM-25 {
+	border-width:1; border-color:black; border-style:solid;
+	font-face:바탕;font-size:10px;
+	HEIGHT:25px;
+}
+td.BORDER-BTM-DBL {
+	border-top-width:1; border-right-width:1; border-bottom-width:3; border-left-width:1; 
+	border-color:black; 
+	border-top-style:solid; border-right-style:solid; border-bottom-style:double; border-left-style:solid;
+	font-face:바탕;font-size:10px;
+}
+td.BORDER-TOP-DBL {
+	border-top-width:3; border-right-width:1; border-bottom-width:1; border-left-width:1; 
+	border-color:black; 
+	border-top-style:double; border-right-style:solid; border-bottom-style:solid; border-left-style:solid;
+	font-face:바탕;font-size:10px;
+	HEIGHT:35px;
+}

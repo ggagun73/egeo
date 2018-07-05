@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+
+	<select id="selectProgrmList" parameterType="usolver.admin.program.vo.ProgrmManage"  resultType="egovMap">
+		<![CDATA[
+	       SELECT * FROM ( SELECT rownum rn, TB.* FROM (
+				SELECT 
+					  PROGRM_FILE_NM   
+					, PROGRM_STRE_PATH 
+					, PROGRM_KOREAN_NM  
+					, dbms_lob.substr(PROGRM_DC, 10, 1)||'...' AS PROGRM_DC
+					, URL          
+				FROM USV_PROGRM	 ]]>
+				WHERE 1=1
+				   <if test="searchKeyword != null">
+				   AND (PROGRM_KOREAN_NM like  '%'|| #{searchKeyword}||'%'  OR PROGRM_FILE_NM like  '%'|| #{searchKeyword}||'%' )
+				   </if>
+	       ) TB )  WHERE rn BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+		
+	</select> 
+
+	<!-- 총건수 조회  					, PROGRM_DC        AS "progrmDc" -->
+	<select id="selectProgrmListCnt" parameterType="usolver.admin.program.vo.ProgrmManage" resultType="int">
+		<![CDATA[
+		SELECT COUNT(*) AS "totcnt"
+		  FROM USV_PROGRM
+	    WHERE 	 1=1 		]]>
+	    	<if test="searchKeyword != null">
+				AND (PROGRM_KOREAN_NM like  '%'|| #{searchKeyword}||'%'  OR PROGRM_FILE_NM like  '%'|| #{searchKeyword}||'%' )
+			</if>		
+	</select>
+
+	<!-- 파일명존재여부 조회 -->
+	<select id="selectProgrmNMTotCnt" parameterType="usolver.admin.program.vo.ProgrmManage" resultType="int">
+		<![CDATA[
+		SELECT COUNT(*) AS "totcnt"
+		  FROM USV_PROGRM
+		 WHERE PROGRM_FILE_NM like  '%'|| #{searchKeyword}||'%'	
+		 ]]>
+	</select>
+
+	<select id="selectProgrmView" parameterType="usolver.admin.program.vo.ProgrmManage" resultType="usolver.admin.program.vo.ProgrmManage">
+		<![CDATA[
+			SELECT
+				  PROGRM_FILE_NM   AS "progrmFileNm" 
+				, PROGRM_STRE_PATH AS "progrmStrePath" 
+				, PROGRM_KOREAN_NM  AS "progrmKoreanNm" 
+				, PROGRM_DC        AS "progrmDc" 
+				, URL              AS "URL"
+			FROM USV_PROGRM
+			WHERE PROGRM_FILE_NM = #{searchKeyword}
+		]]>
+	</select>
+	
+	<insert id="insertProgrm">
+		<![CDATA[
+			INSERT INTO USV_PROGRM 
+				( PROGRM_FILE_NM
+				  , PROGRM_STRE_PATH
+				  , PROGRM_KOREAN_NM
+				  , PROGRM_DC
+				  , URL )
+			VALUES ( #{progrmFileNm}
+				  , #{progrmStrePath}
+				  , #{progrmKoreanNm}
+				  , #{progrmDc}
+				  , #{URL} )
+		]]>
+	</insert>
+
+	<update id="updateProgrm">
+		<![CDATA[
+			UPDATE USV_PROGRM 
+			SET PROGRM_STRE_PATH=#{progrmStrePath}
+				, PROGRM_KOREAN_NM=#{progrmKoreanNm}
+				, PROGRM_DC      =#{progrmDc}
+				, URL            =#{URL}
+			WHERE PROGRM_FILE_NM=#{progrmFileNm}
+		]]>
+	</update>
+
+	<delete id="deleteProgrm">
+		<![CDATA[                          
+			DELETE FROM USV_PROGRM              
+			WHERE PROGRM_FILE_NM=#{progrmFileNm}                 
+		]]>                                
+	</delete> 
+
+	<delete id="deleteAllProgrm">
+		<![CDATA[                          
+			DELETE FROM USV_PROGRM            
+		]]>                                
+	</delete> 
+
+	<!-- 메뉴정보 총건수 조회 -->
+	<select id="selectProgrmListTotCnt" parameterType="usolver.admin.program.vo.ProgrmManage" resultType="int">
+		<![CDATA[
+		SELECT COUNT(PROGRM_FILE_NM) AS "totcnt" FROM USV_PROGRM
+		]]>
+	</select>
+	
+	<!-- 관련 메뉴정보 조회 -->
+	<select id="selectRelatiionMenuList" parameterType="usolver.admin.program.vo.ProgrmManage" resultType="egovMap">
+		<![CDATA[
+		SELECT MENU_NO, MENU_NM, MENU_TYPE FROM USV_MENU_INFO 
+		WHERE PROGRM_FILE_NM = #{progrmFileNm}    
+		]]>
+	</select>
+    	
+</mapper>

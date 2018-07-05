@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="book">
+
+	<!-- 목록조회, 총 데이터수, 엑셀 다운로드의 공통 조건 -->
+	<sql id="searchSql">
+	
+	 <foreach collection="searchColumnsList" item="item" index="index"  >
+		${item}
+ 	 </foreach>
+ 	 <if test="G2_ID_MAP != null ">
+	 	 <trim prefix="AND">
+		 	 (0,FID) IN  
+		 	 <foreach collection="G2_ID_MAP" item="item" index="index" separator="," open="(" close=")"  >
+				(0,#{item})
+		 	 </foreach>
+	 	 </trim>
+ 	 </if>
+	</sql>
+
+	<!-- 시설물 : 컬럼 조회 -->
+	<select id="selectColumnsList" parameterType="map" resultType="egovMap"> 
+	 SELECT GF.G2_TABLENAME  AS EN_TABLENAME
+	 		 , NVL(GD.G2_ALIAS,GF.G2_TABLENAME)  AS KO_TBLENAME
+	 		 , GF.G2_NAME AS EN_COLUMNS
+	 		 , GF.G2_ALIAS AS KO_COlUMNS
+	 		 , NVL(GF.G2_DOMAIN,0) AS G2_DOMAIN
+	 		 , NVL(GF.G2_LENGTH,0) AS G2_LENGTH
+	 FROM (
+	  		SELECT * FROM G2S_FIELDINFO    
+	  		UNION ALL
+	  		SELECT * FROM USV_FIELDINFO
+	  )  GF, G2S_DATASET GD
+	 WHERE GD.FID(+) = GF.G2_DATASETID  
+	 	AND GF.G2_TABLENAME = #{TABLENAME}
+	 ORDER BY GF.FID 	 
+	</select>
+
+	<!-- 시설물 : 컬럼 조회 -->
+	<select id="selectColumnsListByGeoServer" parameterType="map" resultType="egovMap">
+	 SELECT TABLENAME  AS EN_TABLENAME
+	 		 , NVL(TABLEALIAS, TABLENAME)  AS KO_TBLENAME
+	 		 , FIELDNAME AS EN_COLUMNS
+	 		 , FIELDALIAS AS KO_COlUMNS
+	 		 , NVL(0,0) AS G2_DOMAIN
+	 		 , NVL(COLUMN_SIZE ,0) AS G2_LENGTH
+	 FROM MV_FIELDINFO
+	 WHERE TABLENAME = #{TABLENAME}
+	 ORDER BY SEQ 
+	</select>
+	
+	<!-- 시설물 : 목록 조회 -->
+	<select id="selectList" parameterType="map" resultType="egovMap">
+		SELECT 
+				FID ,
+			  <foreach collection="selectColumnsList" item="item" index="index"  separator=", ">
+				${item}
+			  </foreach>	
+	       FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM  ${TABLENAME} D
+					WHERE 1=1				
+				   	<include refid="searchSql" />								  
+					ORDER BY ${OrderByColumn} ${OrderByType}
+				) M
+			 ) 
+		<![CDATA[ WHERE rnum <= #{lastIndex} and rnum > #{firstIndex} ]]>
+	</select>
+	
+	<!-- 시설물 : 목록 조회 총 데이터수(total count) -->
+	<select id="selectListCnt" parameterType="map" resultType="int">
+			SELECT COUNT(*) totcnt
+			FROM ${TABLENAME}
+			WHERE 1=1
+			<include refid="searchSql" />
+	</select>
+	
+	<!-- 특정필드값 조회 -->
+	<select id="selectSearchColumn" parameterType="map" resultType="String">
+			SELECT ${SEARCH_COLUMN} FROM ${TABLENAME} WHERE 1=1 	
+			<include refid="searchSql" />						
+	</select>
+	
+	<!-- 특정필드리스트 조회 -->
+	<select id="selectSearchColumnList" parameterType="map" resultType="egovMap">
+			SELECT ${SEARCH_COLUMN} FROM ${TABLENAME} WHERE 1=1 	
+			<include refid="searchSql" />				
+			${ORDERBY}					  				  
+	</select>
+	
+	<!-- 시설물 : 상세 조회 -->
+	<select id="selectRegisterDetail" parameterType="map" resultType="egovMap">
+		SELECT
+				FID ,
+			  <foreach collection="selectColumnsList" item="item" index="index"  separator=", ">
+				${item}
+			  </foreach>
+		FROM  ${TABLENAME}
+		WHERE FID = #{FID}
+	</select>
+	
+	<!-- 시설물 : 상세 조회 -->
+	<select id="selectAddInfoView" parameterType="map" resultType="egovMap">
+		SELECT
+				FID ,
+			  <foreach collection="selectColumnsList" item="item" index="index"  separator=", ">
+				${item}
+			  </foreach>
+		FROM  ${TABLENAME}
+		WHERE 1= 1
+		<include refid="searchSql" />
+	</select>
+			
+	<!-- 시설물 : 등록 - Yu_mk-->
+	<insert id="insertRegister" parameterType="map">  
+		INSERT INTO ${TABLENAME}(FID, 
+		<foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			${item}
+		 </foreach>
+		values((SELECT NVL(MAX(FID)+1,1) FROM ${TABLENAME}), 
+		 <foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			#{${item}, jdbcType=VARCHAR} 
+		 </foreach>
+	</insert>
+	
+	<!-- 시설물 : 수정 -->
+	<update id="updateRegister">	
+		UPDATE ${TABLENAME}
+		SET 
+		 <foreach collection="updateColumnsList" item="item" index="index"  separator=", ">
+			${item}
+		 </foreach>
+		WHERE FID = #{FID}
+	</update>
+	
+	<!-- 삭제 -->
+	<delete id="deleteRegister">  
+		DELETE FROM ${TABLENAME}
+		WHERE FID = #{FID}
+	</delete>
+	
+	<delete id="deleteRelationTable">  
+		DELETE FROM ${TABLENAME}  WHERE ${KEY_COLUMN} = #{${KEY_COLUMN}}
+	</delete>
+	
+	<!-- 관계테이블 삭제 -->
+	<delete id="deleteRdlRdarAs">  
+		DELETE FROM RDL_RDAR_AS WHERE (RDA_IDN, FTR_CDE) IN (SELECT RDA_IDN, FTR_CDE FROM ${TABLENAME} WHERE FID = #{FID} )
+	</delete>
+	
+	<!-- 삭제 -->
+	<delete id="deleteRdtRtcnDt">  
+		DELETE FROM RDT_RTCN_DT WHERE RUT_IDN IN (SELECT RUT_IDN FROM ${TABLENAME} WHERE FID = #{FID} )
+	</delete>
+					
+	<!-- 도로굴착점용허가조건 삭제 -->
+	<delete id="deleteRdtEachDt">  
+		DELETE FROM RDT_EACH_DT WHERE AGA_NUM IN (SELECT AGA_NUM FROM ${TABLENAME} WHERE FID = #{FID} )
+	</delete>	
+
+	<!-- 시설물: 출력용 -->
+	<select id="selectRegisterPrint"  parameterType="map" resultType="egovMap">
+		SELECT
+			ROWNUM AS rnum
+			,FID ,
+				<foreach collection="selectColumnsList" item="item" index="index"  separator=", ">
+				${item}
+			  </foreach>
+		FROM ${TABLENAME}
+		WHERE 1=1
+	 	<include refid="searchSql" />
+		ORDER BY FID DESC
+	</select>
+		
+	<!-- 시설물: 엑셀다운로드용 -->
+	<select id="selectRegisterExcel" fetchSize="4000" parameterType="map" resultType="map">
+		SELECT
+			ROWNUM AS rnum
+			,FID ,
+				<foreach collection="selectColumnsList" item="item" index="index"  separator=", ">
+				${item}
+			  </foreach>
+		FROM ${TABLENAME}
+		WHERE 1=1
+	 	<include refid="searchSql" />
+		ORDER BY FID DESC
+	</select>
+	
+		
+	<!-- 시설물 : 사용자 검색항목 대장목록 조회 - Yu_mk -->
+	<select id="registerFieldList" parameterType="String" resultType="egovMap">
+		SELECT * FROM (
+		SELECT G2_TABLENAME, G2_NAME, G2_ALIAS
+     	FROM G2S_FIELDINFO
+		UNION	ALL
+     	SELECT G2_TABLENAME, G2_NAME, G2_ALIAS
+     	FROM USV_FIELDINFO
+     	)
+     	WHERE G2_TABLENAME = #{tableName} 
+	</select>	
+		
+	<!-- 시설물 : 사용자 검색항목 대장목록 조회 - Yu_mk -->
+	<select id="registerFieldListForGeoServer" parameterType="String" resultType="egovMap">
+		SELECT * FROM (
+		SELECT TABLENAME AS G2_TABLENAME, FIELDNAME AS G2_NAME, FIELDALIAS AS G2_ALIAS
+     	FROM MV_FIELDINFO
+		UNION	ALL
+     	SELECT G2_TABLENAME, G2_NAME, G2_ALIAS
+     	FROM USV_FIELDINFO
+     	)
+     	WHERE G2_TABLENAME = #{tableName} 
+	</select>	
+	<select id="registerFieldList2" parameterType="String" resultType="egovMap">
+		SELECT G2_NAME, G2_ALIAS
+     	FROM USV_FIELDINFO
+     	WHERE G2_TABLENAME = #{tableName} 
+	</select>
+	
+	<!-- 시설물 : 사용자 검색항목 저장 - Yu_mk -->
+	<insert id="registerSaveUserList" parameterType="map">
+		INSERT INTO USV_USER_FIELDINFO(SEQ, USER_ID, TABLENAME, SEARCH_COLUMN, SEARCH_COLUMN_ALIAS, VIEW_COLUMN, VIEW_COLUMN_ALIAS, REQ_DATE)
+	
+		VALUES ((SELECT NVL(MAX(SEQ)+1,1) FROM USV_USER_FIELDINFO), #{userId}, #{tableName}
+		
+		<choose>
+			<when test="addFind != null">
+				<foreach collection="addFind" open=",('" item="item" index="index"
+					separator="," close="')">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+			, null
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="addFindAlias != null">
+				<foreach collection="addFindAlias" open=",('" item="item" index="index"
+					separator="," close="')">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+			, null
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="addList != null">
+				<foreach collection="addList" open=",('" item="item" index="index"
+					separator="," close="')">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+			, null
+			</otherwise>
+		</choose>
+		<choose>
+			<when test="addListAlias != null">
+				<foreach collection="addListAlias" open=",('" item="item" index="index"
+					separator="," close="')">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+			, null
+			</otherwise>
+		</choose>
+		, SYSDATE)
+
+	</insert>
+	
+	<!-- 시설물 : 사용자 검색항목 업데이트 - Yu_mk -->
+	<update id="registerUpdateUserList" parameterType="map">
+		UPDATE USV_USER_FIELDINFO 
+		
+		SET 
+
+		<if test="addFind != null">
+			SEARCH_COLUMN = 
+			<foreach collection="addFind" open="('" item="item" index="index" separator="," close="')">
+				${item}
+			</foreach>
+				
+			,SEARCH_COLUMN_ALIAS =
+			<foreach collection="addFindAlias" open="('" item="item" index="index" separator="," close="')">
+				${item}
+			</foreach>
+		</if>
+	
+		<if test="addList != null">
+			<choose>
+				<when test="addFind != null">
+					, VIEW_COLUMN = 
+				</when>
+				<otherwise>
+					VIEW_COLUMN = 
+				</otherwise>
+			</choose>
+		
+			<foreach collection="addList" open="('" item="item" index="index" separator="," close="')">
+				${item}
+			</foreach>
+			
+			,VIEW_COLUMN_ALIAS =
+			<foreach collection="addListAlias" open="('" item="item" index="index" separator="," close="')">
+				${item}
+			</foreach>
+		</if>
+				
+		, REQ_DATE = SYSDATE
+		WHERE USER_ID = #{userId} AND TABLENAME = #{tableName}
+	</update>
+	
+	<!-- 시설물 : 사용자 삭제 - Yu_mk -->
+	<select id="registerDeleteUserList" parameterType="map">
+		DELETE FROM USV_USER_FIELDINFO 
+		WHERE USER_ID = #{userId} 
+		AND TABLENAME = #{tableName}
+	</select>
+	
+	<!-- 시설물 : 사용자 검색항목 가져오기 - Yu_mk -->
+	<select id="registerGetUserList" parameterType="map" resultType="usolver.com.cmm.vo.UsvUserFieldVO">
+		 SELECT SEARCH_COLUMN, SEARCH_COLUMN_ALIAS, VIEW_COLUMN, VIEW_COLUMN_ALIAS
+	     FROM USV_USER_FIELDINFO
+	     WHERE 1=1 AND TABLENAME = #{tableName} 
+	     AND USER_ID = #{userId}
+	</select>
+	
+	<!-- 시설물 : 사용자 조회 - Yu_mk -->
+	<select id="registerCheckUser" parameterType="map" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM USV_USER_FIELDINFO
+		WHERE 1=1 AND USER_ID = #{userId} AND TABLENAME = #{tableName}
+	</select>
+	
+	<!-- 시설물 : 속성 조회 (수정) -->
+	<select id="selectAttResult" parameterType="map" resultType="map">
+		${QUERY}
+		<if test="G2_ID_MAP != null">
+	 		<trim prefix="AND">
+		 		(0,FID) IN  
+				<foreach collection="G2_ID_MAP" item="item" index="index" separator="," open="(" close=")"  >
+					(0,#{item})
+				</foreach>
+		 	 </trim>
+	 	 </if>
+	</select>
+	
+</mapper>

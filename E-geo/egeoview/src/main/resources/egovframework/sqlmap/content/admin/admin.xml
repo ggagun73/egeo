@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Admin">
+
+	<typeAlias alias="adminVO" type="usolver.com.admin.vo.AdminVO"/>
+	
+	<select id="content.admin.List" parameterClass="adminVO" resultClass="adminVO">
+
+		SELECT * FROM USV_COMPONENT
+		
+	</select>
+	
+	<insert id="content.admin.valueCheck" parameterClass="adminVO">
+		<!-- INSERT INTO USV_ADMIN_USER
+		(
+			  SEQ,
+			  USER_ID,
+			  SEOL_ID,
+			  DEPT_NM,
+			  REQ_DATE,
+			  APV_YN,
+			  SYS_TYPE,
+			  CATEGORY,
+			  PROG_ID,
+			  CAPTION
+			  
+		)
+		VALUES 
+		(
+			(SELECT (NVL(MAX(SEQ),0)+1)  FROM USV_ADMIN_USER),
+			#USER_ID#,
+			#SEOL_ID#,
+			#DEPT_NM#,
+			SYSDATE,
+			'N',
+			#SYS_TYPE#,
+			#CATEGORY#,
+			#PROG_ID#,
+			#CAPTION#
+		) -->
+		
+		INSERT INTO USV_ADMIN_USER
+		(
+			  SEQ,
+			  USER_ID,
+			  SEOL_ID,
+			  DEPT_NM,
+			  REQ_DATE,
+			  APV_YN,
+			  SYS_TYPE,
+			  CATEGORY,
+			  PROG_ID,
+			  CAPTION
+			  
+		)
+		VALUES 
+		(
+			(SELECT (NVL(MAX(SEQ),0)+1)  FROM USV_ADMIN_USER),
+			#USER_ID#,
+			#SEOL_ID#,
+			#DEPT_NM#,
+			SYSDATE,
+			'N',
+			#SYS_TYPE#,
+			#CATEGORY#,
+			#PROG_ID#,
+			#CAPTION#
+		)
+	</insert>
+	
+	<!-- <select id="content.admin.reqChkList" parameterClass="adminVO" resultClass="adminVO">
+
+		SELECT A.SYS_TYPE, B.USER_ID FROM USV_USER_COMP A, USV_ADMIN_USER B
+			WHERE 
+				A.SYS_TYPE =  B.SYS_TYPE
+	      	<isNotEmpty prepend="AND" property="USER_ID">
+	        	B.USER_ID = #USER_ID#
+        	</isNotEmpty>       
+	</select> -->
+	
+	<insert id="content.admin.reqChkReg" parameterClass="adminVO">
+		
+		INSERT INTO USV_USER_SYSTEM_TEMP
+     	(
+	        SEQ, 
+	        USER_ID,
+	        SYS_ID,
+	        SYS_AUTH,
+	        DEL_YN
+      	)
+        VALUES
+        (
+     	 	(SELECT (NVL(MAX(SEQ),0)+1) FROM USV_USER_SYSTEM),
+       		#USER_ID#,
+       		#SYS_ID#,
+       		'0',
+       		'N'
+        )
+	</insert>
+	
+	<select id="content.admin.reqChkList" parameterClass="adminVO" resultClass="adminVO">
+		SELECT * FROM USV_USER_SYSTEM_TEMP
+		
+		WHERE
+			USER_ID = #USER_ID#
+	</select>
+	
+	
+	
+	<select id="content.admin.chkList" parameterClass="adminVO" resultClass="adminVO">
+
+		SELECT A.SYS_TYPE, A.CATEGORY, A.CAPTION, B.USER_ID FROM USV_USER_COMP A, USV_ADMIN_USER B
+			WHERE 
+				A.PROG_ID =  B.PROG_ID 
+	      	<isNotEmpty prepend="AND" property="USER_ID">
+	        	B.USER_ID = #USER_ID#
+        	</isNotEmpty>        
+	</select>
+	
+	<select id="content.admin.requestUserDetail" parameterClass="adminVO" resultClass="adminVO">
+		SELECT SEQ,
+		       USER_ID,
+		       SEOL_ID,
+		       DEPT_NM,
+		       TO_CHAR(REQ_DATE, 'YYYY-MM-DD') REQ_DATE,
+		       TO_CHAR(EDIT_DATE, 'YYYY-MM-DD') EDIT_DATE,
+		       APV_YN,
+		       SYS_TYPE,
+		       CATEGORY,
+		       PROG_ID,
+		       CAPTION
+		FROM   USV_ADMIN_USER
+		WHERE  USER_ID = #USER_ID#
+	</select>
+	
+	<update id="content.admin.updateAllApvYnToN" parameterClass="adminVO">
+		UPDATE USV_ADMIN_USER
+		SET    APV_YN  = 'N'
+		WHERE  USER_ID = #USER_ID#
+	</update>
+	
+	<update id="content.admin.updateProgId" parameterClass="adminVO">
+		UPDATE USV_ADMIN_USER
+		SET    APV_YN  = 'Y',
+				EDIT_DATE = SYSDATE
+		WHERE  USER_ID = #USER_ID#
+		AND    PROG_ID = #PROG_ID#
+	</update>
+	
+	<insert id="content.admin.insertProgId" parameterClass="adminVO">
+		INSERT INTO USV_ADMIN_USER
+		(
+			  SEQ,
+			  USER_ID,
+			  SEOL_ID,
+			  DEPT_NM,
+			  REQ_DATE,
+			  EDIT_DATE,
+			  APV_YN,
+			  SYS_TYPE,
+			  CATEGORY,
+			  PROG_ID,
+			  CAPTION
+			  
+		)
+		VALUES 
+		(
+			(SELECT (NVL(MAX(SEQ),0)+1)  FROM USV_ADMIN_USER),
+			#USER_ID#,
+			#SEOL_ID#,
+			#DEPT_NM#,
+			SYSDATE,
+			SYSDATE,
+			'Y',
+			#SYS_TYPE#,
+			#CATEGORY#,
+			#PROG_ID#,
+			#CAPTION#
+		)
+	</insert>
+</sqlMap>

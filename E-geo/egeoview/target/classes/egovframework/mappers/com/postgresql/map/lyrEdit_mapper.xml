@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+
+    <!-- CLOB 데이터 처리시 resultMap 이용 -->
+    <resultMap id="insertEditMidData" type="LyrEditMidSaveVO">
+        <result property="G2_ID"/>
+        <result property="G2_DATASETID"/>
+        <result property="G2_NAME"/>
+        <result property="G2_STATE"/>
+        <result property="G2_DATE"/>
+        <result property="G2_SRCVERSION"/>
+        <result property="G2_USERID"/>
+        <result property="G2_DATA" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+    
+    <!-- 편집레이어 정보  -->
+	<select id="selectEditLyrInfo" parameterType="String" resultType="egovMap">
+		<![CDATA[
+			SELECT LYR_ID, LYR_ENG_NM, LYR_FTR_CDE, LYR_KOREAN_NM, LYR_RDL_USE_YN, LYR_WTL_USE_YN, LYR_SWL_USE_YN, A.G2_ID,
+			LYR_EDIT_YN, LYR_TYPE, G2_MAPID, G2_TYPE, G2_BASEID, G2_ORDER, G2_NAME
+			FROM TN_LYR_INFO A
+			RIGHT OUTER JOIN (
+				SELECT * FROM  G2V_LAYER WHERE G2_BASEID IN (
+				SELECT G2_ID FROM TN_LYR_INFO
+				WHERE LYR_KOREAN_NM=#{SYSTEM})
+			) B
+			ON A.G2_ID = B.G2_ID
+			WHERE LYR_EDIT_YN = '1'
+        ]]>
+	</select>	
+	
+	<!-- 편집레이어의 참조레이어 정보  -->
+	<select id="selectRefLyrInfo" parameterType="LyrEditRefVO" resultType="LyrEditRefVO">
+		<![CDATA[
+			SELECT LYR_ID, EDITLYR_ENG_NM, REFLYR_ENG_NM,EDITLYR_KOREAN_NM, REFLYR_KOREAN_NM, WFS_DRAW 			
+			FROM TN_EDITREFLYR_INFO
+			WHERE EDITLYR_ENG_NM = #{EDITLYR_ENG_NM}
+        ]]>
+	</select>
+		
+	<!-- 편집레이어의 스냅 대상 레이어 및 스냅정보  -->
+	<select id="selectSnapLyrInfo" parameterType="LyrEditSnapInfoVO" resultType="LyrEditSnapInfoVO">
+		<![CDATA[
+			SELECT SNAP_ID, EDITLYR_ENG_NM, SNAPLYR_ENG_NM, SNAP_EDGE, SNAP_VERTEX, SNAP_NODE  
+			FROM TN_SNAP_INFO
+      		WHERE EDITLYR_ENG_NM = #{EDITLYR_ENG_NM}
+        ]]>
+	</select>	
+	
+	<!-- 편집레이어의 스냅 대상 레이어 및 스냅정보  -->
+	<select id="selectMiddleEditInfo" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT SNAP_ID, EDITLYR_ENG_NM, SNAPLYR_ENG_NM, SNAP_EDGE, SNAP_VERTEX, SNAP_NODE 
+			FROM TN_SNAP_INFO
+      		WHERE EDITLYR_ENG_NM = 'WTL_SPLY_LS'
+        ]]>
+	</select>
+	
+	<!-- 편집레이어 스키마정보  for GeoGate -->
+	<select id="selectEditLyrSchemaInfo" parameterType="java.util.List"  resultType="LyrEditSchemaInfoVO">
+		<![CDATA[
+			SELECT G2_DATASETID, G2_TABLENAME, G2_NAME, G2_ALIAS, G2_DATATYPE, G2_LENGTH, G2_PRECISION, G2_SCALE, G2_DOMAIN_TYPE, G2_DOMAIN  
+			FROM G2S_FIELDINFO 
+			WHERE G2_TABLENAME in 
+		]]>
+			 <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+				#{item, javaType=String ,jdbcType=VARCHAR}
+			 </foreach>
+			 ORDER BY G2_TABLENAME
+	</select>	 
+		
+	<!-- 편집레이어 스키마정보  for GeoServer  -->
+	<select id="selectEditLyrSchemaInfoByGeoServer" parameterType="java.util.List"  resultType="LyrEditSchemaInfoVO">
+		<![CDATA[
+			SELECT TABLENAME AS G2_TABLENAME, FIELDNAME AS G2_NAME, FIELDALIAS AS G2_ALIAS, 
+			CASE 
+				WHEN DATATYPE = 'string'
+				THEN 51
+				ELSE 16
+			END AS G2_DATATYPE, COLUMN_SIZE AS G2_LENGTH, DECIMAL_DIGITS AS G2_PRECISION, 
+			CASE 
+				WHEN DOMAINNAME = null
+				THEN 0
+				ELSE 2
+			END AS G2_DOMAIN_TYPE 
+			FROM MV_FIELDINFO 
+			WHERE TABLENAME in 
+		]]>
+			 <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+				#{item, javaType=String ,jdbcType=VARCHAR}
+			 </foreach>
+			 ORDER BY TABLENAME
+	</select>
+	
+    <!-- 편집레이어 정보  -->
+	<select id="selectEditMidSaveInfo" parameterType="LyrEditMidSaveVO" resultType="LyrEditMidSaveVO">
+		<![CDATA[
+			SELECT G2_ID, G2_DATASETID, G2_NAME, G2_STATE, G2_DATE, G2_SRCVERSION, G2_USERID, G2_DATA 
+			FROM TN_EDITLYR_MIDSAVE			 
+        ]]>
+        <where>        		
+			<if test="G2_USERID != null">
+				G2_USERID = #{G2_USERID}				
+			</if>
+			<if test="G2_NAME != null">
+				AND G2_NAME = #{G2_NAME}				
+			</if>
+			<if test="G2_ID != null">
+				AND G2_ID = #{G2_ID}				
+			</if>		
+		</where>
+		<!-- <![CDATA[
+			AND G2_STATE <> 0		
+			ORDER BY G2_NAME, G2_ID 
+        ]]> -->
+        <![CDATA[			
+			ORDER BY G2_NAME, G2_ID 
+        ]]>
+	</select>
+	
+	<!-- G2S_EDITHISTORY -->
+	<insert id="insertG2SEditHistory" parameterType="SearchEditHisVO">
+		<![CDATA[
+			INSERT INTO G2S_EDITHISTORY 
+			(				
+				G2_ID,			
+				G2_DATASETID,
+				G2_VERSION,
+				G2_STATE,
+				G2_USER,
+				G2_BEGINE,
+				G2_END,
+				G2_REMARK
+			)
+			SELECT 
+				SEQ_G2S_EDITHISTORY.NEXTVAL,
+ 				#{G2_DATASETID,  jdbcType=INTEGER} ,
+ 				G2_VERSION, 
+ 				#{G2_STATE,  jdbcType=INTEGER} ,
+				#{G2_USER, jdbcType=VARCHAR} ,
+				TO_DATE(G2_DATE, 'YYYY-MM-DD HH24:MI:SS') ,
+				TO_DATE(G2_DATE, 'YYYY-MM-DD HH24:MI:SS') ,	
+				#{G2_REMARK,  jdbcType=INTEGER}
+			FROM
+				  ( SELECT G2_ID, G2_VERSION, TO_CHAR(G2_DATE, 'YYYY-MM-DD HH24:MI:SS') G2_DATE
+				    FROM ${TABLENAME_EDIT}
+				    WHERE G2_ID = #{G2_ID,  jdbcType=INTEGER}
+				    GROUP BY G2_ID, G2_VERSION, G2_DATE
+				    ORDER BY G2_DATE DESC  
+				  )
+			LIMIT 1 
+        ]]>
+	</insert>
+	
+	<!-- 주제도 그룹 정보 -->
+	<insert id="insertEditMidSave" parameterType="LyrEditMidSaveVO">
+		<![CDATA[
+			INSERT INTO TN_EDITLYR_MIDSAVE 
+			(
+				ID ,
+				G2_ID ,
+				G2_NAME ,
+				G2_DATASETID ,
+				G2_STATE ,
+				G2_DATE ,
+				G2_SRCVERSION ,
+				G2_USERID ,
+				G2_DATA
+			)
+			VALUES
+			(
+				SEQ_TN_EDITLYR_MIDSAVE_ID.NEXTVAL ,
+				#{G2_ID} ,
+				#{G2_NAME} ,
+				#{G2_DATASETID} ,
+				#{G2_STATE,  jdbcType=INTEGER} ,
+				TO_DATE(#{G2_DATE, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI:SS') ,
+				#{G2_SRCVERSION,  jdbcType=INTEGER} ,
+				#{G2_USERID, jdbcType=VARCHAR} ,
+				#{G2_DATA}
+			)
+        ]]>
+	</insert>
+	
+	<!-- 편집레이어(중간저장) 정보삭제 :  G2S_EDITHISTORY와 비교하여 중간저장 테이블에 남아있는 항목이 있으면 삭제 -->
+	<delete id="deleteMidSaveCompHistory">
+		<![CDATA[
+			DELETE FROM TN_EDITLYR_MIDSAVE MIDSAVE
+			WHERE EXISTS
+			(	SELECT G2_REMARK
+			 	FROM G2S_EDITHISTORY HIST
+			 	WHERE MIDSAVE.G2_ID = HIST.G2_REMARK	)
+        ]]>
+	</delete>
+	
+	<!-- 편집레이어(중간저장) 정보삭제 :  DATASET_EDIT와 비교하여 중간저장 테이블에 남아있는 항목이 있으면 삭제 -->
+	<delete id="deleteMidSaveCompEdit">
+		<![CDATA[
+			DELETE FROM TN_EDITLYR_MIDSAVE MIDSAVE
+			 WHERE EXISTS
+			 (	SELECT *
+			 	FROM ${TABLENAME_EDIT} EDIT
+			 	WHERE TO_CHAR(MIDSAVE.G2_DATE, 'YYYY-MM-DD HH24:MI:SS') = TO_CHAR(EDIT.G2_DATE, 'YYYY-MM-DD HH24:MI:SS')
+				AND MIDSAVE.G2_STATE = EDIT.G2_STATE
+				AND EDIT.G2_ID IN
+				]]>
+				 <foreach item="item" index="index" collection="g2IdList" open="(" separator="," close=")">
+					#{item}
+			 	</foreach>
+		<![CDATA[	
+			 )
+        ]]>
+	</delete>
+	
+	<!-- 주제도 그룹 정보 -->
+	<update id="updateEditMidSave" parameterType="LyrEditMidSaveVO">
+		<![CDATA[
+			UPDATE TN_EDITLYR_MIDSAVE 
+			SET
+				G2_SRCVERSION = G2_SRCVERSION + 1,
+				G2_DATA = #{G2_DATA}, 
+				G2_DATE = TO_DATE(#{G2_DATE, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI:SS'), 
+				G2_STATE = #{G2_STATE,  jdbcType=INTEGER} 
+			WHERE
+				G2_USERID = #{G2_USERID} AND
+				G2_NAME = #{G2_NAME} AND 
+				G2_ID = #{G2_ID} 
+        ]]>
+	</update>
+	
+	
+	<!-- 편집레이어(중간저장) 정보삭제  -->
+	<delete id="deleteMidSaveFeature" parameterType="LyrEditMidSaveVO">
+		<![CDATA[
+			DELETE FROM TN_EDITLYR_MIDSAVE				
+        ]]>
+        <where>
+			<if test="G2_USERID != null">
+				G2_USERID = #{G2_USERID}				
+			</if>
+			<if test="G2_NAME != null">
+				AND G2_NAME = #{G2_NAME}				
+			</if>
+			<if test="G2_ID != null">
+				AND G2_ID = #{G2_ID}				
+			</if>		
+		</where>
+	</delete>
+	
+	<!-- 주제도 그룹 정보 -->
+	<update id="mergeEditMidSave" parameterType="LyrEditMidSaveVO">
+		<![CDATA[
+			MERGE INTO TN_EDITLYR_MIDSAVE a
+				USING dual ON(a.G2_ID = #{G2_ID})
+				WHEN NOT MATCHED THEN
+					INSERT 
+					(
+						ID ,
+						G2_ID ,
+						G2_NAME ,
+						G2_DATASETID ,
+						G2_STATE ,
+						G2_DATE ,
+						G2_SRCVERSION ,
+						G2_USERID ,
+						G2_DATA
+					)
+					VALUES
+					(
+						SEQ_TN_EDITLYR_MIDSAVE_ID.NEXTVAL ,
+						#{G2_ID} ,
+						#{G2_NAME} ,
+						#{G2_DATASETID} ,
+						#{G2_STATE,  jdbcType=INTEGER} ,
+						TO_DATE(#{G2_DATE, jdbcType=VARCHAR}, 'YYYY-MM-DD HH24:MI:SS') ,
+						#{G2_SRCVERSION,  jdbcType=INTEGER} ,
+						#{G2_USERID, jdbcType=VARCHAR} ,
+						#{G2_DATA}
+					)
+        ]]>
+	</update>
+	
+	<select id="selectEditG2data" parameterType="egovMap" resultType="map">
+		SELECT * 
+		FROM ${TABLENAME}_EDIT
+		WHERE G2_ID = #{G2_ID} AND G2_VERSION = #{G2_VERSION}
+	</select>
+	
+	<select id="selectCloumName" parameterType="String" resultType="String">
+		SELECT column_name
+		FROM user_tab_columns
+		WHERE table_name = #{TABLENAME}
+	</select>
+	
+	<select id="selectLayerOrder" parameterType="String" resultType="map">
+		SELECT LYR_ID AS "id", USER_ID, LYR_ORDER as "seq"
+		FROM TN_USER_LYRORDER
+		WHERE USER_ID = #{USER_ID}
+	</select>
+	
+	<update id="mergeLayerOrder" parameterType="map">
+		MERGE INTO TN_USER_LYRORDER
+            USING DUAL
+            ON (USER_ID = #{USER_ID} AND LYR_ID = #{LYR_ID})
+            WHEN MATCHED THEN
+                      UPDATE SET
+                            LYR_ORDER = #{LYR_ORDER}
+            WHEN NOT MATCHED THEN
+                      INSERT (LYR_ID,USER_ID,LYR_ORDER) 
+                      VALUES (#{LYR_ID},#{USER_ID},#{LYR_ORDER})
+	</update>
+</mapper>

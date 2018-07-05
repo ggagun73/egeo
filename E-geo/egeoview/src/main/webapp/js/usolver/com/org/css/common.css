@@ -1,0 +1,9 @@
+@CHARSET "UTF-8";
+
+.DT_INT {text-align:right;}
+.DT_FLOAT {text-align:right;}
+.DT_DOUBLE {text-align:right;}
+
+.tb_class01 {}
+.tb_class01 th {text-align:center; border-top:1px solid #cecfd1; border-left:1px solid #cecfd1; border-right:1px solid #cecfd1;border-bottom:1px solid #cecfd1;vertical-align:middle; background-color:#DED7C6;}
+.tb_class01 td {text-align:left; border-top:1px solid #cecfd1;border-left:1px solid #cecfd1;border-bottom:1px solid #cecfd1; border-right:1px solid #cecfd1;vertical-align:middle; background-color:#ffffff;}

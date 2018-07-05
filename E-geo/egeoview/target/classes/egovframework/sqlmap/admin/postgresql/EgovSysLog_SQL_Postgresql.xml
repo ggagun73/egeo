@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<!-- 
+	수정일                 수정자                          수정내용
+  =========     =======    =================================================
+  2011.10.17   	서준식     	 	OCCRRNC_DE 컬럼과 날짜 비교문에 RTRIM 함수 적용
+
+-->
+<sqlMap namespace="SysLog">
+
+	<typeAlias alias="egovMap"
+		type="egovframework.rte.psl.dataaccess.util.EgovMap" />
+	<!-- 시스템로그 VO -->
+	<typeAlias alias="sysLog"
+		type="usolver.admin.log.lgm.vo.SysLog" />
+
+	<!-- 시스템로그 맵 -->
+	<resultMap id="SysLogVO" class="usolver.admin.log.lgm.vo.SysLog">
+		<result property="requstId" column="REQUST_ID" />
+		<result property="occrrncDe" column="OCCRRNC_DE" />
+		<result property="srvcNm" column="SVC_NM" />
+		<result property="methodNm" column="METHOD_NM" />
+		<result property="processSeCode" column="PROCESS_SE_CODE" />
+		<result property="processSeCodeNm" column="PROCESS_SE_CODE_NM" />
+		<result property="processTime" column="PROCESS_TIME" />
+		<result property="rqesterIp" column="RQESTER_IP" />
+		<result property="rqesterId" column="RQESTER_ID" />
+		<result property="rqsterNm" column="RQESTER_NM" />
+	</resultMap>
+
+	<!-- 시스템 로그 등록 -->
+	<insert id="SysLogDAO.logInsertSysLog" parameterClass="sysLog">
+		<![CDATA[
+			INSERT INTO USV_SYSLOG
+				( REQUST_ID
+				  , SVC_NM
+				  , METHOD_NM
+				  , PROCESS_SE_CODE
+				  , PROCESS_TIME
+				  , RQESTER_ID
+				  , RQESTER_IP
+				  , OCCRRNC_DE )
+			VALUES ( #requstId#
+				  , #srvcNm#
+				  , #methodNm#
+				  , #processSeCode#
+				  , #processTime#
+				  , #rqesterId#
+				  , #rqesterIp#
+				  , TO_CHAR(now(), 'YYYYMMDD'))
+		]]>
+	</insert>
+
+	<!-- 시스템 로그 상세 조회 -->
+	<select id="SysLogDAO.selectSysLog" parameterClass="sysLog"
+		resultMap="SysLogVO">
+		<![CDATA[
+			SELECT
+				  a.REQUST_ID
+				, TO_CHAR(TO_DATE(a.OCCRRNC_DE),'YYYY-MM-DD') AS OCCRRNC_DE
+				, a.SVC_NM
+				, a.METHOD_NM
+				, a.PROCESS_SE_CODE
+				, c.CODE_NM AS PROCESS_SE_CODE_NM
+				, a.PROCESS_TIME
+				, a.RQESTER_IP
+				, a.RQESTER_ID
+				, b.USER_NAME AS RQESTER_NM
+			FROM
+				USV_SYSLOG a
+			LEFT OUTER JOIN USV_USERS b
+				ON a.RQESTER_ID = b.USER_ID
+			LEFT OUTER JOIN USV_EGOV_CODE_DETAIL c
+				ON TRIM(a.PROCESS_SE_CODE) = c.CODE
+			WHERE
+				c.CODE_ID = 'COM033'
+			AND a.REQUST_ID = #requstId#
+			]]>
+	</select>
+
+	<!-- 시스템 로그 목록 조회 -->
+	<select id="SysLogDAO.selectSysLogInf" parameterClass="sysLog"
+		resultMap="SysLogVO">
+		<![CDATA[
+		SELECT TMP_TBL.* FROM ( SELECT rownum rn, TB.* FROM (
+			SELECT
+				  a.REQUST_ID
+				, TO_CHAR(TO_DATE(a.OCCRRNC_DE),'YYYY-MM-DD') AS OCCRRNC_DE
+				, a.SVC_NM
+				, a.METHOD_NM
+				, a.PROCESS_SE_CODE
+				, c.CODE_NM AS PROCESS_SE_CODE_NM
+				, a.PROCESS_TIME
+				, a.RQESTER_IP
+				, a.RQESTER_ID
+				, b.USER_NAME AS RQESTER_NM
+			FROM
+				USV_SYSLOG a
+			LEFT OUTER JOIN USV_USERS b
+				ON a.RQESTER_ID = b.USER_ID
+			LEFT OUTER JOIN USV_EGOV_CODE_DETAIL c
+				ON TRIM(a.PROCESS_SE_CODE) = c.CODE
+			WHERE
+				c.CODE_ID = 'COM033'
+			]]>
+		<isNotEmpty prepend="AND" property="searchKeyword">
+				<![CDATA[	c.CODE_NM LIKE '%' || #searchKeyword# || '%' ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="searchBgnDe">
+				<![CDATA[	a.OCCRRNC_DE BETWEEN  TO_DATE(#searchBgnDe#)  AND  TO_DATE(#searchEndDe#) ]]>
+		</isNotEmpty>
+		<![CDATA[
+			ORDER BY a.OCCRRNC_DE DESC
+			) AS TB ) AS TMP_TBL  WHERE rn BETWEEN #firstIndex# + 1 AND #firstIndex# + #recordCountPerPage#
+		]]>
+	</select>
+
+	<!-- 시스템 로그 총건수 -->
+	<select id="SysLogDAO.selectSysLogInfCnt" parameterClass="sysLog"
+		resultClass="java.lang.Integer">
+		<![CDATA[
+			SELECT COUNT(a.REQUST_ID) as cnt
+			FROM
+				USV_SYSLOG a
+			LEFT OUTER JOIN USV_USERS b
+				ON a.RQESTER_ID = b.USER_ID
+			LEFT OUTER JOIN USV_EGOV_CODE_DETAIL c
+				ON TRIM(a.PROCESS_SE_CODE) = c.CODE
+			WHERE
+				c.CODE_ID = 'COM033'
+			]]>
+		<isNotEmpty prepend="AND" property="searchKeyword">
+				<![CDATA[ 	c.CODE_NM LIKE '%' || #searchKeyword# || '%'  ]]>
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="searchBgnDe">
+				<![CDATA[ 	a.OCCRRNC_DE BETWEEN  TO_DATE(#searchBgnDe#)  AND  TO_DATE(#searchEndDe#) ]]>
+		</isNotEmpty>
+	</select>
+
+	<!-- 시스템 로그 전날 로그 요약  등록 -->
+	<insert id="SysLogDAO.logInsertSysLogSummary">
+		<![CDATA[
+			INSERT INTO USV_SYSLOGSUMMARY
+			SELECT b.OCCRRNC_DE
+			     , b.SVC_NM
+			     , b.METHOD_NM
+			     , SUM(CASE WHEN b.PROCESS_SE_CODE = 'C' THEN 1 ELSE 0 END) AS CREAT_CO
+			     , SUM(CASE WHEN b.PROCESS_SE_CODE = 'U' THEN 1 ELSE 0 END) AS UPDT_CO
+			     , SUM(CASE WHEN b.PROCESS_SE_CODE = 'R' THEN 1 ELSE 0 END) AS RDCNT
+			     , SUM(CASE WHEN b.PROCESS_SE_CODE = 'D' THEN 1 ELSE 0 END) AS DELETE_CO
+			     , 0 AS OUTPT_CO
+			     , 0 AS ERROR_CO
+			  FROM USV_SYSLOG b
+			 WHERE NOT EXISTS (SELECT c.OCCRRNC_DE
+			                     FROM USV_SYSLOGSUMMARY c
+			                    WHERE RTRIM(c.OCCRRNC_DE) = TO_CHAR((SYSDATE - 1), 'YYYYMMDD')
+			                  )
+			   AND RTRIM(b.OCCRRNC_DE) = TO_CHAR((SYSDATE - 1), 'YYYYMMDD')
+			 GROUP BY b.OCCRRNC_DE
+				    , b.SVC_NM
+				    , b.METHOD_NM
+
+		]]>
+	</insert>
+
+	<!-- 시스템 로그 일주일전 로그 삭제 -->
+	<delete id="SysLogDAO.logDeleteSysLogSummary">
+		<![CDATA[
+			DELETE FROM USV_SYSLOG
+			 WHERE RTRIM(OCCRRNC_DE) < TO_CHAR((SYSDATE - 7), 'YYYYMMDD')
+
+		]]>
+	</delete>
+
+</sqlMap>
+

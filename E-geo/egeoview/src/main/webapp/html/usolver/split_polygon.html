@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="/extLib/jsts/jsts.min.js"></script>
+<script type="text/javascript" src="/extLib/openlayers/OpenLayers.debug.js"></script>
+<style>
+#map {
+    width: 500px;
+    height: 500px;
+    border: 1px solid #dddddd;
+}
+</style>
+<script type="text/javascript">
+
+function fn_load(){
+	var reader = new jsts.io.WKTReader();  
+
+	var a = reader.read('POLYGON((10 10, 100 10, 100 100, 10 100, 10 10))');
+	var b = reader.read('POLYGON((50 50, 200 50, 200 200, 50 200, 50 50))');
+
+	var union = a.union(b);
+
+	var parser = new jsts.io.OL3Parser();
+
+	//a = parser.write(a);
+	//b = parser.write(b);
+	union = parser.write(union);
+
+	var map = new OpenLayers.Map('map', {
+	  maxExtent: new OpenLayers.Bounds(0, 0, 300, 300),
+	  maxResolution: 100,
+	  units: 'm',
+	  controls: [new OpenLayers.Control.MousePosition(), new OpenLayers.Control.Navigation()]
+	});
+
+	var layer = new OpenLayers.Layer.Vector('test', {isBaseLayer: true});
+	map.addLayer(layer);
+
+	var unionOutput = new OpenLayers.Feature.Vector(union, null, { fillColor: 'green', fillOpacity: 1});
+
+	layer.addFeatures([unionOutput ]);
+	map.zoomToMaxExtent();
+}
+
+
+</script>
+</head>
+<body onload="fn_load();">
+<div id='map'></div>
+</body>
+</html>

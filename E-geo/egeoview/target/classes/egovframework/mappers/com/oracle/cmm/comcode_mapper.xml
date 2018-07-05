@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common">
+ 	
+	<!-- 행정구 코드 추출 	-->
+	<select id="selectHjgCde" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+		<![CDATA[ 		
+		SELECT SUBSTR(GC.G2_CODE,1,5) CODE, GC.G2_VALUE VAL
+		FROM  G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+		WHERE GC.G2_DOMAINID = GD.G2_ID
+		   AND  GD.G2_NAME = '행정동'
+		   AND SUBSTR(G2_CODE,6,5) = '00000'
+		ORDER BY SUBSTR(GC.G2_CODE,1,5)  ASC
+		]]>	
+	</select>
+
+	<!-- 행정구 코드 추출 	-->
+	<select id="selectHjdCd" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+		<![CDATA[ 		
+		SELECT SUBSTR(GC.G2_CODE,1,5) CODE, GC.G2_VALUE VAL
+		FROM  G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+		WHERE GC.G2_DOMAINID = GD.G2_ID
+		   AND  GD.G2_NAME = '행정동'
+		   AND SUBSTR(G2_CODE,6,5) = '00000'
+		]]>	
+	</select>
+	
+	<!-- 행정동 코드 추출 -->
+	<select id="selectHjdCde" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+		<![CDATA[ 	
+		SELECT GC.G2_CODE CODE, GC.G2_VALUE VAL
+		FROM  G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+		WHERE GC.G2_DOMAINID = GD.G2_ID
+		   AND  GD.G2_NAME = '행정동'
+		   AND SUBSTR(GC.G2_CODE,6,5)!='00000'
+		]]>	
+		<if test="CODE != null">
+				AND SUBSTR(GC.G2_CODE,1,5) = #{CODE}				
+		</if>
+		ORDER BY GC.G2_VALUE
+	</select>
+	
+	
+	<!-- 법정동 코드 추출 -->
+	<select id="selectBjdCde" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+		<![CDATA[ 	
+		SELECT GC.G2_CODE CODE, GC.G2_VALUE VAL
+		FROM  G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+		WHERE GC.G2_DOMAINID = GD.G2_ID
+		   AND  GD.G2_NAME = '법정동'
+		   AND SUBSTR(GC.G2_CODE,6,5)!='00000'
+		]]>	
+		<if test="CODE != null">
+				AND SUBSTR(GC.G2_CODE,1,5) = #{CODE}				
+		</if>
+		ORDER BY GC.G2_VALUE
+	</select>
+	
+	<!-- 상수민원종류 조회 -->
+	<select id="selectAplCde" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+			<![CDATA[ 	
+		SELECT GC.G2_CODE CODE, GC.G2_VALUE VAL
+		FROM  G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+		WHERE GC.G2_DOMAINID = GD.G2_ID
+		   AND GD.G2_NAME = '상수민원구분'
+			]]>	
+			<if test="CODE != null ">AND GC.G2_CODE = #{CODE}</if>
+		ORDER BY GC.G2_CODE
+	</select>
+	
+	<!-- 공통 코드 추출 -->
+	<select id="selectCd" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+			<![CDATA[ 	
+		SELECT   
+			*
+		FROM TABLE (fn_g2s_domainlist (#{CONTENT_ID}, #{CODE_ID}))
+		ORDER BY VAL		
+			]]>		
+	</select>
+	
+	<!-- 공통 코드 추출 (지형지물) -->
+	<select id="selectDtlCd" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+		<![CDATA[ 	
+		SELECT   
+			*
+		FROM TABLE (fn_domainlist (#{CONTENT_ID}, #{CODE_ID})) 
+		]]>	
+			<if test="CONTENT_ID == 'WTL_VALV_PS' or CONTENT_ID == 'WTL_MANH_PS' or CONTENT_ID == 'WTL_FIRE_PS'">
+				WHERE CODE LIKE 'SA%' 
+			</if>
+			
+			<if test="CONTENT_ID == 'SWL_PIPE_AS' or CONTENT_ID == 'SWL_PIPE_LM'">
+				WHERE CODE LIKE 'SB%' 
+			</if>
+		ORDER BY VAL			
+	</select>	
+	
+	
+	<!-- MV_DOMAIN 에서  코드 추출 -->
+	<select id="selectCdByDomain" parameterType="usolver.com.cmm.vo.CodeVO" resultType="usolver.com.cmm.vo.CodeVO">
+			<![CDATA[ 	
+			SELECT GC.G2_CODE CODE, GC.G2_VALUE VAL
+			 FROM G2S_CODEDDOMAINS GC, G2S_DOMAINS GD
+			WHERE GC.G2_DOMAINID = GD.G2_ID
+		   	]]>	
+		   	<if test="DOMAIN != null ">AND GD.G2_NAME = #{DOMAIN}</if>   
+			ORDER BY GC.G2_CODE			
+	</select>
+	
+	
+	<!-- 공사번호로 G2_ID 가져오기 -->
+	<select id="getConsMaOID" parameterType="hashMap" resultType="String">
+			<![CDATA[
+		SELECT G2_ID FROM $TYPE$_CONS_MA WHERE CNT_NUM=#{CNT_NUM}
+			]]>	
+	</select>
+		
+	<select id="getGdbFields" parameterType="hashMap" resultType="hashmap">
+			<![CDATA[ 	
+				SELECT G2_NAME, G2_DATATYPE, G2_DEFAULT
+				  FROM G2S_FIELDINFO
+				 WHERE G2_TABLENAME = #{TABLENAME}
+	 			]]>	
+	</select>
+
+	<select id="getFieldAliasByFieldName" parameterType="hashMap" resultType="String">
+		<![CDATA[
+		SELECT G2_ALIAS FROM G2S_FIELDINFO WHERE ROWNUM = 1 AND G2_NAME = #{FIELDNAME}
+		]]>
+		<if test="TABLENAME !=null">	 AND G2_TABLENAME = #{TABLENAME}		</if>		
+	</select>
+			
+	<select id="getGdbFieldsForGeoServer" parameterType="hashMap" resultType="hashmap">
+			<![CDATA[ 	
+				SELECT FIELDNAME AS G2_NAME, DECODE(DATATYPE,'string',51,16) AS G2_DATATYPE, DEFAULTVALUE AS G2_DEFAULT
+				  FROM MV_FIELDINFO
+				 WHERE TABLENAME = #{TABLENAME}
+	 			]]>	
+	</select>
+
+	<select id="getFieldAliasByFieldNameForGeoServer" parameterType="hashMap" resultType="String">
+		<![CDATA[
+		SELECT FIELDALIAS AS G2_ALIAS FROM MV_FIELDINFO WHERE ROWNUM = 1 AND FIELDNAME = #{FIELDNAME}
+		]]>
+		<if test="TABLENAME !=null">	 AND TABLENAME = #{TABLENAME}		</if>		
+	</select>
+	
+	<select id="getCoordScale" parameterType="String" resultType="int">
+		SELECT G2_COORD_SCALE FROM G2S_DATAHOUSE WHERE G2_NAME = #{G2_NAME}
+	</select>
+	
+	<select id="getDomainMap" parameterType="String" resultType="map">
+	    SELECT G2_CODE,G2_VALUE
+       	FROM G2S_CODEDDOMAINS
+      	WHERE G2_DOMAINID = #{G2_DOMAINID}
+	</select>
+</mapper>

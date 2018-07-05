@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE form-validation PUBLIC 
+    "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.1//EN" 
+    "http://jakarta.apache.org/commons/dtds/validator_1_1.dtd">
+
+<form-validation>
+
+    <formset>
+    	<form name="rdlCtlrLsVO">
+        	<field property="DPT_CDE" depends="required">
+        		<arg0 key="title.DPT_CDE" />
+			</field>
+        </form>
+        <form name="wtlPipeLmVO">
+        	<field property="IST_YMD" depends="required">
+        		<arg0 key="title.IST_YMD" />
+			</field>
+			<field property="HJD_CDE" depends="required">
+                <arg0 key="title.HJD_CDE" />
+            </field>
+        </form>
+        <form name="wttWutlHtVO">
+        	<field property="REP_CDE" depends="required">
+        		<arg0 key="title.REP_CDE" />
+			</field>
+        </form>
+        <!-- <form name="swtCctvEtVO">
+        	<field property="SHT_YMD" depends="required">
+        		<arg0 key="title.SHT_YMD" />
+			</field>
+        </form> -->
+        <form name="swtCctvEtVO">
+        	<field property="SHT_YMD" depends="required">
+        		<arg0 key="title.SHT_YMD" />
+			</field>
+        </form>
+         <form name="wttImgeEtVO">
+        	<field property="IMG_NAM" depends="required">
+        		<arg0 key="title.IMG_NAM" />
+			</field>
+        </form>
+    </formset>
+
+</form-validation>

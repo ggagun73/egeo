@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="User">
+
+    <typeAlias  alias="egovMap"      type = "egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="userSearchVO" type = "usolver.admin.user.vo.UserDefaultVO"/>
+    <typeAlias  alias="userVO"       type = "usolver.admin.user.vo.UserManageVO"/>
+	<typeAlias  alias="userDataVO"   type = "usolver.admin.user.vo.UserDataVO"/>
+	
+    <select id="userManageDAO.selectUserList_S" parameterClass="userSearchVO" resultClass="egovMap">
+	SELECT * FROM ( SELECT rownum rn, TB.* FROM (
+	    SELECT
+			USER_ID
+			,USER_NAME
+			,(SELECT DEPT_NAME FROM USV_DEPT WHERE DEPT_CD = USER_DEPT ) AS USER_DEPT
+			,TO_CHAR(REQ_DATE,'YYYY-MM-DD') AS REQ_DATE
+			,PASSWORD
+			,ENABLED
+			,USER_TEL
+			,USER_DESC
+			,TO_CHAR(PW_DATE,'YYYY-MM-DD') AS PW_DATE
+	    FROM    USV_USERS
+        WHERE 1=1
+        <isEqual prepend="AND" property="searchCondition" compareValue="0">
+            USER_ID LIKE '%' ||#searchKeyword#|| '%'
+        </isEqual>
+         <isEqual prepend="AND" property="searchCondition" compareValue="1">
+            USER_NAME LIKE '%' ||#searchKeyword#|| '%'
+        </isEqual>
+        ORDER BY REQ_DATE DESC
+        ) TB ) WHERE rn BETWEEN #firstIndex# + 1 AND #firstIndex# + #recordCountPerPage#
+    </select>
+    
+    <select id="userManageDAO.selectUserListTotCnt_S" parameterClass="userSearchVO" resultClass="int">
+            SELECT COUNT(1) totcnt
+            FROM    USV_USERS
+            WHERE 1=1
+            <isEqual prepend="AND" property="searchCondition" compareValue="0">
+                USER_ID LIKE '%' ||#searchKeyword#|| '%'
+            </isEqual>
+            <isEqual prepend="AND" property="searchCondition" compareValue="1">
+            	USER_NAME LIKE '%' ||#searchKeyword#|| '%'
+        </isEqual>
+    </select>
+    
+    <insert id="userManageDAO.insertUser_S">
+        <![CDATA[
+            INSERT INTO USV_USERS 
+	    (
+            USER_ID
+			,USER_NAME
+			,USER_DEPT
+			,REQ_DATE
+			,PASSWORD
+			,USER_TEL
+			,USER_DESC
+			,PW_DATE
+			,ENABLED
+        ) 
+        VALUES
+        (
+          	#userId#
+			,#userName#
+			,#userDept#
+			,SYSDATE
+			,#password#
+			,#userTel#
+			,#userDesc#
+			,SYSDATE
+			,'1'
+        ) 
+        ]]>
+    </insert>
+    
+    <delete id="userManageDAO.deleteUser_S">
+        <![CDATA[
+            DELETE FROM USV_USERS 
+            WHERE USER_ID = #delId#
+        ]]>
+    </delete>
+    
+    <select id="userManageDAO.selectUser_S" resultClass="userVO"  remapResults="true" >
+        <![CDATA[
+            SELECT
+           		 USER_ID		as userId
+				,USER_NAME		as userName
+				,USER_DEPT		as userDept
+				,REQ_DATE		as reqDate
+				,PASSWORD		as password
+				,ENABLED		as enabled
+				,USER_TEL		as userTel
+				,USER_DESC		as userDesc
+				,PW_DATE		as pwDate
+        FROM USV_USERS
+            WHERE USER_ID=#uniqId#
+        ]]>
+    </select>
+    
+    <update id="userManageDAO.updateUser_S">
+        <![CDATA[
+            UPDATE USV_USERS
+			SET  
+				 USER_NAME= #userName#
+				,USER_DEPT 	= #userDept#
+				,USER_TEL 	= #userTel#
+				,USER_DESC 	= #userDesc#
+			WHERE
+				USER_ID = #userId#
+        ]]>
+    </update>
+    
+    <insert id="userManageDAO.insertUserHistory_S">
+        <![CDATA[
+            INSERT INTO COMTHEMPLYRINFOCHANGEDTLS 
+                (   EMPLYR_ID           ,
+                    EMPL_NO             ,
+                    SEXDSTN_CODE        ,
+                    BRTHDY                ,
+                    AREA_NO             ,
+                    HOUSE_MIDDLE_TELNO    ,
+                    HOUSE_END_TELNO       ,
+                    FXNUM               ,
+                    HOUSE_ADRES           ,
+                    DETAIL_ADRES        ,
+                    ZIP                 ,
+                    OFFM_TELNO          ,
+                    MBTLNUM         ,
+                    EMAIL_ADRES         ,
+                    GROUP_ID            ,
+                    ORGNZT_ID           ,
+                    PSTINST_CODE          ,
+                    EMPLYR_STTUS_CODE   ,
+                    ESNTL_ID             ,
+                    CHANGE_DE           )
+            SELECT 
+                    EMPLYR_ID           ,
+                    EMPL_NO             ,
+                    SEXDSTN_CODE        ,
+                    BRTHDY                ,
+                    AREA_NO             ,
+                    HOUSE_MIDDLE_TELNO    ,
+                    HOUSE_END_TELNO       ,
+                    FXNUM               ,
+                    HOUSE_ADRES           ,
+                    DETAIL_ADRES        ,
+                    ZIP                 ,
+                    OFFM_TELNO          ,
+                    MBTLNUM         ,
+                    EMAIL_ADRES         ,
+                    GROUP_ID            ,
+                    ORGNZT_ID           ,
+                    PSTINST_CODE          ,
+                    EMPLYR_STTUS_CODE   ,
+                    ESNTL_ID             ,
+                    SYSDATE
+            FROM USV_USERS
+            WHERE USER_ID = #userId#
+        ]]>
+    </insert>
+    
+    <select id="userManageDAO.checkIdDplct_S" resultClass="int">
+        <![CDATA[
+            SELECT COUNT(1) usedCnt
+                FROM(
+                SELECT
+                    USER_ID             userId
+                FROM    USV_USERS
+                ) A
+            WHERE userId = #sUserId#
+        ]]>
+    </select>
+    
+    <update id="userManageDAO.updatePassword_S">
+        <![CDATA[
+            UPDATE USV_USERS 
+            SET 
+                   PASSWORD   =  #password#
+            WHERE  USER_ID  = #userId#
+        ]]>
+    </update>
+    
+    <select id="userManageDAO.selectPassword_S" resultClass="userVO">
+        <![CDATA[
+            SELECT
+                    PASSWORD          password 
+            FROM    USV_USERS
+            WHERE   USER_ID=#userId#
+        ]]>
+    </select>
+    
+    <select id="userManageDAO.selectAllUserList_S" resultClass="egovMap">
+		SELECT 
+			USER_ID			as userId
+			,USER_NAME		as userName
+		FROM USV_USERS
+    </select>
+    
+    <select id="userManageDAO.selectAllUserListTotCnt_S" parameterClass="userSearchVO" resultClass="int">
+        SELECT COUNT(1) totcnt
+        FROM    USV_USERS
+    </select>
+    
+    <select id="userManageDAO.selectUserFunctionList_S" parameterClass="userVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT 
+                	SEQ AS "seq",
+                	USER_ID AS "userId"
+                FROM  
+                    USV_USER_LAYER
+                WHERE 
+                   	USER_ID = #userId#
+        ]]>
+	</select>
+	
+	<delete id="userManageDAO.deleteDataFunctionList_S">
+		<![CDATA[                          
+			DELETE FROM USV_USER_LAYER              
+			WHERE USER_ID = #userId#                
+		]]>                                
+	</delete>
+	
+	<insert id="userManageDAO.insertDataFunctionList_S" parameterClass="userDataVO">
+		INSERT ALL
+		<dynamic>
+			<iterate property="functionList">
+				INTO USV_USER_LAYER (SEQ, USER_ID)
+				VALUES (#functionList[]#, #userId#)
+			</iterate>
+		</dynamic>
+		SELECT * FROM dual
+	</insert>
+	
+	<select id="userManageDAO.selectUserMenuFunctionList_D" parameterClass="userDataVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT A.MENU_NO AS "menuNo"
+                FROM  
+                    USV_MENU_INFO A, 
+                    (SELECT		MENU_NO 
+                    FROM	USV_USER_MENU 
+                    WHERE 
+                    	USER_ID = #userId# ) B 
+                    
+                WHERE A.MENU_NO = B.MENU_NO
+        ]]>
+	</select>
+	
+	<delete id="userManageDAO.deleteUserMenuFunctionList_S">
+		<![CDATA[                          
+			DELETE FROM USV_USER_MENU              
+			WHERE USER_ID = #userId#                
+		]]>                                
+	</delete>
+	
+	<insert id="userManageDAO.insertUserMenuFunctionList_S" parameterClass="userDataVO">
+		INSERT ALL
+		<dynamic>
+			<iterate property="functionList">
+				INTO USV_USER_MENU ( USER_ID ,MENU_NO )
+				VALUES (#userId#, #functionList[]#)
+			</iterate>
+		</dynamic>
+		SELECT * FROM dual
+	</insert>
+</sqlMap>

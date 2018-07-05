@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+
+	<select id="selectAuthorList" parameterType="usolver.admin.author.vo.AuthorManage"  resultType="egovMap">
+        <![CDATA[
+        SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (           
+			            SELECT AUTHOR_CODE		
+								, TO_CHAR(TO_DATE(AUTHOR_CREAT_DE), 'YYYY-MM-DD') AS AUTHOR_CREAT_DE
+								,AUTHOR_DC
+								,AUTHOR_NM
+								,AUTHOR_ORDR
+								,AUTHOR_TYPE
+			            FROM USV_AUTHOR_INFO		    
+			            ]]>        	
+					    WHERE 1=1
+					     <if test="searchKeyword != null">
+					           AND    ( AUTHOR_NM LIKE '%'||#{searchKeyword}||'%'  OR AUTHOR_CODE LIKE '%'||#{searchKeyword}||'%'  OR AUTHOR_TYPE LIKE '%'||#{searchKeyword}||'%'  )
+					      </if>
+					    <if test="searchCondition != null  and searchCondition != '' "> 
+					      		AND   AUTHOR_TYPE = #{searchCondition} 
+					      </if>
+			        <![CDATA[            
+           					 ORDER BY AUTHOR_ORDR ASC
+                  ) ALL_LIST
+              )
+             WHERE  RNUM  > #{firstIndex}
+               AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+        ]]>                 
+    </select>
+    
+    <select id="selectAuthorUserList" parameterType="usolver.admin.author.vo.AuthorManage"   resultType="egovMap">
+        <![CDATA[              
+        SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (           
+			            SELECT  B.USER_ID
+			            		  ,A.AUTHOR_CODE
+			            		  ,B.SYS_CODE
+			            		  ,TO_CHAR(B.REQ_DATE, 'YYYY-MM-DD') AS REQ_DATE
+			            		  ,TO_CHAR(B.APPROVE_DATE, 'YYYY-MM-DD') AS APPROVE_DATE
+			            		  ,B.COMP_AUTH
+			            		  ,A.AUTHOR_ORDR
+			            		  ,A.AUTHOR_NM
+			            		  ,A.AUTHOR_DC
+			            		  ,DECODE(B.APPROVE_DATE,NULL,DECODE(B.REQ_DATE,NULL,'0','1'),'2')  REG_YN
+			            FROM ( SELECT * FROM USV_AUTHOR_INFO 
+			            		  WHERE 1= 1		  ]]>        
+<!-- 			            		  <if test="sysCode != null">	
+			            		  	 AND  AUTHOR_CODE LIKE '%'||#{sysCode}||'%'
+			            		  </if> -->
+			            		  <if test="authorType != null">
+					                 AND AUTHOR_TYPE = #{authorType}
+					    		  </if>
+			            		  )	A 
+			            		LEFT OUTER JOIN  USV_USER_AUTHOR B
+								ON A.AUTHOR_CODE = B.AUTHOR_CODE		    
+					             <if test="searchKeyword != null">
+					                AND  B.USER_ID = #{searchKeyword}
+					             </if>
+					             <if test="sysCode != null">	
+					                AND  B.SYS_CODE = #{sysCode}
+					           	  </if>		     		
+			        <![CDATA[            
+           					 ORDER BY AUTHOR_ORDR ASC
+                    	) ALL_LIST
+              )
+             WHERE  RNUM  > #{firstIndex}
+               AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+        ]]>                 
+    </select>
+    
+    <insert id="insertAuthor" parameterType="usolver.admin.author.vo.AuthorManage">
+        <![CDATA[
+            INSERT INTO USV_AUTHOR_INFO 
+                  ( AUTHOR_CODE
+                  , AUTHOR_NM
+                  , AUTHOR_DC
+                  , AUTHOR_CREAT_DE
+                  , AUTHOR_ORDR
+                  , AUTHOR_TYPE  )
+           VALUES ( #{authorCode, jdbcType=VARCHAR}
+                 	 , #{authorNm, jdbcType=VARCHAR}
+                 	 , #{authorDc, jdbcType=VARCHAR}
+                 	 , SYSDATE
+                 	 , #{authorOrdr, jdbcType=VARCHAR}
+                 	 , #{authorType, jdbcType=VARCHAR}     )
+        ]]>  
+    </insert>
+
+    <update id="updateAuthor" parameterType="usolver.admin.author.vo.AuthorManage">
+        <![CDATA[
+            UPDATE USV_AUTHOR_INFO 
+               SET  AUTHOR_NM		=#{authorNm}
+                 	, AUTHOR_DC		=#{authorDc}
+                 	, AUTHOR_ORDR	=#{authorOrdr}
+                 	, AUTHOR_TYPE		=#{authorType}
+             WHERE AUTHOR_CODE=#{authorCode}
+        ]]>
+    </update>
+    
+    <delete id="deleteAuthor" parameterType="usolver.admin.author.vo.AuthorManage">
+        <![CDATA[
+            DELETE FROM USV_AUTHOR_INFO 
+             WHERE AUTHOR_CODE=#{authorCode}
+        ]]>
+    </delete>
+    
+    <delete id="deleteAllAuthor" parameterType="usolver.admin.author.vo.AuthorManage">
+        <![CDATA[
+            DELETE FROM USV_MENU_AUTHOR
+        ]]>
+    </delete>
+    
+    <select id="selectAuthor"  resultType="egovMap">
+        <![CDATA[
+            SELECT AUTHOR_CODE, AUTHOR_NM, AUTHOR_DC, AUTHOR_ORDR, AUTHOR_TYPE, TO_CHAR(TO_DATE(AUTHOR_CREAT_DE), 'YYYY-MM-DD') AS AUTHOR_CREAT_DE
+              FROM USV_AUTHOR_INFO 
+             WHERE AUTHOR_CODE=#{authorCode}
+        ]]>
+    </select>
+    
+    <select id="selectAuthorListTotCnt" parameterType="usolver.admin.author.vo.AuthorManage" resultType="int">
+            SELECT COUNT(*) totcnt
+            FROM USV_AUTHOR_INFO
+            WHERE 1=1
+            <if test="searchKeyword != null">
+                AND  ( AUTHOR_NM LIKE '%'||#{searchKeyword}||'%'  OR AUTHOR_CODE LIKE '%'||#{searchKeyword}||'%'  OR AUTHOR_TYPE LIKE '%'||#{searchKeyword}||'%'  )
+            </if>
+            <if test="searchCondition != null  and searchCondition != '' "> 
+	      		AND   AUTHOR_TYPE = #{searchCondition} 
+	        </if>
+    </select>
+    
+    <select id="selectAuthorAllList" parameterType="usolver.admin.author.vo.AuthorManage"  resultType="egovMap">
+            SELECT
+                   AUTHOR_CODE, AUTHOR_NM, AUTHOR_DC, AUTHOR_ORDR, AUTHOR_TYPE, TO_CHAR(TO_DATE(AUTHOR_CREAT_DE), 'YYYY-MM-DD') AS AUTHOR_CREAT_DE
+              FROM USV_AUTHOR_INFO
+    </select>
+    
+    	<!--  시스템 정보를 이것으로 대처?  -->
+    <select id="selectAuthorSystem" parameterType="usolver.admin.author.vo.AuthorManage"   resultType="egovMap">
+            SELECT  USER_ID, AUTHOR_CODE, SYS_CODE, REQ_DATE, APPROVE_DATE, COMP_AUTH, AUTHOR_ORDR, AUTHOR_ORDR, AUTHOR_TYPE
+              FROM USV_USER_AUTHOR
+            WHERE COMP_AUTH = '2'  
+                AND AUTHOR_CODE IN ('ROLE_WATER', 'ROLE_SEWER', 'ROLE_ROAD')
+                AND USER_ID = #{userId}
+            ORDER BY AUTHOR_ORDR ASC
+    </select>	
+    	
+    	
+    <!-- EgovMenuCreat_SQL_Oracle 권한별 메뉴관리 -->
+	<select id="selectMenuFunctionList_D" parameterType="usolver.admin.menu.vo.MenuCreatVO" resultType="egovMap">
+	    SELECT
+			A.MENU_NO AS menuNo
+	    FROM   
+	    	USV_MENU_INFO A, 
+            (SELECT		MENU_NO 
+            FROM	USV_MENU_AUTHOR 
+            WHERE 
+            	AUTHOR_CODE = #{authorCode} ) B 
+            
+        WHERE A.MENU_NO = B.MENU_NO
+    </select>
+    <select id="selectMenuFunctionList_D2" parameterType="usolver.admin.menu.vo.MenuCreatVO" resultType="egovMap">
+	    SELECT
+			LYR_ID AS lyrId,
+            AUTHOR_CODE AS authorCode
+	    FROM   
+	    	USV_AUTHOR_LAYER
+        WHERE 
+        	AUTHOR_CODE = #{authorCode}
+    </select>
+    
+    <select id="selectMenuCreatManageList_D" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="egovMap">
+		SELECT * FROM ( SELECT rownum rn, TB.* FROM (
+		    SELECT
+				AUTHOR_CODE   AS authorCode,
+				AUTHOR_NM     AS authorNm,
+				AUTHOR_DC     AS authorDc,
+				AUTHOR_CREAT_DE AS authorCreatDe,
+			   (SELECT COUNT(B.AUTHOR_CODE)
+				FROM   USV_MENU_AUTHOR B
+				WHERE  B.AUTHOR_CODE = A.AUTHOR_CODE ) AS chkYeoBu
+			FROM    USV_AUTHOR_INFO A
+	        WHERE
+	           	A.AUTHOR_CODE like '%'||#{searchKeyword}||'%') TB
+        ) WHERE rn BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+    </select>
+    
+    <select id="selectAllMenuCreatManageList_D" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="egovMap">
+		SELECT * FROM ( SELECT rownum rn, TB.* FROM (
+		    SELECT
+				AUTHOR_CODE 	  AS authorCode,
+      			AUTHOR_NM   	  AS authorNm,
+      			AUTHOR_DC         AS authorDc,
+      			AUTHOR_CREAT_DE   AS authorCreatDe,
+      			(SELECT COUNT(B.AUTHOR_CODE)
+      			FROM USV_MENU_AUTHOR B
+      			WHERE B.AUTHOR_CODE = A.AUTHOR_CODE
+      			) AS "chkYeoBu"
+	    	FROM USV_AUTHOR_INFO A
+			WHERE A.AUTHOR_TYPE = #{searchKeyword}
+			) TB
+        ) WHERE rn BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+    </select>
+    
+    <select id="selectMenuCreatManageTotCnt_S" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="int">
+            SELECT COUNT(1) totcnt
+            FROM   USV_AUTHOR_INFO
+            WHERE 1=1
+            <if test="searchKeyword != null">
+           		AND (AUTHOR_CODE like '%'||#{searchKeyword}||'%')
+            </if>
+    </select>
+    
+    <select id="selectMenuCreatList_D" parameterType="usolver.admin.menu.vo.MenuCreatVO" resultType="egovMap">
+	    SELECT
+			A.MENU_NO AS menuNo
+			, A.MENU_ORDR AS menuOrdr
+			, A.MENU_NM AS menuNm
+			, A.UPPER_MENU_NO AS upperMenuNo
+		    , (SELECT count(B.MENU_NO) 
+		         FROM USV_MENU_AUTHOR B   
+		        WHERE B.MENU_NO  = A.MENU_NO 
+		          AND B.AUTHOR_CODE = #{authorCode}) AS chkYeoBu
+		FROM USV_MENU_INFO A
+		WHERE A.MENU_NO > 0
+		ORDER BY A.MENU_ORDR
+    </select>
+    
+    <select id="selectAllMenuCreatList_D" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="egovMap">
+		SELECT 
+			MENU_NO           	AS menuNo
+			, MENU_ORDR         AS menuOrdr
+			, MENU_NM           AS menuNm
+			, UPPER_MENU_NO     AS upperMenuNo
+			, MENU_DC           AS menuDc
+			, RELATE_IMAGE_PATH AS relateImagePath
+			, RELATE_IMAGE_NM   AS relateImageNm
+			, PROGRM_FILE_NM    AS progrmFileNm
+			, FUNCTION_LIST		AS functionList
+			, MENU_ID			AS menuId
+			, WIDTH				AS width
+			, HEIGHT			AS height
+			, INSERT_HEIGHT		AS insertHeight
+			, CALL				AS call
+			, KEY_COLUMN		AS keyColumn
+			, MENU_TYPE			AS menuType
+				
+    	FROM USV_MENU_INFO
+		WHERE 
+			MENU_NO > 0
+			AND MENU_NO LIKE #{searchKeyword}||'%'
+		ORDER BY MENU_ORDR
+    </select>
+    
+    <insert id="insertMenuCreat_S">
+        <![CDATA[
+            INSERT INTO USV_MENU_AUTHOR 
+		    (
+	            AUTHOR_CODE
+				,MENU_NO
+	        ) 
+	        VALUES
+	        (
+	          	#{authorCode}
+				,#{menuNo}
+	        ) 
+        ]]>
+    </insert>
+    
+    <insert id="insertMenuFunctionList_S" parameterType="usolver.admin.menu.vo.MenuCreatVO">
+		INSERT ALL
+			<foreach item="item" index="index" collection="functionList">
+            	INTO USV_MENU_AUTHOR (AUTHOR_CODE, MENU_NO)
+            	VALUES (#{authorCode}, #{item} ) 
+   			</foreach>
+		SELECT * FROM dual
+	</insert>
+	<insert id="insertMenuFunctionList_S2" parameterType="usolver.admin.menu.vo.MenuCreatVO">
+		INSERT ALL
+			<foreach item="item" index="index" collection="functionList">
+            	INTO USV_AUTHOR_LAYER (AUTHOR_CODE, LYR_ID)
+            	VALUES (#{authorCode}, #{item} ) 
+   			</foreach>
+		SELECT * FROM dual
+	</insert>
+	
+	<select id="selectMenuCreatCnt_S" parameterType="usolver.admin.menu.vo.MenuCreatVO" resultType="int">
+            SELECT COUNT(1) totcnt
+            FROM   USV_AUTHOR_INFO
+            WHERE AUTHOR_CODE = #{authorCode}
+    </select>
+    
+    <delete id="deleteMenuFunctionList_S">
+        <![CDATA[
+            DELETE FROM USV_MENU_AUTHOR 
+            WHERE AUTHOR_CODE = #{authorCode}
+        ]]>
+    </delete>
+    <delete id="deleteMenuFunctionList_S2">
+        <![CDATA[
+            DELETE FROM USV_AUTHOR_LAYER 
+            WHERE AUTHOR_CODE = #{authorCode}
+        ]]>
+    </delete>
+    
+    <select id="selectAuthorByUsr" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="usolver.admin.menu.vo.MenuCreatVO">
+            SELECT 
+				AUTHOR_CODE AS authorCode
+            FROM   USV_AUTHOR_INFO
+    </select>
+    
+    <select id="selectUsrByPk" parameterType="usolver.com.cmm.vo.AdmDefaultVO" resultType="int">
+            SELECT count(AUTHOR_CODE) totcnt
+            FROM   USV_AUTHOR_INFO
+    </select>
+</mapper>

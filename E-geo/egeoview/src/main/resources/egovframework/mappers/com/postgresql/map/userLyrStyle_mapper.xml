@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	<!-- 유저 레이어 스타일 전체 정보 -->
+	<select id="selectAllUserLyrStlye" parameterType="UserLyrStyleVO" resultType="UserLyrStyleVO">
+		SELECT *
+		FROM 
+		<choose>
+			<when test="isDefault != true">
+				TN_USER_STYLE
+			</when>
+			<otherwise>
+				TN_USER_STYLE_DEFAULT
+			</otherwise>
+		</choose>
+		WHERE USER_ID = #{USER_ID}
+		<if test="isDefault != true">
+			AND SUBJECT_ID = #{SUBJECT_ID}
+		</if>
+	</select>
+	
+	<!-- 유저 레이어 스타일 전체 정보 -->
+	<select id="selectUserLyrStlye" parameterType="UserLyrStyleVO" resultType="UserLyrStyleVO">
+		SELECT *
+		FROM 
+		<choose>
+			<when test="isDefault != true">
+				TN_USER_STYLE
+			</when>
+			<otherwise>
+				TN_USER_STYLE_DEFAULT
+			</otherwise>
+		</choose>
+		WHERE USER_ID = #{USER_ID} AND TABLE_NAME = #{TABLE_NAME}
+		<if test="isDefault != true">
+			AND SUBJECT_ID = #{SUBJECT_ID}
+		</if>
+	</select>
+	
+	<delete id="deleteUserLyrStyle" parameterType="UserLyrStyleVO">
+		DELETE 
+		FROM 
+		<choose>
+			<when test="isDefault != true">
+				TN_USER_STYLE
+			</when>
+			<otherwise>
+				TN_USER_STYLE_DEFAULT
+			</otherwise>
+		</choose>
+		WHERE 
+			USER_ID = #{USER_ID} AND TABLE_NAME = #{TABLE_NAME}
+			<if test="isDefault != true">
+				AND SUBJECT_ID = #{SUBJECT_ID}
+			</if>
+	</delete>
+	
+	<!-- 유저 레이어 스타일 갱신 -->
+	<update id="updateUserLyrStyle" parameterType="UserLyrStyleVO">
+		UPDATE
+		<choose>
+			<when test="isDefault != true">
+				TN_USER_STYLE
+			</when>
+			<otherwise>
+				TN_USER_STYLE_DEFAULT
+			</otherwise>
+		</choose>
+		SET
+			LAYER_STYLE = #{LAYER_STYLE}
+		WHERE
+			USER_ID = #{USER_ID} AND TABLE_NAME = #{TABLE_NAME}
+			<if test="isDefault != true">
+				AND SUBJECT_ID = #{SUBJECT_ID}
+			</if>		 
+	</update>
+	
+	<!-- 유저 레이어 스타일 추가 -->
+	<insert id="insertUserLyrStyle" parameterType="UserLyrStyleVO">
+		INSERT INTO 
+		<choose>
+			<when test="isDefault != true">
+				TN_USER_STYLE
+			</when>
+			<otherwise>
+				TN_USER_STYLE_DEFAULT
+			</otherwise>
+		</choose>
+			(
+				USER_ID,
+				LAYER_NAME,
+				TABLE_NAME,
+				<if test="isDefault != true">
+					SUBJECT_ID,
+				</if>
+				LAYER_STYLE
+			) VALUES (
+				#{USER_ID},
+				#{LAYER_NAME},
+				#{TABLE_NAME},
+				<if test="isDefault != true">
+					#{SUBJECT_ID},
+				</if>
+				#{LAYER_STYLE}
+			)
+	</insert>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AuthorRoleManage">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="roleHierarchyManageVO" type="usolver.admin.role.vo.RoleHierarchyManageVO"/>
+    <typeAlias  alias="roleHierarchyManage" type="usolver.admin.role.vo.RoleHierarchyManage"/>
+
+    <resultMap id="roleHierarchy" class="usolver.admin.role.vo.RoleHierarchyManageVO">
+        <result property="parentAuthor" column="PARENT_AUTHOR" columnIndex="1"/>
+        <result property="childAuthor" column="CHILD_AUTHOR" columnIndex="2"/>
+    </resultMap>
+	
+    <select id="roleHierarchyManageDAO.selectRoleHierarchyList" parameterClass="roleHierarchyManageVO" resultMap="roleHierarchy">
+        <![CDATA[
+        	SELECT  * 
+              FROM  (
+            SELECT (ROW_NUMBER() OVER())  AS RNUM, ALL_LIST.* 
+              FROM  (
+        	SELECT PARENT_AUTHOR,
+        		   CHILD_AUTHOR 
+        		   
+        	FROM USV_AUTHOR_HIERARCHY
+            
+            ) ALL_LIST
+                    )
+              LIMIT #recordCountPerPage# OFFSET #firstIndex# 
+        ]]>
+    </select>
+
+    <insert id="roleHierarchyManageDAO.insertRoleHierarchy" parameterClass="roleHierarchyManage">
+        <![CDATA[
+	        INSERT INTO USV_AUTHOR_HIERARCHY 
+	                  ( PARENT_AUTHOR
+	            	  , CHILD_AUTHOR
+	            	  )
+	           VALUES ( #parentAuthor#
+	                  , #childAuthor#
+	                  )           
+        ]]>
+    </insert>
+    
+    <update id="roleHierarchyManageDAO.updateRoleHierarchy" parameterClass="roleHierarchyManage">
+        <![CDATA[
+			
+		
+        ]]>
+    </update>
+
+    <delete id="roleHierarchyManageDAO.deleteRoleHierarchy" parameterClass="roleHierarchyManage">
+        <![CDATA[
+           
+        ]]>
+    </delete>
+    
+    <select id="roleHierarchyManageDAO.selectRoleHierarchyListTotCnt" parameterClass="roleHierarchyManageVO" resultClass="int">
+		SELECT COUNT(*) totcnt
+		FROM USV_AUTHOR_HIERARCHY
+		
+	</select>
+    
+</sqlMap>

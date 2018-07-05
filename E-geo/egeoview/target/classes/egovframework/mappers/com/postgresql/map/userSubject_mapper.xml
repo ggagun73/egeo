@@ -1,0 +1,761 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	
+	<!-- <insert id="insertSubject" parameterType="SubjectVO" useGeneratedKeys="true" keyProperty="SUBJECT_ID" keyColumn="SUBJECT_ID" >		
+		<selectKey keyProperty="SUBJECT_ID" resultType="DECIMAL" order="BEFORE" >
+			SELECT SEQ_TN_USER_SUBJECT.NEXTVAL FROM DUAL
+		</selectKey>
+			INSERT INTO TN_USER_SUBJECT ( 
+				  SUBJECT_ID /* 주제도_id */	
+				, USER_ID /* 사용자_아이디 */
+				, SUBJECT_NAME /* 주제도_이름 */
+				, SUBJECT_GROUP /* 주제도_그룹 */
+				, SUBJECT_SHARE /* 주제도_공유범위 */
+				, SUBJECT_DESC /* 주제도_설명 */
+				, SHARE_STATUS /* 공유승인상태 */
+			) VALUES (
+				  #{SUBJECT_ID}  
+				, #{USER_ID} 
+				, #{SUBJECT_NAME} 
+				, #{SUBJECT_GROUP} 
+				, #{SUBJECT_SHARE} 
+				, #{SUBJECT_DESC} 
+				, #{SHARE_STATUS}
+			)
+	</insert> -->
+	<insert id="insertSubject" parameterType="SubjectVO" > 
+			INSERT INTO TN_USER_SUBJECT ( 
+				  SUBJECT_ID /* 주제도_id */	
+				, USER_ID /* 사용자_아이디 */
+				, SUBJECT_NAME /* 주제도_이름 */
+				, SUBJECT_GROUP /* 주제도_그룹 */
+				, SUBJECT_SHARE /* 주제도_공유범위 */
+				, SUBJECT_DESC /* 주제도_설명 */
+				, SHARE_STATUS /* 공유승인상태 */
+				, BASE /* 공유승인상태 */
+				, SYSTEM_MAP /* 공유승인상태 */
+			) VALUES (
+				  #{SUBJECT_ID}  
+				, #{USER_ID} 
+				, #{SUBJECT_NAME} 
+				, #{SUBJECT_GROUP} 
+				, #{SUBJECT_SHARE} 
+				, #{SUBJECT_DESC} 
+				, #{SHARE_STATUS}
+				, #{BASE}
+				, #{SYSTEM_MAP}
+			)
+	</insert> 
+	<insert id="insertSubjectLayer" parameterType="SubjectLayerVO">	
+			INSERT INTO TN_USER_LAYER ( 
+				  SUBJECT_ID /* 주제도_id */	
+				, LAYER_NAME /* 레이어_이름 */
+				, TABLE_NAME /* 테이블_이름 */
+				, LAYER_ORDER /* 정렬(요청)_순서 */
+				, GROUP_ID /* 레이어_아이디 */
+				, GROUP_NAME /* 레이어_아이디 */
+				, LAYER_ID /* 레이어_아이디 */
+				, LAYER_ONOFF /* 레이어_아이디 */
+				, LAYER_TYPE /* 레이어_아이디 */
+			) VALUES (
+				  #{SUBJECT_ID}  
+				, #{LAYER_NAME} 
+				, #{TABLE_NAME} 
+				, #{LAYER_ORDER} 
+				, #{GROUP_ID} 
+				, #{GROUP_NAME} 
+				, #{LAYER_ID, jdbcType=NUMERIC} 
+				, #{LAYER_ONOFF, jdbcType=CHAR} 
+				, #{LAYER_TYPE, jdbcType=CHAR} 
+			)
+	</insert>
+	
+	<update id="updateSubject" parameterType="SubjectVO">		
+			UPDATE TN_USER_SUBJECT
+			SET
+				<if test="SUBJECT_NAME != null ">
+					SUBJECT_NAME = #{SUBJECT_NAME}
+				</if>
+				<if test="SUBJECT_GROUP != null ">
+				,SUBJECT_GROUP= #{SUBJECT_GROUP}
+				</if>
+				<if test="SUBJECT_DESC != null">
+				,SUBJECT_DESC= #{SUBJECT_DESC}  
+				</if>
+				<if test="SUBJECT_SHARE != null">
+				,SUBJECT_SHARE = #{SUBJECT_SHARE}  
+				</if>
+				<if test="SHARE_STATUS != null">
+				,SHARE_STATUS = #{SHARE_STATUS}
+				</if>
+				<if test="BASE != null">
+				,BASE = #{BASE}
+				</if>
+				<if test="SYSTEM_MAP != null">
+				,SYSTEM_MAP = #{SYSTEM_MAP}
+				</if>
+			WHERE
+				SUBJECT_ID=#{SUBJECT_ID} 
+				AND  
+				USER_ID=#{USER_ID} 
+			
+	</update>	
+	
+	
+	<update id="initBaseSubject" parameterType="SubjectVO">		
+			UPDATE TN_USER_SUBJECT
+			SET
+				BASE ='N'
+			WHERE
+				USER_ID=#{USER_ID} 
+			
+	</update>	
+	
+	
+	<update id="setBaseSubject" parameterType="SubjectVO">		
+			UPDATE TN_USER_SUBJECT
+			SET				
+				<if test="SUBJECT_GROUP != null ">
+				SUBJECT_GROUP= #{SUBJECT_GROUP}
+				</if>
+				<if test="BASE != null">
+				,BASE = #{BASE}
+				</if>
+			WHERE
+				SUBJECT_ID=#{SUBJECT_ID} 
+				AND  
+				USER_ID=#{USER_ID} 
+			
+	</update>
+	
+	
+	<update id="setApproveSubject" parameterType="SubjectVO">		
+			UPDATE TN_USER_SUBJECT
+			SET				
+				<if test="SHARE_STATUS != null ">
+				SHARE_STATUS= #{SHARE_STATUS}
+				</if>
+			WHERE
+				SUBJECT_ID=#{SUBJECT_ID} 
+			
+	</update>	
+	
+	
+	<update id="setSystemSubject" parameterType="SubjectVO">		
+			UPDATE TN_USER_SUBJECT
+			SET				
+				<if test="SYSTEM_MAP != null ">
+				SYSTEM_MAP= #{SYSTEM_MAP}
+				</if>
+			WHERE
+				SUBJECT_ID=#{SUBJECT_ID} 
+			
+	</update>	
+
+	<delete id="deleteSubject" parameterType="java.util.List">
+	<![CDATA[ 
+		
+		DELETE FROM TN_USER_SUBJECT 
+		WHERE SUBJECT_ID  = #{SUBJECT_ID}			
+	]]> 
+	</delete> 
+	
+	<select id="selectSubjectList"	parameterType="SubjectVO"	resultType="SubjectVO" >
+		<![CDATA[ 		 
+			SELECT
+				  SUBJECT_ID  
+				, USER_ID  
+				, SUBJECT_NAME  
+				, SUBJECT_GROUP 
+				, SUBJECT_DESC  
+				, SUBJECT_SHARE  
+				, SHARE_STATUS 
+				, BASE 
+				, SYSTEM_MAP 
+			FROM TN_USER_SUBJECT
+			WHERE USER_ID = #{USER_ID}
+			ORDER BY SUBJECT_GROUP DESC
+		]]>		
+	</select>
+	
+	<select id="selectSubject"	parameterType="SubjectVO"	resultType="SubjectVO" >
+		<![CDATA[ 		 
+			SELECT
+				  SUBJECT_ID  
+				, USER_ID  
+				, SUBJECT_NAME  
+				, SUBJECT_GROUP 
+				, SUBJECT_DESC  
+				, SUBJECT_SHARE  
+				, SHARE_STATUS 
+				, BASE 
+			FROM TN_USER_SUBJECT
+			WHERE SUBJECT_ID = #{SUBJECT_ID}
+			ORDER BY SUBJECT_GROUP DESC
+		]]>		
+	</select>
+		
+	<select id="selectSubjectLayerList"	parameterType="SubjectLayerVO"	resultType="SubjectLayerVO" >
+		<![CDATA[ 		 
+			SELECT
+				  SUBJECT_ID  
+				, LAYER_NAME  
+				, TABLE_NAME 
+				, LAYER_ORDER
+				, LAYER_ID 
+				, LAYER_ONOFF 
+				, LAYER_TYPE 
+			FROM TN_USER_LAYER
+			WHERE SUBJECT_ID = #{SUBJECT_ID}
+			ORDER BY LAYER_ORDER ASC
+		]]>		
+	</select>
+	
+	
+	<update id="updateSubjectLayer" parameterType="SubjectLayerVO">		
+			UPDATE TN_USER_LAYER
+			SET
+				<if test="LAYER_NAME != null ">
+					LAYER_NAME = #{LAYER_NAME}
+				</if>
+				<if test="TABLE_NAME != null ">
+				,TABLE_NAME= #{TABLE_NAME}
+				</if>
+				<if test="LAYER_ORDER != null">
+				,LAYER_ORDER= #{LAYER_ORDER}  
+				</if>
+				<if test="LAYER_ID != null">
+				,LAYER_ORDER= #{LAYER_ID}  
+				</if>
+				<if test="LAYER_ONOFF != null">
+				,LAYER_ORDER= #{LAYER_ONOFF}  
+				</if>
+				<if test="LAYER_TYPE != null">
+				,LAYER_ORDER= #{LAYER_TYPE}  
+				</if>
+			WHERE
+				SUBJECT_ID=#{SUBJECT_ID} 
+			
+	</update>	
+
+	<delete id="deleteSubjectAllLayer" parameterType="SubjectVO">
+	<![CDATA[ 
+		
+		DELETE FROM TN_USER_LAYER 
+		WHERE SUBJECT_ID  = #{SUBJECT_ID}
+	]]> 
+	</delete> 
+
+	<delete id="deleteSubjectAllStyle" parameterType="SubjectVO">
+	<![CDATA[ 
+		
+		DELETE FROM TN_USER_STYLE 
+		WHERE SUBJECT_ID  = #{SUBJECT_ID}
+	]]> 
+	</delete> 
+
+	<delete id="deleteSubjectLayer" parameterType="SubjectLayerVO">
+	<![CDATA[ 
+		
+		DELETE FROM TN_USER_LAYER 
+		WHERE SUBJECT_ID  = #{SUBJECT_ID}
+		AND  
+		TABLE_NAME=#{TABLE_NAME}				
+	]]> 
+	</delete> 
+	
+		
+	<insert id="insertSubjectFileInfo" parameterType="SubjectFileInfoVO">
+		<![CDATA[ 
+
+			INSERT INTO TN_SUBJECT_FILE_INFO (
+				  FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, FILE_PATH /* 주제도_파일_정보.파일_경로 */
+				, SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+			) VALUES (
+			      SEQ_TN_MEMO_FILE_INFO.NEXTVAL /* 주제도_파일_정보.파일_아이디 */
+				, #{FILE_SIZE} /* 주제도_파일_정보.파일_크기 */
+				, #{FILE_NM} /* 주제도_파일_정보.파일_이름 */
+				, #{FILE_PATH} /* 주제도_파일_정보.파일_경로 */
+				, #{SUBJECT_ID} /* 주제도_파일_정보.주제도_아이디 */
+				, #{FILE_UPLOAD_NM} /* 주제도_파일_정보.파일_업로드_이름 */
+				, #{FILE_EXT} /* 주제도_파일_정보.파일_확장자 */
+			)
+		]]>
+	</insert>
+	
+	
+	<select id="selectSysSubjectFileInfoList"	resultType="SubjectFileTotVO" parameterType="SubjectFileTotVO">
+		<![CDATA[ 
+
+			SELECT
+				  TSFI.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TSFI.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TSFI.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TSFI.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TSFI.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TSFI.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TUS.SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TUS.SUBJECT_NAME
+				, TUS.SUBJECT_GROUP
+				, TUS.SUBJECT_DESC
+		    	, TUS.SUBJECT_SHARE
+		    	, TUS.SHARE_STATUS
+		    	, TUS.BASE
+		    	, TUS.SYSTEM_MAP
+		    	, TUS.USER_ID
+			FROM TN_SUBJECT_FILE_INFO TSFI, TN_USER_SUBJECT TUS
+			WHERE TUS.SUBJECT_ID = TSFI.SUBJECT_ID(+) 
+				AND UPPER(TUS.SYSTEM_MAP)='Y'
+				AND UPPER(TUS.SUBJECT_SHARE) = 'ALL'		
+				AND UPPER(TUS.SHARE_STATUS)='APPROVED'		
+		]]> 
+				<if test="SUBJECT_GROUP != null"> 
+				AND UPPER(TUS.SUBJECT_GROUP) = UPPER(#{SUBJECT_GROUP})	
+				</if>
+				 
+	</select>
+	
+	
+	<select id="selectSubjectFileInfoList"	resultType="SubjectFileTotVO" parameterType="SubjectFileTotVO">
+		<![CDATA[ 
+
+			SELECT
+				  TSFI.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TSFI.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TSFI.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TSFI.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TSFI.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TSFI.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TUS.SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TUS.SUBJECT_NAME
+				, TUS.SUBJECT_GROUP
+				, TUS.SUBJECT_DESC
+		    	, TUS.SUBJECT_SHARE
+		    	, TUS.SHARE_STATUS
+		    	, TUS.BASE
+		    	, TUS.SYSTEM_MAP
+		    	, TUS.USER_ID
+			FROM TN_SUBJECT_FILE_INFO TSFI, TN_USER_SUBJECT TUS
+			WHERE TUS.SUBJECT_ID = TSFI.SUBJECT_ID(+)
+				AND UPPER(TUS.SHARE_STATUS)='APPROVED'		
+		]]> 
+				<if test="SUBJECT_ID != null"> 
+				AND UPPER(TUS.SUBJECT_ID) = {SUBJECT_ID}	
+				</if>
+				 
+	</select>
+	
+	
+	<select id="selectStandbySubjectFileInfoList"	resultType="SubjectFileTotVO" parameterType="SubjectFileTotVO">
+		<![CDATA[ 
+
+			SELECT
+				  TSFI.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TSFI.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TSFI.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TSFI.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TSFI.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TSFI.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TUS.SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TUS.SUBJECT_NAME
+				, TUS.SUBJECT_GROUP
+				, TUS.SUBJECT_DESC
+		    	, TUS.SUBJECT_SHARE
+		    	, TUS.SHARE_STATUS
+		    	, TUS.BASE
+		    	, TUS.SYSTEM_MAP
+		    	, TUS.USER_ID
+			FROM TN_SUBJECT_FILE_INFO TSFI, TN_USER_SUBJECT TUS
+			WHERE TUS.SUBJECT_ID = TSFI.SUBJECT_ID(+)
+				AND UPPER(TUS.SHARE_STATUS)='STANDBY'		
+		]]> 
+				<if test="SUBJECT_SHARE != null"> 
+				AND UPPER(TUS.SUBJECT_SHARE) = 'ALL'			
+				</if>
+				 
+	</select>
+	
+		
+	<select id="selectSharedSubjectFileInfoList"	resultType="SubjectFileTotVO" parameterType="SubjectFileTotVO">
+		<![CDATA[ 
+
+			SELECT
+				  TSFI.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TSFI.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TSFI.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TSFI.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TSFI.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TSFI.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TUS.SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TUS.SUBJECT_NAME
+				, TUS.SUBJECT_GROUP
+				, TUS.SUBJECT_DESC
+		    	, TUS.SUBJECT_SHARE
+		    	, TUS.SHARE_STATUS
+		    	, TUS.BASE
+		    	, TUS.SYSTEM_MAP
+		    	, TUS.USER_ID
+			FROM TN_SUBJECT_FILE_INFO TSFI, TN_USER_SUBJECT TUS
+			WHERE TUS.SUBJECT_ID = TSFI.SUBJECT_ID(+) 
+				AND UPPER(TUS.USER_ID)=UPPER(#{USER_ID})
+		]]> 
+				<if test="SUBJECT_GROUP != null">
+					AND UPPER(TUS.SUBJECT_GROUP) = UPPER(#{SUBJECT_GROUP})	
+					AND UPPER(TUS.SUBJECT_SHARE) = 'ALL'		
+					AND UPPER(TUS.SHARE_STATUS)='APPROVED'		
+				</if>
+	</select>
+	
+		
+	<select id="selectMySubjectFileInfoList"	resultType="SubjectFileTotVO" parameterType="SubjectFileTotVO">
+		<![CDATA[ 
+
+			SELECT
+				  TSFI.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TSFI.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TSFI.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TSFI.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TSFI.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TSFI.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TUS.SUBJECT_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TUS.SUBJECT_NAME
+				, TUS.SUBJECT_GROUP
+				, TUS.SUBJECT_DESC
+		    	, TUS.SUBJECT_SHARE
+		    	, TUS.SHARE_STATUS
+		    	, TUS.BASE
+		    	, TUS.SYSTEM_MAP
+		    	, TUS.USER_ID
+			FROM TN_SUBJECT_FILE_INFO TSFI, TN_USER_SUBJECT TUS
+			WHERE TUS.SUBJECT_ID = TSFI.SUBJECT_ID(+) 
+				AND UPPER(TUS.USER_ID)=UPPER(#{USER_ID})
+				AND UPPER(TUS.SUBJECT_SHARE) = 'NONE'
+				AND UPPER(TUS.SHARE_STATUS)='APPROVED'
+		]]> 
+				
+	</select>
+	
+	<delete id="deleteSubjectFiles" parameterType="SubjectVO">
+		<![CDATA[
+			/* 주제도에 딸린 파일 모두 삭제*/
+			
+			DELETE FROM TN_SUBJECT_FILE_INFO 
+			WHERE	
+				SUBJECT_ID=#{SUBJECT_ID}
+		]]>
+	</delete>
+	
+	<select id="selectFilePathFromSubjectID" parameterType="SubjectVO" resultType="java.lang.String">
+	<![CDATA[
+		
+		SELECT FILE_PATH || FILE_UPLOAD_NM FILE_PATH
+		FROM TN_SUBJECT_FILE_INFO 
+		WHERE	
+			SUBJECT_ID IN 	( #{SUBJECT_ID} )				
+	]]> 
+	</select>
+	
+	
+	<select id="selectBaseLyrInfoBySubject" parameterType="SubjectVO" resultType="egovMap">
+	<![CDATA[
+		
+		SELECT 
+			  	TUS.SUBJECT_ID as "tmapid", -- TN_LYR_INFO에 추가
+		        TUL.GROUP_ID as "layerGroup", 
+		        TUL.GROUP_NAME AS "groupName", 
+					  TUL.LAYER_ID AS "id", 
+		        TUL.TABLE_NAME AS "table", 
+		        TUL.LAYER_NAME AS "theme",
+					  TUL.LAYER_NAME AS "alias", 
+		        TUL.LAYER_ORDER AS "seq", -- TN_LYR_INFO에 추가
+		       	TUL.LAYER_ONOFF as "show",  --TN_LYR_INFO에 추가
+		        TUL.LAYER_TYPE as "layerType"
+		FROM 
+					 TN_USER_SUBJECT TUS,
+		       TN_USER_LAYER TUL
+		WHERE TUS.SUBJECT_ID = TUL.SUBJECT_ID
+		       AND
+		      TUS.BASE='Y'
+		       AND
+		      TUS.USER_ID=#{USER_ID}
+		ORDER BY TUL.LAYER_ID ASC	
+	
+	]]> 
+	</select>
+	
+	
+	<select id="selectMyLyrInfoBySubject" parameterType="SubjectVO" resultType="egovMap">
+	<![CDATA[
+		
+		SELECT 
+			  	TUS.SUBJECT_ID as "tmapid", -- TN_LYR_INFO에 추가
+		        TUL.GROUP_ID as "layerGroup", 
+		        TUL.GROUP_NAME AS "groupName", 
+					  TUL.LAYER_ID AS "id", 
+		        TUL.TABLE_NAME AS "table", 
+		        TUL.LAYER_NAME AS "theme",
+					  TUL.LAYER_NAME AS "alias", 
+		        TUL.LAYER_ORDER AS "seq", -- TN_LYR_INFO에 추가
+		       	TUL.LAYER_ONOFF as "show",  --TN_LYR_INFO에 추가
+		        TUL.LAYER_TYPE as "layerType"
+		FROM 
+					 TN_USER_SUBJECT TUS,
+		       TN_USER_LAYER TUL
+		WHERE TUS.SUBJECT_ID = TUL.SUBJECT_ID
+		       AND
+		      TUS.USER_ID=#{USER_ID}
+		ORDER BY TUL.LAYER_ID ASC	
+	
+	]]> 
+	</select>
+	
+	
+	<select id="selectLyrInfoBySubject" parameterType="SubjectVO" resultType="egovMap">
+	<![CDATA[
+		
+		SELECT 
+			  	TUS.SUBJECT_ID as "tmapid", -- TN_LYR_INFO에 추가
+		        TUL.GROUP_ID as "layerGroup", 
+		        TUL.GROUP_NAME AS "groupName", 
+					  TUL.LAYER_ID AS "id", 
+		        TUL.TABLE_NAME AS "table", 
+		        TUL.LAYER_NAME AS "theme",
+					  TUL.LAYER_NAME AS "alias", 
+		        TUL.LAYER_ORDER AS "seq", -- TN_LYR_INFO에 추가
+		       	TUL.LAYER_ONOFF as "show",  --TN_LYR_INFO에 추가
+		        TUL.LAYER_TYPE as "layerType"
+		FROM 
+					 TN_USER_SUBJECT TUS,
+		       TN_USER_LAYER TUL
+		WHERE TUS.SUBJECT_ID = TUL.SUBJECT_ID
+		 		AND
+		      TUS.SUBJECT_ID = #{SUBJECT_ID}
+		ORDER BY TUL.LAYER_ID ASC	
+	
+	]]> 
+	</select>
+	<!-- <select id="selectUserMemoList"	parameterType="userMemoVO"	resultType="userMemoVO" >
+		<![CDATA[ 		
+			/* userMemoDAO.selectUserMemoList */
+			/* 사용자_주제도 조회 */
+			SELECT
+				  MEMO_ID /* 사용자_주제도.파일_경로 */
+				, USER_ID /* 사용자_주제도.주제도_아이디 */
+				, MEMO_INFO /* 사용자_주제도.주제도_정보 */
+				, MEMO_NM /* 사용자_주제도.주제도_이름 */
+				, X /* 사용자_주제도.X */
+				, Y /* 사용자_주제도.Y */
+				, MAP_SCALE /* 사용자_주제도.지도_축척 */
+				, MEMO_CN /* 사용자_주제도.주제도_내용 */
+			FROM TN_USER_MEMO
+			WHERE USER_ID = #{USER_ID}
+			ORDER BY MEMO_ID DESC
+		]]>		
+	</select>
+	
+	
+	<select id="selectMemoList"	parameterType="MemoVO"	resultType="MemoVO" >
+		<![CDATA[ 		
+			/* MemoDAO.selectMemoList */
+			/* 사용자_주제도 조회 */			
+			SELECT
+				  MEMO_ID /* 사용자_주제도.파일_경로 */
+				, USER_ID /* 사용자_주제도.주제도_아이디 */
+				, MEMO_INFO /* 사용자_주제도.주제도_정보 */
+				, MEMO_NM /* 사용자_주제도.주제도_이름 */
+				, X /* 사용자_주제도.X */
+				, Y /* 사용자_주제도.Y */
+				, MAP_SCALE /* 사용자_주제도.지도_축척 */
+				, MEMO_CN /* 사용자_주제도.주제도_내용 */
+			FROM TN_MEMO
+			WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+				AND LEVEL=1
+			CONNECT BY PRIOR MEMO_ID=PARENT_ID			
+		]]>		
+	</select>
+	
+	<select id="selectMemoIDs"	parameterType="MemoVO"	resultType="String" >
+		<![CDATA[ 		
+			/* MemoDAO.selectMemoList */
+			/* 사용자_주제도 조회 */			
+			SELECT
+				  MEMO_ID 				
+			FROM TN_MEMO
+			WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+			START WITH MEMO_ID=#{MEMO_ID}
+			CONNECT BY PRIOR MEMO_ID=PARENT_ID			
+		]]>		
+	</select>
+	
+	<select id="selectMarkerList" parameterType="MarkerVO" resultType="MarkerVO">
+		<![CDATA[
+			SELECT
+  				TA.GROUP_NM GROUP_NM
+  				, TB.MARKER_ID MARKER_ID
+  				, TB.MARKER_NM MARKER_NM
+  				, TB.FILE_PATH FILE_PATH
+  				, TB.FILE_NM FILE_NM
+  				, TB.MARKER_SIZE MARKER_SIZE
+  				, TB.CREATE_USER_ID  CREATE_USER_ID
+			FROM 
+				TN_MARKER_GROUP TA
+				, TN_MARKER TB
+			WHERE 
+				TA.GROUP_ID= TB.GROUP_ID 
+		]]>
+	</select>
+	
+	<insert id="insertMemoFileInfo" parameterType="memoFileInfoVO">
+		<![CDATA[ 
+			/* memoFileInfoDAO.insertMemoFileInfo */
+			/* 주제도_파일_정보 등록 */
+			INSERT INTO TN_MEMO_FILE_INFO (
+				  FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, FILE_PATH /* 주제도_파일_정보.파일_경로 */
+				, MEMO_ID /* 주제도_파일_정보.주제도_아이디 */
+				, FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+			) VALUES (
+			      SEQ_TN_MEMO_FILE_INFO.NEXTVAL /* 주제도_파일_정보.파일_아이디 */
+				, #{FILE_SIZE} /* 주제도_파일_정보.파일_크기 */
+				, #{FILE_NM} /* 주제도_파일_정보.파일_이름 */
+				, #{FILE_PATH} /* 주제도_파일_정보.파일_경로 */
+				, #{MEMO_ID} /* 주제도_파일_정보.주제도_아이디 */
+				, #{FILE_UPLOAD_NM} /* 주제도_파일_정보.파일_업로드_이름 */
+				, #{FILE_EXT} /* 주제도_파일_정보.파일_확장자 */
+			)
+		]]>
+	</insert>
+	
+	<select id="selectMemoFileInfoList"	resultType="memoHistVO" parameterType="memoHistVO">
+		<![CDATA[ 
+			/* memoFileInfoDAO.selectMemoFileInfo */
+			/* 주제도_파일_정보 조회 */
+			SELECT
+				  TNMEMOFILEINFO.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TNMEMOFILEINFO.FILE_SIZE /* 주제도_파일_정보.파일_크기 */
+				, TNMEMOFILEINFO.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TNMEMOFILEINFO.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TNMEMOFILEINFO.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TNMEMOFILEINFO.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TNMEMO.MEMO_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TNMEMO.MEMO_CN
+				, TNMEMO.MEMO_INFO
+				, TNMEMO.MEMO_NM
+		    	, TNMEMO.CREATE_DT
+		    	, TNMEMO.USER_ID
+		    	, TNMEMO.FEATURE_SEQ
+			FROM TN_MEMO_FILE_INFO TNMEMOFILEINFO, TN_MEMO TNMEMO
+			WHERE TNMEMO.MEMO_ID = TNMEMOFILEINFO.MEMO_ID(+)
+      			AND  TNMEMO.MEMO_ID=#{MEMO_ID}	
+				AND UPPER(TNMEMO.USER_ID)=UPPER(#{USER_ID})
+		]]>
+	</select>
+
+	<select id="selectMemoGroupList"  parameterType="memoGroupVO" resultType="memoGroupVO">
+		<![CDATA[
+			/* userMemoDAO.selectMemoGroup */
+			/* 주제도그룹 리스트 */
+			
+			SELECT 
+				  GROUP_ID		/* 주제도그룹.주제도그룹 ID */
+				, GROUP_NM		/* 주제도그룹.그룹명 */
+			FROM TN_MARKER_GROUP
+			ORDER BY GROUP_ID ASC 
+		]]>
+	</select>
+	
+	
+	<select id="selectMemoHistList" parameterType="memoHistVO" resultType="memoHistVO">
+		<![CDATA[
+			/* userMemoDAO.selectMemoHistList */
+			/* 주제도 이력 */
+			SELECT
+				  TNMEMOFILEINFO.FILE_ID /* 주제도_파일_정보.파일_아이디 */
+				, TNMEMOFILEINFO.FILE_NM /* 주제도_파일_정보.파일_이름 */
+				, TNMEMOFILEINFO.FILE_PATH /* 주제도_파일_정보.파일_경로 */				
+				, TNMEMOFILEINFO.FILE_UPLOAD_NM /* 주제도_파일_정보.파일_업로드_이름 */
+				, TNMEMOFILEINFO.FILE_EXT /* 주제도_파일_정보.파일_확장자 */
+				, TNMEMO.MEMO_ID /* 주제도_파일_정보.주제도_아이디 */
+				, TNMEMO.MEMO_CN
+				, TNMEMO.MEMO_INFO
+				, TNMEMO.MEMO_NM
+		       	, TNMEMO.CREATE_DT
+		       	, TNMEMO.USER_ID
+		       	, TNMEMO.FEATURE_SEQ
+			FROM TN_MEMO_FILE_INFO TNMEMOFILEINFO, 
+		         (	SELECT LEVEL, MEMO_ID, MEMO_NM, MEMO_CN, MEMO_INFO, USER_ID,FEATURE_SEQ,TO_CHAR(CREATE_DT,'YYYY-MM-DD HH24') CREATE_DT
+		         	FROM TN_MEMO 
+		         	WHERE
+		          		UPPER(USER_ID) = UPPER(#{USER_ID})
+		          		AND FEATURE_SEQ=#{FEATURE_SEQ}
+		         	CONNECT BY PRIOR MEMO_ID=PARENT_ID	
+		         	START WITH PARENT_ID=0) TNMEMO   
+		    WHERE TNMEMO.MEMO_ID= TNMEMOFILEINFO.MEMO_ID(+)
+		]]>
+		
+	</select>
+	
+	<delete id="deleteMemoFiles" parameterType="java.util.List">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 주제도에 딸린 파일 모두 삭제*/
+		
+		DELETE FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			MEMO_ID IN					
+	]]>
+		<foreach collection="list" item="item" index="index" separator=", " open="(" close=")">
+				#{item}
+		</foreach>
+	</delete>
+	
+	<select id="selectFilePathFromMemoID" parameterType="java.util.List" resultType="java.lang.String">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 주제도에 딸린 파일 모두 삭제*/
+		
+		SELECT FILE_PATH || FILE_UPLOAD_NM FILE_PATH
+		FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			MEMO_ID IN					
+	]]>
+		<foreach collection="list" item="item" index="index" separator=", " open="(" close=")">
+				#{item}
+		</foreach>
+	</select>
+	
+	<select id="selectFilePathFromFileID" parameterType="memoHistVO" resultType="java.lang.String">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 주제도에 딸린 파일 모두 삭제*/
+		
+		SELECT FILE_PATH || FILE_UPLOAD_NM FILE_PATH
+		FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			FILE_ID	= #{FILE_ID}				
+	]]>
+	</select>
+		
+	
+	<delete id="deleteSubjectFile" parameterType="java.util.List">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFile */
+		/* 주제도파일삭제*/
+		
+		DELETE FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			FILE_ID = #{FILE_ID}					
+	]]>
+	</delete> -->
+	
+</mapper>

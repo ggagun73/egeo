@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<bean id="beanNameResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="0" />
+	</bean>
+	<bean name="jsonView" class="net.sf.json.spring.web.servlet.view.JsonView">
+		<!--  
+			2010.10.15  수정
+			jsonView의 contentType이 application/json 이면 파일 업로드 후 jsonview로 리턴받을 때
+			결과를 파일 형식으로 리턴받아 자동으로 다운로드가 되는 현상이 발생한다.
+			contentType의 value 값을 text/html로 바꿔주면 이같은 현상이 발생하지 않는다.
+		-->
+		<!-- 원본 : property name="contentType" value="application/json"/-->
+		<property name="contentType" value="text/html;charset=UTF-8"/> 
+		
+	</bean>
+</beans>

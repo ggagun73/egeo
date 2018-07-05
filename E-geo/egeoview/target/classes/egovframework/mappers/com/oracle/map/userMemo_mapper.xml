@@ -1,0 +1,328 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	<insert id="insertUserMemo" parameterType="userMemoVO" useGeneratedKeys="true" keyProperty="MEMO_ID" keyColumn="MEMO_ID">
+			INSERT INTO TN_USER_MEMO (
+				  MEMO_ID /* 사용자_메모.파일_경로 */
+				, USER_ID /* 사용자_메모.메모_아이디 */
+				, MEMO_INFO /* 사용자_메모.메모_정보 */
+				, MEMO_NM /* 사용자_메모.메모_이름 */
+				, X /* 사용자_메모.X */
+				, Y /* 사용자_메모.Y */
+				, MAP_SCALE /* 사용자_메모.지도_축척 */
+				, MEMO_CN /* 사용자_메모.메모_내용 */
+			) VALUES (
+				<if test="MEMO_ID != null ">
+					#{MEMO_ID} /* 사용자_메모.파일_경로 */
+				</if>
+				<if test="MEMO_ID == null">
+				  SEQ_USER_MEMO.NEXTVAL /* 사용자_메모.파일_경로 */
+				</if>
+				, 'test' /* 사용자_메모.메모_아이디 */
+				, #{MEMO_INFO:CLOB} /* 사용자_메모.메모_정보 */
+				, #{MEMO_NM} /* 사용자_메모.메모_이름 */
+				, #{X} /* 사용자_메모.X */
+				, #{Y} /* 사용자_메모.Y */
+				, #{MAP_SCALE} /* 사용자_메모.지도_축척 */
+				, #{MEMO_CN:CLOB} /* 사용자_메모.메모_내용 */
+			)
+	</insert>
+	
+	<insert id="insertMemo" parameterType="MemoVO" useGeneratedKeys="true" keyProperty="MEMO_ID" keyColumn="MEMO_ID" >		
+		<selectKey keyProperty="MEMO_ID" resultType="DECIMAL" order="BEFORE" >
+			SELECT SEQ_MEMO.NEXTVAL FROM DUAL
+		</selectKey>
+			INSERT INTO TN_MEMO ( 
+				  MEMO_ID /* 사용자_메모.메모_id */				
+				, PARENT_ID /**/  
+				, USER_ID /* 사용자_메모.메모_아이디 */
+				, MEMO_INFO /* 사용자_메모.메모_정보 */
+				, MEMO_NM /* 사용자_메모.메모_이름 */
+				, X /* 사용자_메모.X */
+				, Y /* 사용자_메모.Y */
+				, MAP_SCALE /* 사용자_메모.지도_축척 */
+				, MEMO_CN /* 사용자_메모.메모_내용 */
+				, MARKER_ID
+				, MARKER_TYPE
+				, FEATURE_SEQ
+			) VALUES (
+				  #{MEMO_ID} /* 사용자_메모.메모_id */					
+				, #{PARENT_ID}
+				, 'test' /* 사용자_메모.메모_아이디 */
+				, #{MEMO_INFO} /* 사용자_메모.메모_정보 */
+				, #{MEMO_NM} /* 사용자_메모.메모_이름 */
+				, #{X} /* 사용자_메모.X */
+				, #{Y} /* 사용자_메모.Y */
+				, #{MAP_SCALE} /* 사용자_메모.지도_축척 */
+				, #{MEMO_CN} /* 사용자_메모.메모_내용 */
+				, #{MARKER_ID}
+				, #{MARKER_TYPE}	
+				, #{FEATURE_SEQ}			
+			)
+	</insert>
+	
+	<update id="updateMemo" parameterType="MemoVO">		
+			UPDATE TN_MEMO
+			SET
+				<if test="MEMO_INFO != null ">
+					MEMO_INFO = #{MEMO_INFO}
+				</if>
+				<if test="MEMO_NM != null ">
+				,MEMO_NM= #{MEMO_NM}
+				</if>
+				<if test="X != null">
+				,X= #{X} /* 사용자_메모.X */
+				</if>
+				<if test="Y != null">
+				,Y= #{Y} /* 사용자_메모.X */
+				</if>
+				<if test="MAP_SCALE != null">
+				,MAP_SCALE= #{MAP_SCALE} /* 사용자_메모.지도_축척 */
+				</if>
+				<if test="MEMO_CN != null">
+				,MEMO_CN = #{MEMO_CN} /* 사용자_메모.메모_내용 */
+				</if>
+				<if test="MARKER_ID != null">
+				,MARKER_ID = #{MARKER_ID}
+				</if>
+				<if test="MARKER_TYPE != null">
+				,MARKER_TYPE = #{MARKER_TYPE}
+				</if>
+			WHERE
+				MEMO_ID=#{MEMO_ID}
+			
+	</update>
+	
+	<select id="selectUserMemoList"	parameterType="userMemoVO"	resultType="userMemoVO" >
+		<![CDATA[ 		
+			/* userMemoDAO.selectUserMemoList */
+			/* 사용자_메모 조회 */
+			SELECT
+				  MEMO_ID /* 사용자_메모.파일_경로 */
+				, USER_ID /* 사용자_메모.메모_아이디 */
+				, MEMO_INFO /* 사용자_메모.메모_정보 */
+				, MEMO_NM /* 사용자_메모.메모_이름 */
+				, X /* 사용자_메모.X */
+				, Y /* 사용자_메모.Y */
+				, MAP_SCALE /* 사용자_메모.지도_축척 */
+				, MEMO_CN /* 사용자_메모.메모_내용 */
+			FROM TN_USER_MEMO
+			WHERE USER_ID = #{USER_ID}
+			ORDER BY MEMO_ID DESC
+		]]>		
+	</select>
+	
+	
+	<select id="selectMemoList"	parameterType="MemoVO"	resultType="MemoVO" >
+		<![CDATA[ 		
+			/* MemoDAO.selectMemoList */
+			/* 사용자_메모 조회 */			
+			SELECT
+				  MEMO_ID /* 사용자_메모.파일_경로 */
+				, USER_ID /* 사용자_메모.메모_아이디 */
+				, MEMO_INFO /* 사용자_메모.메모_정보 */
+				, MEMO_NM /* 사용자_메모.메모_이름 */
+				, X /* 사용자_메모.X */
+				, Y /* 사용자_메모.Y */
+				, MAP_SCALE /* 사용자_메모.지도_축척 */
+				, MEMO_CN /* 사용자_메모.메모_내용 */
+			FROM TN_MEMO
+			WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+				AND LEVEL=1
+			CONNECT BY PRIOR MEMO_ID=PARENT_ID			
+		]]>		
+	</select>
+	
+	<select id="selectMemoIDs"	parameterType="MemoVO"	resultType="String" >
+		<![CDATA[ 		
+			/* MemoDAO.selectMemoList */
+			/* 사용자_메모 조회 */			
+			SELECT
+				  MEMO_ID 				
+			FROM TN_MEMO
+			WHERE UPPER(USER_ID) = UPPER(#{USER_ID})
+			START WITH MEMO_ID=#{MEMO_ID}
+			CONNECT BY PRIOR MEMO_ID=PARENT_ID			
+		]]>		
+	</select>
+	
+	<select id="selectMarkerList" parameterType="MarkerVO" resultType="MarkerVO">
+		<![CDATA[
+			SELECT
+  				TA.GROUP_NM GROUP_NM
+  				, TB.MARKER_ID MARKER_ID
+  				, TB.MARKER_NM MARKER_NM
+  				, TB.FILE_PATH FILE_PATH
+  				, TB.FILE_NM FILE_NM
+  				, TB.MARKER_SIZE MARKER_SIZE
+  				, TB.CREATE_USER_ID  CREATE_USER_ID
+			FROM 
+				TN_MARKER_GROUP TA
+				, TN_MARKER TB
+			WHERE 
+				TA.GROUP_ID= TB.GROUP_ID 
+		]]>
+	</select>
+	
+	<insert id="insertMemoFileInfo" parameterType="memoFileInfoVO">
+		<![CDATA[ 
+			/* memoFileInfoDAO.insertMemoFileInfo */
+			/* 메모_파일_정보 등록 */
+			INSERT INTO TN_MEMO_FILE_INFO (
+				  FILE_ID /* 메모_파일_정보.파일_아이디 */
+				, FILE_SIZE /* 메모_파일_정보.파일_크기 */
+				, FILE_NM /* 메모_파일_정보.파일_이름 */
+				, FILE_PATH /* 메모_파일_정보.파일_경로 */
+				, MEMO_ID /* 메모_파일_정보.메모_아이디 */
+				, FILE_UPLOAD_NM /* 메모_파일_정보.파일_업로드_이름 */
+				, FILE_EXT /* 메모_파일_정보.파일_확장자 */
+			) VALUES (
+			      SEQ_TN_MEMO_FILE_INFO.NEXTVAL /* 메모_파일_정보.파일_아이디 */
+				, #{FILE_SIZE} /* 메모_파일_정보.파일_크기 */
+				, #{FILE_NM} /* 메모_파일_정보.파일_이름 */
+				, #{FILE_PATH} /* 메모_파일_정보.파일_경로 */
+				, #{MEMO_ID} /* 메모_파일_정보.메모_아이디 */
+				, #{FILE_UPLOAD_NM} /* 메모_파일_정보.파일_업로드_이름 */
+				, #{FILE_EXT} /* 메모_파일_정보.파일_확장자 */
+			)
+		]]>
+	</insert>
+	
+	<select id="selectMemoFileInfoList"	resultType="memoHistVO" parameterType="memoHistVO">
+		<![CDATA[ 
+			/* memoFileInfoDAO.selectMemoFileInfo */
+			/* 메모_파일_정보 조회 */
+			SELECT
+				  TNMEMOFILEINFO.FILE_ID /* 메모_파일_정보.파일_아이디 */
+				, TNMEMOFILEINFO.FILE_SIZE /* 메모_파일_정보.파일_크기 */
+				, TNMEMOFILEINFO.FILE_NM /* 메모_파일_정보.파일_이름 */
+				, TNMEMOFILEINFO.FILE_PATH /* 메모_파일_정보.파일_경로 */				
+				, TNMEMOFILEINFO.FILE_UPLOAD_NM /* 메모_파일_정보.파일_업로드_이름 */
+				, TNMEMOFILEINFO.FILE_EXT /* 메모_파일_정보.파일_확장자 */
+				, TNMEMO.MEMO_ID /* 메모_파일_정보.메모_아이디 */
+				, TNMEMO.MEMO_CN
+				, TNMEMO.MEMO_INFO
+				, TNMEMO.MEMO_NM
+		    	, TNMEMO.CREATE_DT
+		    	, TNMEMO.USER_ID
+		    	, TNMEMO.FEATURE_SEQ
+			FROM TN_MEMO_FILE_INFO TNMEMOFILEINFO, TN_MEMO TNMEMO
+			WHERE TNMEMO.MEMO_ID = TNMEMOFILEINFO.MEMO_ID(+)
+      			AND  TNMEMO.MEMO_ID=#{MEMO_ID}	
+				AND UPPER(TNMEMO.USER_ID)=UPPER(#{USER_ID})
+		]]>
+	</select>
+
+	<select id="selectMemoGroupList"  parameterType="memoGroupVO" resultType="memoGroupVO">
+		<![CDATA[
+			/* userMemoDAO.selectMemoGroup */
+			/* 메모그룹 리스트 */
+			
+			SELECT 
+				  GROUP_ID		/* 메모그룹.메모그룹 ID */
+				, GROUP_NM		/* 메모그룹.그룹명 */
+			FROM TN_MARKER_GROUP
+			ORDER BY GROUP_ID ASC 
+		]]>
+	</select>
+	
+	
+	<select id="selectMemoHistList" parameterType="memoHistVO" resultType="memoHistVO">
+		<![CDATA[
+			/* userMemoDAO.selectMemoHistList */
+			/* 메모 이력 */
+			SELECT
+				  TNMEMOFILEINFO.FILE_ID /* 메모_파일_정보.파일_아이디 */
+				, TNMEMOFILEINFO.FILE_NM /* 메모_파일_정보.파일_이름 */
+				, TNMEMOFILEINFO.FILE_PATH /* 메모_파일_정보.파일_경로 */				
+				, TNMEMOFILEINFO.FILE_UPLOAD_NM /* 메모_파일_정보.파일_업로드_이름 */
+				, TNMEMOFILEINFO.FILE_EXT /* 메모_파일_정보.파일_확장자 */
+				, TNMEMO.MEMO_ID /* 메모_파일_정보.메모_아이디 */
+				, TNMEMO.MEMO_CN
+				, TNMEMO.MEMO_INFO
+				, TNMEMO.MEMO_NM
+		       	, TNMEMO.CREATE_DT
+		       	, TNMEMO.USER_ID
+		       	, TNMEMO.FEATURE_SEQ
+			FROM TN_MEMO_FILE_INFO TNMEMOFILEINFO, 
+		         (	SELECT LEVEL, MEMO_ID, MEMO_NM, MEMO_CN, MEMO_INFO, USER_ID,FEATURE_SEQ,TO_CHAR(CREATE_DT,'YYYY-MM-DD HH24') CREATE_DT
+		         	FROM TN_MEMO 
+		         	WHERE
+		          		UPPER(USER_ID) = UPPER(#{USER_ID})
+		          		AND FEATURE_SEQ=#{FEATURE_SEQ}
+		         	CONNECT BY PRIOR MEMO_ID=PARENT_ID	
+		         	START WITH PARENT_ID=0) TNMEMO   
+		    WHERE TNMEMO.MEMO_ID= TNMEMOFILEINFO.MEMO_ID(+)
+		]]>
+		
+	</select>
+	
+	<delete id="deleteMemoFiles" parameterType="java.util.List">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 메모에 딸린 파일 모두 삭제*/
+		
+		DELETE FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			MEMO_ID IN					
+	]]>
+		<foreach collection="list" item="item" index="index" separator=", " open="(" close=")">
+				#{item}
+		</foreach>
+	</delete>
+	
+	<select id="selectFilePathFromMemoID" parameterType="java.util.List" resultType="java.lang.String">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 메모에 딸린 파일 모두 삭제*/
+		
+		SELECT FILE_PATH || FILE_UPLOAD_NM FILE_PATH
+		FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			MEMO_ID IN					
+	]]>
+		<foreach collection="list" item="item" index="index" separator=", " open="(" close=")">
+				#{item}
+		</foreach>
+	</select>
+	
+	<select id="selectFilePathFromFileID" parameterType="memoHistVO" resultType="java.lang.String">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFiles */
+		/* 메모에 딸린 파일 모두 삭제*/
+		
+		SELECT FILE_PATH || FILE_UPLOAD_NM FILE_PATH
+		FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			FILE_ID	= #{FILE_ID}				
+	]]>
+	</select>
+		
+	
+	<delete id="deleteMemoFile" parameterType="java.util.List">
+	<![CDATA[
+		/* userMemoDAO.deleteMemoFile */
+		/* 메모파일삭제*/
+		
+		DELETE FROM TN_MEMO_FILE_INFO 
+		WHERE	
+			FILE_ID = #{FILE_ID}					
+	]]>
+	</delete>
+	
+
+	<delete id="deleteMemos" parameterType="java.util.List">
+	<![CDATA[
+		/* userMemoDAO.deleteMemos */
+		/* 메모삭제 */
+		
+		DELETE FROM TN_MEMO 
+		WHERE MEMO_ID IN		
+	]]>
+		<foreach collection="list" item="item" index="index"  separator=", " open="(" close=")">
+				#{item}
+		</foreach>
+		
+	</delete>
+</mapper>

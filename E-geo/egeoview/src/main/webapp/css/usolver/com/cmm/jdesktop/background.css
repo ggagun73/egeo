@@ -1,0 +1,81 @@
+@charset "utf-8";
+
+/* skip_navigation */
+#skipnavi {position:relative; z-index:9999;}
+#skipnavi a {position:absolute; top:-10000px;}
+#skipnavi a:hover, #skipnavi  a:active, #skipnavi a:focus 
+{display:block; font-size:1.3em; font-weight:bold; padding:15px; background-color:#fff; border: 3px solid #ededed; position:absolute; top:0px; left:45%;}
+
+body {height:100%; background:url(/images/usolver/com/cmm/jdesktop/bg01.png) 0 0 repeat-x !important ;}
+
+
+/* layout */
+/* #wrap {height:100%;width:100%;overflow:hidden; background:url(/images/usolver/com/cmm/jdesktop/bg02.png) center center no-repeat;} */
+#wrap {height:100%;width:100%;overflow:hidden;}
+#header {top:0;left:0px;right:0;height:30px; position:absolute; z-index:0; overflow:hidden;background-color:#fff; border-bottom:1px solid #363a43; }
+#content {top:31px;left:0px;right:0;bottom:26px; position:absolute; background:url(/extLib/jdesktop/images/bg_tx1.png) center center no-repeat;}
+#content .ConIconBx { top:0px; left:0px; width:90px; height:400px; position:absolute; z-index:1; overflow:hidden; padding:45px 0 0 20px; }
+#content .ConIconBx .ConIcon { float:left; width:64px; padding:0 10px 16px 10px; }
+#content .ConIconBx .ConIcon p { float:left; width:64px; height:64px; text-align:center; }
+#content .ConIconBx .ConIcon .IconTx { float:left; width:64px; line-height:22px; text-align:center; font-weight:bold; color:#fff; font-size:14px; letter-spacing:-0.05em; }
+#content .FavoriteBx { top:0px; right:0px; bottom:0px; width:154px; height:100%; position:absolute; z-index:1000; overflow:hidden; padding:0px 0 0 0px;}
+#content .FavoriteBx .FavoriteTit { float:left; width:100%; height:40px; padding:0 0 0px 0; background:none;}
+#content .FavoriteBx .FavoriteCon  { top:40px; right:0px; bottom:0px; width:144px; position:absolute; overflow:hidden; padding:0px 0 0 10px; background:url(/images/usolver/com/cmm/jdesktop/favorite_bg.png) 0 0 repeat-y;}
+#footer {left:0px;right:0;bottom:0px; height:25px; position:absolute; z-index:0; overflow:hidden; background-color:#080808; -ms-filter: alpha(opacity=30); filter: alpha(opacity=30); opacity:0.3; -moz-opacity:0.3;}
+#footer .footer_tx { float:right; text-align:right; padding:4px 20px 0 0; width:200px; color:#ffffff; font-weight:bold; font-size:12px; }
+
+#left{width:315px;position:absolute;top:65px;left:0px;bottom:0;z-index:99; overflow:hidden}
+
+
+/* .Depth2_Bx1								{ width:917px; height:247px; visibility: show; position:absolute; z-index:1000; }
+.Depth2_Bx2								{ position:absolute; top:30px; left:0px; width:100%; z-index:1000; } */
+
+/* .Depth2_Bx1								{ width:917px; height:247px; visibility: show; position:absolute; }
+.Depth2_Bx2								{ position:absolute; top:30px; left:0px; width:100%; }
+
+#Depth_2Bx {top:0px; left:0px; width:915px; height:245px; position:absolute; z-index:1000; overflow:hidden; background:url(/images/usolver/com/cmm/jdesktop/2depth_bg.png) 0 0 repeat-x; border:1px solid #565a61; }
+#Depth_2Bx .TabBx1	{ float:left; width:895px; padding:5px 10px 0 10px; }
+#Depth_2Bx .TabBx1 ul { float:left; width:100%; height:35px; background:url(/images/usolver/com/cmm/jdesktop/depth2_line.gif) 0 bottom repeat-x;}
+#Depth_2Bx .TabBx1 ul li { float:left; }
+a.D2_TabM:link { color:#b9bdc6; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; }
+a.D2_TabM:hover { color:#fff;}
+a.D2_TabM:active,a.D2_TabM:visited {color:#b9bdc6; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; }
+a.D2_TabM_selected:link, a.D2_TabM_selected:visited { color:#fff; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; background:url(/images/usolver/com/cmm/jdesktop/depth2_arrow.png) center 0 no-repeat;}
+#Depth_2Bx .TabBx2	{ float:left; width:835px; padding:15px 40px 0 40px; }
+#Depth_2Bx .TabBx2 .Bx { float:left; width:100%; padding:0 0 0px 0; }
+.D2_IcoBx { float:left; width:64px; padding:0 13px 10px 13px; } */
+
+.Depth2_Bx1								{ width:917px; height:247px; visibility: hidden; position:absolute; z-index:1000; }
+.Depth2_Bx2								{ position:absolute; top:30px; left:0px; width:100%; z-index:1000; }
+
+#Depth_2Bx {top:0px; left:0px; width:915px; height:175px; position:absolute; z-index:1000; overflow:hidden; background:url(/images/usolver/com/cmm/jdesktop/2depth_bg.png) 0 0 repeat-x; border:1px solid #565a61; }
+#Depth_2Bx .TabBx1	{ float:left; width:895px; padding:5px 10px 0 10px; }
+#Depth_2Bx .TabBx1 ul { float:left; width:100%; height:35px; background:url(/images/usolver/com/cmm/jdesktop/depth2_line.gif) 0 bottom repeat-x;}
+#Depth_2Bx .TabBx1 ul li { float:left; }
+#Depth_2Bx .TabBx2	{ float:left; width:835px; padding:15px 40px 0 40px; }
+#Depth_2Bx .TabBx2 .Bx { float:left; width:100%; padding:0 0 0px 0; }
+
+#Depth_2Bx2 {top:0px; left:0px; width:915px; height:245px; position:absolute; z-index:1000; overflow:hidden; background:url(/images/usolver/com/cmm/jdesktop/2depth_bg.png) 0 0 repeat-x; border:1px solid #565a61; }
+#Depth_2Bx2 .TabBx1	{ float:left; width:895px; padding:5px 10px 0 10px; }
+#Depth_2Bx2 .TabBx1 ul { float:left; width:100%; height:35px; background:url(/images/usolver/com/cmm/jdesktop/depth2_line.gif) 0 bottom repeat-x;}
+#Depth_2Bx2 .TabBx1 ul li { float:left; }
+#Depth_2Bx2 .TabBx2	{ float:left; width:835px; padding:15px 40px 0 40px; }
+#Depth_2Bx2 .TabBx2 .Bx { float:left; width:100%; padding:0 0 0px 0; }
+
+.D2_IcoBx { float:left; width:64px; padding:0 13px 10px 13px; }
+a.D2_TabM:link { color:#b9bdc6; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; }
+a.D2_TabM:hover { color:#fff;}
+a.D2_TabM:active,a.D2_TabM:visited {color:#b9bdc6; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; }
+a.D2_TabM_selected:link, a.D2_TabM_selected:visited { color:#fff; font-weight:bold; font-size:14px; display:block; text-align:center; padding:6px 39px 0px 39px; height:27px; background:url(/images/usolver/com/cmm/jdesktop/depth2_arrow.png) center 0 no-repeat;}
+
+
+
+/* header  jdesktop.css 에서 설정함. 
+#header .headerBx1	{ float:left; width:10%; height:30px; }
+#header .headerBx2 	{ float:left; width:40%; height:30px; }
+#header .headerBx3 	{ float:left; width:50%; height:30px; } 
+#header .headerBx3 .TopIcoBx { float:right; padding:2px 15px 0 0; }
+#header .headerBx3 .TopIcoBx li { float:left; padding:0 3px 0 3px;}
+*/
+.TopIcoBx .userBx{ float:left; padding:2px 15px 0 0;line-height:25px;}
+.TopIcoBx .userBx strong{color:#133f80;}

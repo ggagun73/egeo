@@ -1,0 +1,16 @@
+var NUTs 			= NUTs || {};
+NUTs.Protocol 		= NUTs.Protocol || {};
+NUTs.Control 		= NUTs.Control || {};
+NUTs.Format 		= NUTs.Format || {};
+NUTs.Format.SLD 	= NUTs.Format.SLD || {};
+NUTs.Handler 		= NUTs.Handler || {};
+NUTs.Layer 			= NUTs.Layer || {};
+NUTs.Maps 			= NUTs.Maps || {};
+NUTs.Request 		= NUTs.Request || {};
+NUTs.Mashup 		= NUTs.Mashup || {};
+NUTs.Tool 			= NUTs.Tool || {};
+NUTs.Tool.DataTool	= NUTs.Tool.DataTool || {};
+NUTs.GeoServer		= NUTs.GeoServer || {};
+NUTs.GeoServer.Tool	= NUTs.GeoServer.Tool || {};
+NUTs.Edit			= NUTs.Edit || {};
+NUTs.Edit.Control 	= NUTs.Edit.Control || {};

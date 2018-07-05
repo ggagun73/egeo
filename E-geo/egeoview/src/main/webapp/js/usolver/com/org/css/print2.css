@@ -1,0 +1,185 @@
+BODY { FONT-SIZE: 8pt }
+TABLE { FONT-SIZE: 8pt }
+TD { FONT-SIZE: 8pt }
+UNKNOWN { FONT-SIZE: 8pt; COLOR: black; TEXT-DECORATION: none }
+
+td.C {
+	text-align: center; vertical-align:middle;
+}
+td.R {
+	text-align: right; vertical-align:middle; margin-right:20px; PADDING: 0PX 10PX;
+}
+td.L {
+	text-align: left; vertical-align:middle; margin-left:100px; PADDING: 0PX 10PX;
+}
+
+td.B {
+	text-align: center; vertical-align:middle; font-weight:bold;
+}
+
+
+
+td.Title1 {
+	FONT-SIZE:18pt; letter-spacing:20; 
+}
+
+
+
+td.Name0 {
+	HEIGHT:25px; width:170px;
+}
+
+td.Name1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px; width:170px;
+}
+
+td.Name1-1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px; width:150px;
+}
+
+
+td.Name2 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-TOP:1px solid; HEIGHT:25px; width:170px;
+}
+td.Name2-1 {
+	BORDER-BOTTOM:1px solid; BORDER-TOP:1px solid; HEIGHT:25px; width:170px;
+}
+td.Name2-2 {
+	BORDER-LEFT:1px solid;  BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name2-3 {
+	BORDER-LEFT:1px solid;  BORDER-TOP:1px solid; solid; HEIGHT:25px;
+}
+td.Name2-4 {
+	BORDER-TOP:1px solid; HEIGHT:25px;
+}
+td.Name2-5 {
+	BORDER-RIGHT:1px solid;  BORDER-TOP:1px solid; solid; HEIGHT:25px;
+}
+td.Name2-6 {
+	BORDER-TOP:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name3 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px; width:200px;
+}
+td.Name4 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:120px;
+}
+td.Name4-0 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:120px; 
+}	
+td.Name4-1 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:25px; 
+}
+td.Name4-2 {
+	BORDER-TOP:1px solid; BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:25px; width:170px;
+}
+td.Name4-3 {
+	BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:25px; 
+}
+td.Name4-4 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:25px; width:170px;
+}
+td.Name5 {
+	BORDER-LEFT:1px solid;  BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name5-1 {
+	BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name5-2 {
+	BORDER-BOTTOM:1px solid; HEIGHT:10px;
+}
+td.Name6 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; BORDER-RIGHT:1px solid; HEIGHT:25px; width:200px; 
+}
+td.Name6-1 {
+	BORDER-BOTTOM:1px solid; HEIGHT:25px; width:200px; 
+}
+td.Name7 {
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name8 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:50px;
+}
+td.Name9 {
+	BORDER-LEFT:1px solid;  HEIGHT:25px;
+}
+td.Name9-1{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; HEIGHT:25px;
+}
+td.Name10 {
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px;
+}
+td.Name10-1 {
+	BORDER-LEFT:2px solid; BORDER-TOP:2px solid; BORDER-RIGHT:2px solid; BORDER-BOTTOM:2px solid;
+}
+td.Name10-2 {
+	BORDER-TOP:4px solid;
+}
+td.Name11 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:350px;
+}
+td.Name11-1 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:350px;
+}
+td.Name11-2 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:400px;
+}
+td.Name11-3 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:400px;
+}
+td.Name11-4 {
+	BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:100px;
+}
+td.Name11-5 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:200px;
+}
+td.Name11-6 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:167px;
+}
+td.Name11-7{
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:127px;
+}
+td.Name12 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:25px; width:80px;
+}
+td.Name13 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:20px;
+}
+td.Name14 {
+	BORDER-LEFT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:18px;
+}
+td.Name14-1 {
+	BORDER-LEFT:1px solid; HEIGHT:18px;
+}
+td.Name14-2 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; HEIGHT:18px;
+}
+td.Name14-3 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-BOTTOM:1px solid; HEIGHT:18px;
+}
+td.Name14-4 {
+	BORDER-LEFT:1px solid; BORDER-TOP:1px solid; HEIGHT:18px;
+}
+td.Name14-5 {
+	BORDER-LEFT:1px solid; BORDER-RIGHT:1px solid; BORDER-TOP:1px solid; HEIGHT:18px;
+}
+
+td.Name15{
+	BORDER-TOP:2px solid; BORDER-RIGHT:1px solid; HEIGHT:25px;
+}
+td.Name15-1{
+	BORDER-TOP:2px solid; HEIGHT:25px;
+}
+td.Name16{
+	BORDER-RIGHT:1px solid; HEIGHT:25px;
+}
+td.Name17{
+	HEIGHT:25px;
+}
+td.Name17-1{
+	HEIGHT:1px;
+}
+td.Name17-2{
+	HEIGHT:1px; BORDER-BOTTOM:1px solid;
+}

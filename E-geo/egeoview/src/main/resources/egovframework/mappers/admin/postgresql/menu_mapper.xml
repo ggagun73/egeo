@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+
+<!-- 	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="menuManageVO" type="usolver.admin.menu.vo.MenuManageVO"/>
+	<typeAlias  alias="comDefaultVO" type="egovframework.com.cmm.ComDefaultVO"/> -->
+
+	<select id="selectMenuManageList" parameterType="egovframework.com.cmm.ComDefaultVO" resultType="egovMap">
+		<![CDATA[
+		       SELECT * FROM ( SELECT (ROW_NUMBER() OVER()) AS rn, TB.* FROM (
+					SELECT 
+						  MENU_NM           	AS "menuNm"
+							, MENU_ORDR      	AS "menuOrdr"
+				            , MENU_NO           AS "menuNo"
+				            , MENU_ID           AS "menuId"
+				            , MENU_DC           AS "menuDc"
+				            , MENU_TYPE         AS "menuType"         
+				            , WIDTH          	AS "width"
+				            , HEIGHT	        AS "height"
+				            , INSERT_HEIGHT	    AS "insertHeight"
+				            , CALL		        AS "call"
+				      		, KEY_COLUMN        AS "keyColumn"
+				            , UPPER_MENU_NO     AS "upperMenuNo"
+				            , RELATE_IMAGE_PATH AS "relateImagePath"
+				            , RELATE_IMAGE_NM   AS "relateImageNm"
+				            , FUNCTION_LIST	    AS "functionList"
+				            , PROGRM_FILE_NM    AS "progrmFileNm"
+					FROM USV_MENU_INFO 
+					WHERE MENU_NM like '%'|| #{searchKeyword}||'%'
+		       ) TB )  WHERE rn BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+		 ]]>
+	</select> 
+
+	<!-- 총건수 조회 -->
+	<select id="selectMenuManageListTotCnt" parameterType="egovframework.com.cmm.ComDefaultVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(MENU_NO) AS "totcnt"
+		  FROM USV_MENU_INFO
+		 WHERE MENU_NM like '%'||#{searchKeyword}||'%'
+		]]>
+	</select>
+
+
+	<select id="selectMenuManage" parameterType="egovframework.com.cmm.ComDefaultVO" resultType="usolver.admin.menu.vo.MenuManageVO">
+		<![CDATA[
+			SELECT 
+				MENU_NM           	AS "menuNm"
+				, MENU_ORDR      	AS "menuOrdr"
+	            , MENU_NO           AS "menuNo"
+	            , MENU_ID           AS "menuId"
+	            , MENU_DC           AS "menuDc"
+	            , MENU_TYPE         AS "menuType"         
+	            , WIDTH          	AS "width"
+	            , HEIGHT	        AS "height"
+	            , INSERT_HEIGHT	    AS "insertHeight"
+	            , CALL		        AS "call"
+	      		, KEY_COLUMN        AS "keyColumn"
+	            , UPPER_MENU_NO     AS "upperMenuNo"
+	            , RELATE_IMAGE_PATH AS "relateImagePath"
+	            , RELATE_IMAGE_NM   AS "relateImageNm"
+	            , FUNCTION_LIST	    AS "functionList"
+	            , PROGRM_FILE_NM    AS "progrmFileNm"
+			FROM USV_MENU_INFO
+			WHERE MENU_NO = #{searchKeyword}
+		]]>
+	</select>
+	
+	<insert id="insertMenuManage">
+		<![CDATA[
+			INSERT INTO USV_MENU_INFO 
+				( MENU_NM
+	            , MENU_ORDR
+	            , MENU_NO
+	            , MENU_ID
+	            , MENU_DC
+	            , MENU_TYPE
+	            , WIDTH
+	            , HEIGHT
+	            , INSERT_HEIGHT
+	            , CALL
+	            , KEY_COLUMN
+	            , UPPER_MENU_NO
+	            , RELATE_IMAGE_PATH
+	            , RELATE_IMAGE_NM
+	            , FUNCTION_LIST
+	            , PROGRM_FILE_NM
+	             )
+			VALUES (   #{menuNm}
+	                 , #{menuOrdr}
+	                 , #{menuNo}
+	                 , #{menuId}
+	                 , #{menuDc}
+	                 , #{menuType}
+	                 , #{width}
+	                 , #{height}
+	                 , #{insertHeight}
+	                 , #{call}
+	                 , #{keyColumn}
+	                 , #{upperMenuNo}
+	                 , #{relateImagePath}
+	                 , #{relateImageNm}
+	                 , #{functionList}
+	                 , #{progrmFileNm}
+	         		)
+		]]>
+	</insert>
+
+	<update id="updateMenuManage">
+		<![CDATA[
+			UPDATE USV_MENU_INFO 
+			SET
+			
+			MENU_NM           	= #{menuNm}
+			, MENU_ORDR      	= #{menuOrdr}
+            , MENU_NO           = #{menuNo}
+            , MENU_ID           = #{menuId}
+            , MENU_DC           = #{menuDc}
+            , MENU_TYPE         = #{menuType}       
+            , WIDTH          	= #{width}
+            , HEIGHT	        = #{height}
+            , INSERT_HEIGHT	    = #{insertHeight}
+            , CALL		        = #{call}
+      		, KEY_COLUMN        = #{keyColumn}
+            , UPPER_MENU_NO     = #{upperMenuNo}
+            , RELATE_IMAGE_PATH = #{relateImagePath}
+            , RELATE_IMAGE_NM   = #{relateImageNm}  
+            , FUNCTION_LIST	    = #{functionList}
+            , PROGRM_FILE_NM    = #{progrmFileNm}			
+			WHERE MENU_NO = #{menuNo}
+		]]>
+	</update>
+
+	<delete id="deleteMenuManage">
+		<![CDATA[                          
+			DELETE FROM USV_MENU_INFO              
+			WHERE MENU_NO = #{menuNo}               
+		]]>                                
+	</delete> 
+	
+	<!-- 메뉴번호 존재여부 조회 -->
+	<select id="selectMenuNoByPk" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(MENU_NO) AS "totcnt"
+		  FROM USV_MENU_INFO
+		 WHERE MENU_NO = #{menuNo}
+		]]>
+	</select>
+	
+	<!-- 신규 메뉴번호 조회 -->
+	<select id="selectNewMenuNo" parameterType="egovframework.com.cmm.ComDefaultVO" resultType="int">
+		<![CDATA[
+		SELECT COALESCE(MAX(MENU_NO) + 1, '1') AS RESULT FROM USV_MENU_INFO
+		]]>
+	</select>
+	
+	<!-- 상위 메뉴번호 존재여부 조회 -->
+	<select id="selectUpperMenuNoByPk" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(MENU_NO) AS totcnt
+		  FROM USV_MENU_INFO
+		 WHERE UPPER_MENU_NO = #{menuNo}
+		]]>
+	</select>
+
+	<select id="selectMenuListT" parameterType="egovframework.com.cmm.ComDefaultVO" resultType="egovMap">
+		<![CDATA[ 
+            SELECT
+			      MENU_NO           AS "menuNo"
+				, MENU_ORDR         AS "menuOrdr"
+				, MENU_NM           AS "menuNm"
+				, UPPER_MENU_NO     AS "upperMenuNo"
+				, MENU_DC           AS "menuDc"
+				, RELATE_IMAGE_PATH AS "relateImagePath"
+				, RELATE_IMAGE_NM   AS "relateImageNm"
+				, PROGRM_FILE_NM    AS "progrmFileNm"
+				, FUNCTION_LIST		AS "functionList"
+				, MENU_ID			AS "menuId"
+				, WIDTH				AS "width"
+				, HEIGHT			AS "height"
+				, INSERT_HEIGHT		AS "insertHeight"
+				, CALL				AS "call"
+				, KEY_COLUMN		AS "keyColumn"
+				, MENU_TYPE			AS "menuType"
+			FROM USV_MENU_INFO 
+			WHERE Menu_NO > 0  
+			ORDER BY UPPER_MENU_NO, MENU_ORDR
+		]]>
+	</select>
+
+	<delete id="deleteAllMenuList" >
+		<![CDATA[                          
+			DELETE FROM USV_MENU_INFO              
+		]]>                                
+	</delete> 
+
+	<!-- 메뉴정보 총건수 조회 -->
+	<select id="selectMenuListTotCnt" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(MENU_NO) AS totcnt
+		  FROM USV_MENU_INFO
+		  WHERE  1=1
+		]]>
+	</select>	
+	
+	
+<!-- 	<select id="selectMainMenuCnt" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(MENU_NO) AS totcnt
+		  FROM  (  SELECT * 
+						FROM 	USV_MENU_INFO
+						START WITH MENU_ID =  #{menuId}
+						CONNECT BY PRIOR MENU_NO = UPPER_MENU_NO 
+					  ) B
+		  WHERE  1=1
+		]]>
+		<if test="userId != null and userId != '' ">
+					AND MENU_NO IN ( SELECT COALESCE(MENU_NO,'') FROM  USV_USER_MENU WHERE USER_ID = #{userId}   )  
+        </if>
+	</select>	 -->
+	
+	
+	<select id="selectMainMenuCnt" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[
+		SELECT COUNT(TBL.MENU_NO) AS totcnt
+		  FROM  (  
+				
+					WITH RECURSIVE 
+				      	menu_info 
+				      AS ( 
+				          SELECT 
+				              UMI.MENU_NM, UMI.PROGRM_FILE_NM, UMI.MENU_NO, UMI.UPPER_MENU_NO, UMI.MENU_ORDR, UMI.MENU_DC, UMI.RELATE_IMAGE_PATH, UMI.RELATE_IMAGE_NM, UMI.MENU_ID, UMI.WIDTH, UMI.HEIGHT, UMI.INSERT_HEIGHT, UMI.CALL, UMI.KEY_COLUMN, UMI.MENU_TYPE, UMI.FUNCTION_LIST
+				              ,ARRAY[]::"numeric"[] AS menu_path 
+				              ,false 
+				          FROM USV_MENU_INFO AS UMI  
+				          WHERE MENU_ID = #{menuId} 
+				          
+				          UNION ALL 
+				          
+				          SELECT 
+				              UMI.MENU_NM, UMI.PROGRM_FILE_NM, UMI.MENU_NO, UMI.UPPER_MENU_NO, UMI.MENU_ORDR, UMI.MENU_DC, UMI.RELATE_IMAGE_PATH, UMI.RELATE_IMAGE_NM, UMI.MENU_ID, UMI.WIDTH, UMI.HEIGHT, UMI.INSERT_HEIGHT, UMI.CALL, UMI.KEY_COLUMN, UMI.MENU_TYPE, UMI.FUNCTION_LIST 
+				              ,mi.menu_path || UMI.menu_no
+				              ,UMI.menu_no = ANY(menu_path)
+				          FROM USV_MENU_INFO UMI, menu_info mi
+				          WHERE UMI.upper_menu_no = mi.menu_no
+				      ) 
+				      
+				      SELECT MENU_NM, PROGRM_FILE_NM, MENU_NO, UPPER_MENU_NO, MENU_ORDR, MENU_DC, RELATE_IMAGE_PATH, RELATE_IMAGE_NM, MENU_ID, WIDTH, HEIGHT, INSERT_HEIGHT, CALL, KEY_COLUMN, MENU_TYPE, FUNCTION_LIST 
+				      ,menu_path 
+				      FROM menu_info 
+					  ORDER BY menu_no
+				
+			) AS TBL
+		  WHERE  1=1
+		  
+		]]>
+		<if test="userId != null and userId != '' ">
+					AND MENU_NO IN ( SELECT COALESCE(MENU_NO, null) FROM  USV_USER_MENU WHERE USER_ID = #{userId}   )  
+        </if>
+	</select>	
+	
+	<!-- <select id="selectMainMenuHead" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="egovMap">
+		<![CDATA[ 
+            SELECT   DISTINCT
+			      B.MENU_NO           AS "menuNo"
+				, B.MENU_ORDR         AS "menuOrdr"
+				, B.MENU_NM           AS "menuNm"
+				, B.UPPER_MENU_NO     AS "upperMenuNo"
+				, B.MENU_DC           AS "menuDc"
+				, B.RELATE_IMAGE_PATH AS "relateImagePath"
+				, B.RELATE_IMAGE_NM   AS "relateImageNm"
+				, B.PROGRM_FILE_NM    AS "progrmFileNm"
+				, (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "URL"
+				, B.MENU_ID
+				, B.WIDTH
+				, B.HEIGHT
+				, B.INSERT_HEIGHT
+				, B.CALL
+				, B.KEY_COLUMN
+				, B.MENU_TYPE
+				, B.FUNCTION_LIST
+			FROM  (  SELECT * 
+						FROM 	USV_MENU_INFO
+						START WITH MENU_ID =  #{menuId}
+						CONNECT BY PRIOR MENU_NO = UPPER_MENU_NO 
+					  ) AS 
+			B 
+			WHERE B.Menu_NO > 0 ]]>
+			<if test="authorList != null  and authorList != '' ">
+					AND ( B.MENU_NO IN ( SELECT COALESCE(MENU_NO,'') 
+												   FROM  USV_MENU_AUTHOR WHERE 1=1
+													<foreach item="item" index="index" open=" AND  AUTHOR_CODE IN (" close=")" collection="authorList" separator=",">
+															#{item}
+													</foreach>													
+					)  OR B.MENU_TYPE = 'INFO' )	
+            </if>
+           <if test="userId != null  and userId != '' ">
+					AND ( B.MENU_NO IN ( SELECT COALESCE(MENU_NO,'') FROM  USV_USER_MENU WHERE USER_ID = #{userId}   )  OR B.MENU_TYPE = 'INFO' )
+            </if>
+			ORDER BY B.MENU_NO, B.MENU_ORDR  ASC 
+	</select>	 -->
+	
+	<select id="selectMainMenuHead" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="egovMap">
+		<![CDATA[ 
+            SELECT   DISTINCT
+			      B.MENU_NO           AS "menuNo"
+				, B.MENU_ORDR         AS "menuOrdr"
+				, B.MENU_NM           AS "menuNm"
+				, B.UPPER_MENU_NO     AS "upperMenuNo"
+				, B.MENU_DC           AS "menuDc"
+				, B.RELATE_IMAGE_PATH AS "relateImagePath"
+				, B.RELATE_IMAGE_NM   AS "relateImageNm"
+				, B.PROGRM_FILE_NM    AS "progrmFileNm"
+				, (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "URL"
+				, B.MENU_ID
+				, B.WIDTH
+				, B.HEIGHT
+				, B.INSERT_HEIGHT
+				, B.CALL
+				, B.KEY_COLUMN
+				, B.MENU_TYPE
+				, B.FUNCTION_LIST
+			FROM  (  
+			
+				      WITH RECURSIVE 
+				      	menu_info 
+				      AS ( 
+				          SELECT 
+				              UMI.MENU_NM, UMI.PROGRM_FILE_NM, UMI.MENU_NO, UMI.UPPER_MENU_NO, UMI.MENU_ORDR, UMI.MENU_DC, UMI.RELATE_IMAGE_PATH, UMI.RELATE_IMAGE_NM, UMI.MENU_ID, UMI.WIDTH, UMI.HEIGHT, UMI.INSERT_HEIGHT, UMI.CALL, UMI.KEY_COLUMN, UMI.MENU_TYPE, UMI.FUNCTION_LIST
+				              ,ARRAY[]::"numeric"[] AS menu_path 
+				              ,false 
+				          FROM USV_MENU_INFO AS UMI  
+				          WHERE MENU_ID = #{menuId} 
+				          
+				          UNION ALL 
+				          
+				          SELECT 
+				              UMI.MENU_NM, UMI.PROGRM_FILE_NM, UMI.MENU_NO, UMI.UPPER_MENU_NO, UMI.MENU_ORDR, UMI.MENU_DC, UMI.RELATE_IMAGE_PATH, UMI.RELATE_IMAGE_NM, UMI.MENU_ID, UMI.WIDTH, UMI.HEIGHT, UMI.INSERT_HEIGHT, UMI.CALL, UMI.KEY_COLUMN, UMI.MENU_TYPE, UMI.FUNCTION_LIST 
+				              ,mi.menu_path || UMI.menu_no
+				              ,UMI.menu_no = ANY(menu_path)
+				          FROM USV_MENU_INFO UMI, menu_info mi
+				          WHERE UMI.upper_menu_no = mi.menu_no
+				      ) 
+				      
+				      SELECT MENU_NM, PROGRM_FILE_NM, MENU_NO, UPPER_MENU_NO, MENU_ORDR, MENU_DC, RELATE_IMAGE_PATH, RELATE_IMAGE_NM, MENU_ID, WIDTH, HEIGHT, INSERT_HEIGHT, CALL, KEY_COLUMN, MENU_TYPE, FUNCTION_LIST 
+				      ,menu_path 
+				      FROM menu_info 
+					  ORDER BY menu_no
+	  
+			
+				 ) AS 
+			B 
+			WHERE B.Menu_NO > 0 ]]>
+			<if test="authorList != null  and authorList != '' ">
+					AND ( B.MENU_NO IN ( SELECT COALESCE(MENU_NO, null) 
+												   FROM  USV_MENU_AUTHOR WHERE 1=1
+													<foreach item="item" index="index" open=" AND  AUTHOR_CODE IN (" close=")" collection="authorList" separator=",">
+															#{item}
+													</foreach>													
+					)  OR B.MENU_TYPE = 'INFO' )	
+            </if>
+           <if test="userId != null  and userId != '' ">
+					AND ( B.MENU_NO IN ( SELECT COALESCE(MENU_NO, null) FROM  USV_USER_MENU WHERE USER_ID = #{userId}   )  OR B.MENU_TYPE = 'INFO' )
+            </if>
+			ORDER BY B.MENU_NO, B.MENU_ORDR  ASC 
+	</select>
+	
+	<select id="selectMainMenu" parameterType="HashMap" resultType="egovMap">
+		<![CDATA[ 
+            SELECT   DISTINCT
+			      B.MENU_NO           AS "menuNo"
+				, B.MENU_ORDR         AS "menuOrdr"
+				, B.MENU_NM           AS "menuNm"
+				, B.UPPER_MENU_NO     AS "upperMenuNo"
+				, B.MENU_DC           AS "menuDc"
+				, B.RELATE_IMAGE_PATH AS "relateImagePath"
+				, B.RELATE_IMAGE_NM   AS "relateImageNm"
+				, B.PROGRM_FILE_NM    AS "progrmFileNm"
+				, (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "URL"
+				, B.MENU_ID
+				, B.WIDTH
+				, B.HEIGHT
+				, B.INSERT_HEIGHT
+				, B.CALL
+				, B.KEY_COLUMN
+				, B.MENU_TYPE
+				, B.FUNCTION_LIST
+			FROM USV_MENU_AUTHOR A, USV_MENU_INFO B 
+			WHERE  B.MENU_NO > 0 
+			AND    A.MENU_NO  = B.MENU_NO 								]]>
+			<!-- <iterate property="paramList"	  open=" AND  AUTHOR_CODE IN (" close=")" conjunction="," > -->
+			<foreach item="item" index="index" open=" AND  AUTHOR_CODE IN (" close=")" collection="paramList" separator=",">
+					 #{item}
+			</foreach>
+			ORDER BY B.MENU_NO, B.MENU_ORDR  ASC 		
+	</select>
+	
+
+	<select id="selectMainMenuLeft" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="egovMap">
+		<![CDATA[ 
+			SELECT
+			       B.MENU_NO           AS "menuNo"
+				 , B.MENU_ORDR         AS "menuOrdr"
+				 , B.MENU_NM           AS "menuNm"
+				 , B.UPPER_MENU_NO     AS "upperMenuNo"
+				 , B.RELATE_IMAGE_PATH AS "relateImagePath"
+				 , B.RELATE_IMAGE_NM   AS "relateImageNm"
+				 , (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "chkURL"	
+			FROM   USV_MENU_AUTHOR A, USV_MENU_INFO B
+			WHERE  A.MENU_NO  = B.MENU_NO 
+			ORDER BY B.MENU_ORDR
+		]]> 
+	</select>
+
+	<select id="selectLastMenuURL" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="String">
+		<![CDATA[ 
+			SELECT URL 
+			FROM   USV_PROGRM
+			WHERE  PROGRM_FILE_NM = (SELECT PROGRM_FILE_NM FROM USV_MENU_INFO  WHERE MENU_NO = #{menuNo})
+		]]> 
+	</select>
+
+	<select id="selectLastMenuNo" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[ 
+			select MIN(MENU_NO) 
+			from   USV_MENU_INFO
+			where  UPPER_MENU_NO = #{menuNo}
+			and    MENU_ORDR =
+			      (select MIN(MENU_ORDR) 
+			       from USV_MENU_AUTHOR A, USV_MENU_INFO B
+			       where A.MENU_NO = B.MENU_NO
+			       AND   B.UPPER_MENU_NO = #{menuNo})
+		]]> 
+	</select>
+
+	<select id="selectLastMenuNoCnt" parameterType="usolver.admin.menu.vo.MenuManageVO" resultType="int">
+		<![CDATA[ 
+			select count(MENU_NO) 
+			from   USV_MENU_INFO
+			where  UPPER_MENU_NO = #{menuNo}
+			and    MENU_ORDR =
+			      (select MIN(MENU_ORDR) 
+			       from USV_MENU_AUTHOR A, USV_MENU_INFO B
+			       where A.MENU_NO = B.MENU_NO
+			       AND   B.UPPER_MENU_NO = #{menuNo})
+		]]> 
+	</select>
+	
+</mapper>        

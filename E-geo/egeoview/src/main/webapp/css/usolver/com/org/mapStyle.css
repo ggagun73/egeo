@@ -1,0 +1,117 @@
+@charset "utf-8";
+
+
+
+.nav_control {
+	position: absolute;
+	overflow: visible;
+	width: 24px;
+	z-index: 999;
+	/* 	background: white; */
+	margin:40px 0px 0px 0px;
+	right:240px;
+	text-align: center;
+}
+
+
+.nav_control .mc_zoom {
+	position: relative;
+	width: 24px;
+	/* border: 1px solid #8d8d8d; */
+}
+
+.spmc_zoomin {
+	position: absolute;
+	z-index: 2;
+	width: 17px;
+	height: 15px;
+	top: 5px;
+	left:5px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/re_plus.gif);
+}
+
+.spmc_zoomout {
+	position: absolute;
+	z-index: 2;
+	width: 17px;
+	height: 15px;
+	bottom: 5px;
+	left: 5px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/re_minus.gif);
+}
+
+.spmc_slider {
+	position: absolute;
+	left:5px;
+	width: 18px;
+	height: 6px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/top_bg_001.png);
+}
+
+.mc_scaler .spmc_scaler_on {
+	height: 225px;
+	width: 27px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/re_bg.gif) no-repeat;
+}
+
+.mc_scaler .spmc_scaler_off {
+	position: absolute;
+	height: 23px;
+	background:
+		url(http://stat.seoul.go.kr/initinfo/images/gis/re_bg.gif)
+		no-repeat;
+	background-position: -112px 5px;
+	margin-left: -21px;
+	width: 20px;
+	top: 24px;
+}
+
+.spmc,.map_ctrl .mc_tools .mc_toolsin {
+	display: inline-block;
+	overflow: hidden;
+	line-height: 999px;
+	vertical-align: top;
+}
+
+
+.mc_legend {
+	overflow: hidden;
+	position: absolute;
+	top: 38px;
+	left: 25px;
+	width: 40px;
+	zoom: 1;
+}
+
+.spmc_lg3 {
+	float: left;
+	margin-bottom: 3px;
+	width: 40px;
+	height: 15px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/scale_unit1.png);
+	margin-top: 30px;
+}
+
+.spmc_lg2 {
+	float: left;
+	margin-bottom: 3px;
+	width: 40px;
+	height: 15px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/scale_unit2.png);
+	margin-top: 72px;
+}
+
+.spmc_lg1 {
+	float: left;
+	margin-bottom: 3px;
+	width: 40px;
+	height: 15px;
+	background: url(http://stat.seoul.go.kr/initinfo/images/gis/scale_unit3.png);
+	margin-top: 13px;
+}
+
+
+
+
+
+

@@ -1,0 +1,727 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="EtcMapEt">
+
+	<typeAlias alias="EtcMapEtVO" type="usolver.com.cmm.map.service.vo.EtcMapEtVO"/>
+		
+	<!-- 지도 레이어 목록 조회 -->
+	<select id="content.etc.etcMapLayerList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		select LYR_PK, UP_LYR, LYR_ID, CLS_GBN, CLS_LVL, LVL1_NM, LVL2_NM, LVL3_NM, LOWER(LYR_SYMBOL) AS LYR_SYMBOL
+		from 	MAP_LYRLIST 
+		order by SORT_ODR	
+	</select>
+	
+	
+	<!-- 지도 레이어 목록 조회 -->
+	<select id="content.etc.etcMapLayerListOn" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		select  USER_ID,LYR_ON
+		from 	MAP_LYRLIST_INFO 
+		WHERE 1=1
+		AND SYS_TYPE = #SYS_TYPE#
+		<isNotEmpty prepend="AND" property="USER_ID"><!-- 사용자 ID -->
+				USER_ID LIKE '%' || #USER_ID# || '%'
+		</isNotEmpty>
+	</select>
+	
+	
+	
+	<select id="content.etc.etcBuildSearchList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+       SELECT B.*
+       FROM (
+			SELECT
+			      ROWNUM rnum,
+				A.OBJECTID,  
+				A.FTR_CDE,  
+				A.BLD_NAM, 
+				A.DBL_NAM,   
+				A.AAA_CDE,  
+				A.AAB_CDE,  
+				A.BJD_CDE,
+				(SELECT BJD_NAM FROM BML_BADM_AS WHERE BJD_CDE = A.BJD_CDE)  AS BJD_NAM,  
+				A.HJD_CDE, 
+				(SELECT HJD_NAM FROM BML_HADM_AS WHERE HJD_CDE = A.HJD_CDE)  AS HJD_NAM,
+				A.SAN_CDE,  
+				A.FAC_NUM, 
+				A.FAD_NUM,  
+				A.NRD_NAM,  
+				A.NFC_NUM, 
+				A.NFD_NUM,  
+				A.BLD_HIT,  
+				A.IMP_CDE,  
+				A.BLD_USE,  
+				A.HJG_CDE,
+				(SELECT HJG_NAM FROM BML_GADM_AS WHERE HJG_CDE = A.HJG_CDE)  AS HJG_NAM,
+				BJD_CDE || SAN_CDE + 1 || 
+				DECODE(TRIM(FAC_NUM), '', '0000', LPAD(TRIM(FAC_NUM), 4, '0')) || 
+				DECODE(TRIM(FAD_NUM), '', '0000', LPAD(TRIM(FAD_NUM), 4, '0')) PNU				
+			FROM BML_BLDG_AS A
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="BLD_NAM"><!-- 건물명 -->
+				A.BLD_NAM LIKE '%' || #BLD_NAM# || '%'
+			</isNotEmpty>				
+			ORDER BY A.BLD_NAM ASC
+		) B
+	<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.etc.etcBuildSearchListCnt" parameterClass="EtcMapEtVO" resultClass="int">
+			SELECT COUNT(*) totcnt
+			FROM BML_BLDG_AS
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="BLD_NAM"><!-- 건물명 -->
+				BLD_NAM LIKE '%' || #BLD_NAM# || '%'
+			</isNotEmpty>
+			
+	</select>
+	
+	<select id="content.etc.etcJibunSearchList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+	       SELECT A.*
+	       FROM (
+				SELECT
+				      ROWNUM rnum,
+					  OBJECTID,  
+					  PNU,
+					  (SELECT BJD_NAM FROM BML_BADM_AS WHERE BJD_CDE = SUBSTR(PNU,0,10)) AS  HJD_NAM,
+					  JIBUN			
+				FROM LP_PA_BBND
+				WHERE 1=1
+				<isNotEmpty prepend="AND" property="PNU"><!-- PNU -->
+					PNU LIKE '%' || #PNU# || '%'
+				</isNotEmpty>				
+				ORDER BY PNU ASC
+			) A
+		<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.etc.etcJibunSearchListCnt" parameterClass="EtcMapEtVO" resultClass="int">
+			SELECT COUNT(*) totcnt
+			FROM LP_PA_BBND
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="PNU"><!-- PNU -->
+				PNU LIKE '%' || #PNU# || '%'
+			</isNotEmpty>
+			
+	</select>
+	
+	<select id="content.etc.etcRoadSearchList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+	       SELECT A.*
+	       FROM (
+				SELECT
+				    DISTINCT(RN) RN, 
+				    ROWNUM rnum,
+					OBJECTID,  
+					AG_GID,      
+					SIG_CD,      
+					RDS_MAN_NO,    
+					RN_CD,       
+					ENG_RN ,     
+					NTFC_DE,      
+					RN_DLB_DE,   
+					ROA_MAN_ES,  
+					WDR_RD_CD , 
+					ROA_CLS_SE,  
+					RDS_DPN_SE,   
+					RBP_CN,      
+					REP_CN,     
+					ROAD_BT,    
+					ROAD_LT,    
+					BSI_INT,     
+					NLR_LCL_NO,  
+					ALWNC_RESN 				
+				FROM TL_SPRD_MANAGE
+				WHERE 1=1
+				<isNotEmpty prepend="AND" property="RN"><!-- 도로명 -->
+					RN LIKE '%' || #RN# || '%'
+				</isNotEmpty>				
+				ORDER BY RN ASC
+			) A
+		<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.etc.etcRoadSearchListCnt" parameterClass="EtcMapEtVO" resultClass="int">
+			SELECT COUNT(*) totcnt
+			FROM TL_SPRD_MANAGE
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="RN"><!-- 도로명 -->
+				RN LIKE '%' || #RN# || '%'
+			</isNotEmpty>
+	</select>
+	
+	<select id="content.etc.etcNewAddressSearchList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+	       SELECT A.*
+	       FROM (
+				SELECT  
+						ROWNUM rnum,
+						T.OBJECTID,      
+				        T.AG_GID,      
+				        T.BUL_MAN_NO, 
+				        T.SIG_CD,      
+				        T.RN_CD,        
+				        T.RDS_MAN_NO,  
+				        T.BSI_INT_SN,   
+				        T.EQB_MAN_SN,   
+				        T.BULD_SE_CD,   
+				        trim(T.BULD_MNNM) as BULD_MNNM,   
+				        trim(T.BULD_SLNO) as BULD_SLNO,   
+				        trim(T.BULD_NM) as BULD_NM,      
+				        T.BUL_ENG_NM,  
+				        T.BULD_NM_DC,  
+				        T.BULD_STTUS,   
+				        T.BDTYP_CD,      
+				        T.BUL_DPN_SE,   
+				        T.GRO_FLO_CO,   
+				        T.UND_FLO_CO,   
+				        T.ZIP,         
+				        T.POS_BUL_NM,   
+				        T.REG_PUB_NM,   
+				        T.EMD_CD,       
+				        T.LI_CD,       
+				        T.MNTN_YN,      
+				        T.LNBR_MNNM,    
+				        T.LNBR_SLNO,    
+				        T.COMPET_DE,   
+				        T.NTFC_DE,      
+				        T.MVM_RES_CD,    
+				        SUBSTR(T.BD_MGT_SN, 0, 19) PNU
+				FROM TL_SPBD_BULD T
+				WHERE T.RN_CD = (SELECT 
+										DISTINCT RN_CD
+								 FROM TL_SPRD_MANAGE 
+								 WHERE 1=1
+								 <isNotEmpty prepend="AND" property="RN"><!-- 건물명 -->
+									RN = #RN# 
+								 </isNotEmpty>
+								)
+				 <isNotEmpty prepend="AND" property="BULD_MNNM"><!-- 건물명 -->
+					BULD_MNNM LIKE '%' || #BULD_MNNM# || '%'
+				 </isNotEmpty>
+				 <isNotEmpty prepend="AND" property="BULD_SLNO"><!-- 건물명 -->
+					BULD_SLNO LIKE '%' || #BULD_SLNO# || '%'
+				 </isNotEmpty>			
+												
+				ORDER BY T.BULD_NM ASC				
+			) A
+		<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.etc.etcNewAddressSearchListCnt" parameterClass="EtcMapEtVO" resultClass="int">
+			    SELECT COUNT(*) totcnt			    
+				FROM TL_SPBD_BULD T
+				WHERE T.RN_CD = (SELECT 
+										DISTINCT RN_CD
+								 FROM TL_SPRD_MANAGE 
+								 WHERE 1=1
+								 <isNotEmpty prepend="AND" property="RN"><!-- 건물명 -->
+									RN = #RN# 
+								 </isNotEmpty>
+								)
+				 <isNotEmpty prepend="AND" property="BULD_MNNM"><!-- 건물명 -->
+					BULD_MNNM LIKE '%' || #BULD_MNNM# || '%'
+				 </isNotEmpty>
+				 <isNotEmpty prepend="AND" property="BULD_SLNO"><!-- 건물명 -->
+					BULD_SLNO LIKE '%' || #BULD_SLNO# || '%'
+				 </isNotEmpty>			
+	</select>
+	
+	
+	<insert id="content.etc.etcMapLayerInfoSave">
+		<![CDATA[
+			INSERT INTO MAP_LYRLIST_INFO 
+				( 
+				 USER_ID
+				,LYR_ON
+				,SYS_TYPE			
+				 )
+			VALUES (				
+				 #USER_ID#
+				,#LYR_ON#				
+				,#SYS_TYPE# 				
+			   )
+		]]>
+	</insert>
+	
+	
+	<insert id="content.etc.etcMapDrawInfoSave">
+		<![CDATA[
+			INSERT INTO MAP_DRAW_INFO 
+				( 				 
+				 SEQ
+				,USER_ID
+				,DRAW_NAME
+				
+				 )
+			VALUES (				
+				 MAP_DRAW_INFO_SEQ.NEXTVAL	
+				,#USER_ID#				
+				,#DRAW_NAME#
+											
+			   )
+		]]>
+	</insert>
+	
+	
+	<!-- 지도 도형 목록 조회 -->
+	<select id="content.etc.etcMapDrawInfoList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		SELECT  *
+		FROM 	MAP_DRAW_INFO 
+		WHERE   USER_ID = #USER_ID#	
+		ORDER BY SEQ	
+	</select>
+	
+	
+	<!-- 지도 도형 삭제 -->
+	<delete id="content.etc.etcMapDrawInfoDelete">
+		<![CDATA[
+			DELETE FROM MAP_DRAW_INFO 
+			WHERE SEQ = #SEQ#
+		]]>
+	</delete>
+	
+	
+	<delete id="content.etc.etcMapDrawLineDelete">
+		<![CDATA[
+			DELETE FROM LINE_PRINT 
+			WHERE USER_ID = #USER_ID#
+			AND DRAW_NAME = #DRAW_NAME#
+		]]>
+	</delete>
+	
+	<delete id="content.etc.etcMapDrawPointDelete">
+		<![CDATA[
+			DELETE FROM POINT_PRINT 
+			WHERE USER_ID = #USER_ID#
+			AND DRAW_NAME = #DRAW_NAME#
+		]]>
+	</delete>
+	
+	<delete id="content.etc.etcMapDrawPolygonDelete">
+		<![CDATA[
+			DELETE FROM POLYGON_PRINT 
+			WHERE USER_ID = #USER_ID#
+			AND DRAW_NAME = #DRAW_NAME#
+		]]>
+	</delete>
+	
+	
+	<!-- 상세보기 -->
+	<select id="content.etc.etcMapDrawInfoDetail" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		<![CDATA[
+			SELECT
+				*
+			FROM MAP_DRAW_INFO
+			WHERE  USER_ID = #USER_ID#
+			AND DRAW_NAME = #DRAW_NAME#
+		]]>
+	</select>
+	
+	
+	<insert id="content.etc.etcMapLayerInfoDetailSave">
+		<![CDATA[
+			INSERT INTO MAP_LYRDTL_INFO 
+				( 
+				  SEQ
+				  ,USER_ID
+				  ,SYSTEM_ID
+				  ,LYR_ID
+				  ,FILL_COLOR 
+				  ,FILL_STYLE  
+				  ,OUTLINE_COLOR 
+				  ,OUTLINE_STYLE 
+				  ,OUTLINE_WIDTH 
+				  ,FONT_SIZE
+				  ,FONT_WEIGHT 
+				  ,FONT_STYLE 
+				  ,FONT_FAMILY
+				  ,FONT_COLOR 
+				  ,GEOMETRY_TYPE
+				  ,MAXSCALE
+			      ,MINSCALE
+			      ,OPACITY
+			      ,LABEL_FIELD
+			      ,LEGEND_NUM
+			      ,LEGEND_NM
+			      ,MARKER_STYLE		
+				 )
+			VALUES (
+				   MAP_DRAW_INFO_SEQ.NEXTVAL
+				  ,#USER_ID#
+				  ,#SYSTEM_ID#
+				  ,#LYR_ID#
+				  ,#FILL_COLOR# 
+				  ,#FILL_STYLE#  
+				  ,#OUTLINE_COLOR# 
+				  ,#OUTLINE_STYLE# 
+				  ,#OUTLINE_WIDTH#
+				  ,#FONT_SIZE#
+				  ,#FONT_WEIGHT# 
+				  ,#FONT_STYLE# 
+				  ,#FONT_FAMILY#
+				  ,#FONT_COLOR#
+				  ,#GEOMETRY_TYPE#	
+				  ,#MAXSCALE#
+			      ,#MINSCALE#
+			      ,#OPACITY#
+			      ,#LABEL_FIELD#
+			      ,#LEGEND_NUM#
+			      ,#LEGEND_NM#
+			      ,#MARKER_STYLE#		      			      					
+			   )
+		]]>
+	</insert>
+	
+	<update id="content.etc.etcMapLayerInfoDetailUpdate">
+		<![CDATA[
+			DELETE FROM MAP_LYRDTL_INFO						  		  			
+			WHERE USER_ID = #USER_ID#
+			AND SYSTEM_ID = #SYSTEM_ID#
+			AND LYR_ID = #LYR_ID#
+			AND LEGEND_NUM = #LEGEND_NUM#
+		]]>
+	</update>
+	
+	<select id="content.etc.etcMapLayerInfoDetailCheck" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		<![CDATA[
+			SELECT
+				*
+			FROM MAP_LYRDTL_INFO
+			WHERE  USER_ID = #USER_ID#
+			AND SYSTEM_ID = #SYSTEM_ID#
+			AND LYR_ID = #LYR_ID#
+			AND LEGEND_NM = #LEGEND_NM# 			
+			ORDER BY LYR_ID,LEGEND_NUM 
+			
+		]]>
+	</select>
+	
+	
+	<!-- 지도 레이어 스타일 삭제 -->
+	<delete id="content.etc.etcMapLayerInfoDetailDelete">
+		<![CDATA[
+			DELETE FROM MAP_LYRDTL_INFO 
+			WHERE  USER_ID = #USER_ID#
+			AND SYSTEM_ID = #SYSTEM_ID#
+			AND LYR_ID = #LYR_ID#	
+		]]>
+	</delete>
+	
+	
+	
+	<select id="content.etc.etcMapLayerInfoSaveList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		<![CDATA[
+			SELECT
+				*
+			FROM MAP_LYRDTL_INFO
+			WHERE  USER_ID = #USER_ID#
+			AND SYSTEM_ID = #SYSTEM_ID#				
+			ORDER BY LYR_ID,LEGEND_NUM
+		]]>
+	</select>
+	
+	
+	
+	<insert id="content.etc.etcMapGroupLayerNameSave">
+		<![CDATA[
+			INSERT INTO MAP_GROUPLAYER_INFO 
+				( 				 
+				 SEQ
+				,USER_ID
+				,GROUPLAYER_NAME
+				,LAYER_LIST
+				,USE_YN
+				,SYS_TYPE
+				 )
+			VALUES (				
+				 MAP_GROUPLAYER_INFO_SEQ.NEXTVAL	
+				,#USER_ID#				
+				,#GROUPLAYER_NAME#
+				,#LAYER_LIST#
+				,#USE_YN#
+				,#SYS_TYPE#							
+			   )
+		]]>
+	</insert>
+	
+	
+	
+	
+	<!-- 그룹레이어명 상세보기 -->
+	<select id="content.etc.etcMapGroupLayerNameDetail" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		<![CDATA[
+			SELECT
+				*
+			FROM MAP_GROUPLAYER_INFO
+			WHERE  USER_ID = #USER_ID#
+			AND SYS_TYPE = #SYS_TYPE# 
+			AND GROUPLAYER_NAME = #GROUPLAYER_NAME#
+		]]>
+	</select>
+	
+	
+	
+	<!-- 그룹레이어명 목록 조회 -->
+	<select id="content.etc.etcMapGroupLayerNameList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		SELECT  *
+		FROM 	MAP_GROUPLAYER_INFO 
+		WHERE   USER_ID = #USER_ID#	
+		AND     SYS_TYPE = #SYS_TYPE# 		
+		AND     GROUPLAYER_NAME NOT IN('default')
+		ORDER BY SEQ	
+	</select>
+	
+	
+	<!-- 그룹레이어명 삭제 -->
+	<delete id="content.etc.etcMapGroupLayerNameDelete">
+		<![CDATA[
+			DELETE FROM MAP_GROUPLAYER_INFO 
+			WHERE SEQ = #SEQ#
+		]]>
+	</delete>
+	
+	
+	<!-- 그룹레이어명 삭제 -->
+	<delete id="content.etc.etcMapGroupLayerDefaultNameDelete">
+		<![CDATA[
+			DELETE FROM MAP_GROUPLAYER_INFO 
+			WHERE GROUPLAYER_NAME = #GROUPLAYER_NAME#
+			AND SYS_TYPE = #SYS_TYPE# 
+		]]>
+	</delete>
+	
+	
+	<!-- 그룹레이어명 상세보기 -->
+	<select id="content.etc.etcMapGroupLayerSelect" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		<![CDATA[
+			SELECT
+				*
+			FROM MAP_GROUPLAYER_INFO
+			WHERE  SEQ = #SEQ#
+		]]>
+	</select>
+	
+	
+	<!-- 그룹레이어명 목록 조회 -->
+	<select id="content.etc.etcMapMyLayerList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+		SELECT  *
+		FROM 	MAP_GROUPLAYER_INFO 
+		WHERE   USER_ID = #USER_ID#
+		AND SYS_TYPE = #SYS_TYPE# 	
+		AND USE_YN = 'Y'
+	</select>
+	
+	
+	
+	<update id="content.etc.etcMapGroupLayerConfirmUseN">
+		<![CDATA[
+			UPDATE MAP_GROUPLAYER_INFO 
+			SET 
+			  USE_YN = 'N'	  			
+			WHERE  USER_ID = #USER_ID#
+			AND SYS_TYPE = #SYS_TYPE# 	
+		]]>
+	</update>
+	
+	
+	<update id="content.etc.etcMapGroupLayerConfirmUseY">
+		<![CDATA[
+			UPDATE MAP_GROUPLAYER_INFO 
+			SET 
+			  USE_YN = 	'Y'	  			
+			WHERE  SEQ = #SEQ#
+		]]>
+	</update>
+	
+	
+	<!-- 지도 도형 삭제 -->
+	<delete id="content.etc.etcMapLayerInfoDelete">
+		<![CDATA[
+			DELETE FROM MAP_LYRLIST_INFO 
+			WHERE USER_ID = #USER_ID#
+			AND SYS_TYPE = #SYS_TYPE# 
+		]]>
+	</delete>
+	
+	
+	<delete id="content.etc.etcMapLayerStyleDelete">
+		<![CDATA[
+			DELETE FROM MAP_LYRDTL_INFO 
+			WHERE USER_ID = #USER_ID#
+			AND SYSTEM_ID = #SYSTEM_ID# 
+		]]>
+	</delete>
+	
+	
+	<select id="content.etc.etcUsvComponentSearch" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">	
+			SELECT
+				*
+			FROM USV_COMPONENT			
+			WHERE 1=1
+			<isNotEmpty prepend="AND" property="LAYERNAME">
+				LAYERNAME = #LAYERNAME#
+			</isNotEmpty>	
+			<isNotEmpty prepend="AND" property="CAPTION">
+				CAPTION = #CAPTION#
+			</isNotEmpty>	
+	</select>
+	
+	
+	
+	<!-- 도로면 차도 보도 조회 -->
+	<select id="content.etc.etcMapIdentifyRoadSearch_SDWK" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+			SELECT OBJECTID,
+				    (SELECT PROG_ID FROM USV_COMPONENT WHERE LAYERNAME = #LAYERNAME# ) AS PROG_ID 
+			FROM RDT_SDWK_DT
+			WHERE RDA_IDN = #RDA_IDN# 
+	</select>
+	
+	
+	
+	<select id="content.etc.etcMapIdentifyRoadSearch_RDWY" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+			SELECT  OBJECTID,
+				    (SELECT PROG_ID FROM USV_COMPONENT WHERE LAYERNAME = #LAYERNAME#) AS PROG_ID
+			FROM RDT_RDWY_DT
+			WHERE RDA_IDN = #RDA_IDN# 
+	</select>
+	
+	
+	<select id="content.etc.etcMapFilnalLocationList" parameterClass="EtcMapEtVO" resultClass="EtcMapEtVO">
+			SELECT  SEQ,
+					USER_ID,
+					SYSTEM_ID,
+					SCALE,
+					XMAX,
+					XMIN,
+					YMAX,
+					YMIN
+			FROM MAP_FINAL_LOC
+			WHERE USER_ID = #USER_ID# 
+			AND SYSTEM_ID = #SYSTEM_ID# 
+	</select>
+	
+	<insert id="content.etc.etcMapFilnalLocationInsert">
+		<![CDATA[
+			INSERT INTO MAP_FINAL_LOC 
+				( 				 
+				 SEQ
+				,USER_ID
+				,SYSTEM_ID
+				,SCALE
+				,XMAX
+				,XMIN
+				,YMAX
+				,YMIN
+				 )
+			VALUES (				
+				 SEQ_MAP_FINAL_LOC.NEXTVAL	
+				,#USER_ID#				
+				,#SYSTEM_ID#
+				,#SCALE#
+				,#XMAX#
+				,#XMIN#	
+				,#YMAX#
+				,#YMIN#							
+			   )
+		]]>
+	</insert>
+	
+	
+	
+	<update id="content.etc.etcMapGroupLayerNameUpdate">
+		<![CDATA[
+			UPDATE MAP_FINAL_LOC 
+			SET 
+			  SCALE = #SCALE#,
+			  XMAX = #XMAX#,
+			  XMIN = #XMIN#,
+			  YMAX = #YMAX#,
+			  YMIN = #YMIN#  			
+			WHERE USER_ID = #USER_ID# 
+			AND SYSTEM_ID = #SYSTEM_ID#
+		]]>
+	</update>
+	
+	
+	
+	<typeAlias alias="UsvUserMapVO" type="usolver.com.cmm.map.service.vo.UsvUserMapVO"/>
+	
+	<update id="content.etc.etcMapGroupLayersSave" parameterClass="UsvUserMapVO">
+	MERGE INTO USV_USER_GROUP
+	   USING DUAL
+	   ON (USER_ID = #USER_ID# AND SYS_ID = #SYS_ID# AND GROUP_NAME = #GROUP_NAME#)
+	   WHEN MATCHED THEN
+	      UPDATE
+	         SET GROUP_LAYERS = #GROUP_LAYERS#
+	   WHEN NOT MATCHED THEN
+	      INSERT (USER_ID, SYS_ID, GROUP_NAME, GROUP_LAYERS)
+	      VALUES (#USER_ID#, #SYS_ID#, #GROUP_NAME#, #GROUP_LAYERS#)
+	</update>
+	<select id="content.etc.etcMapGroupLayersList" parameterClass="UsvUserMapVO" resultClass="UsvUserMapVO">
+		SELECT * FROM USV_USER_GROUP WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#
+		<isNotEmpty prepend="AND" property="GROUP_NAME">
+				GROUP_NAME = #GROUP_NAME#
+		</isNotEmpty>
+	</select>
+	<delete id="content.etc.etcMapGroupLayersDelete">
+		DELETE FROM USV_USER_GROUP WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID# AND GROUP_NAME = #GROUP_NAME#
+	</delete>
+	<select id="content.etc.etcMapUserConfigList" parameterClass="UsvUserMapVO" resultClass="UsvUserMapVO">
+		SELECT * FROM USV_USER_CONFIG WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#
+	</select>
+	<delete id="content.etc.etcMapUserConfigDelete">
+		DELETE FROM USV_USER_CONFIG WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#
+	</delete>
+	<update id="content.etc.etcMapUserGraphicSymbolSave" parameterClass="UsvUserMapVO">
+	MERGE INTO USV_USER_SYMBOL
+	   USING DUAL
+	   ON (USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#)
+	   WHEN MATCHED THEN
+	      UPDATE SET
+			<isNotEmpty removeFirstPrepend="true">
+				<isNotEmpty prepend="," property="SYMBOL_P">SYMBOL_P = #SYMBOL_P#</isNotEmpty>
+				<isNotEmpty prepend="," property="SYMBOL_L">SYMBOL_L = #SYMBOL_L#</isNotEmpty>
+				<isNotEmpty prepend="," property="SYMBOL_A">SYMBOL_A = #SYMBOL_A#</isNotEmpty>
+				<isNotEmpty prepend="," property="SYMBOL_T">SYMBOL_T = #SYMBOL_T#</isNotEmpty>
+			</isNotEmpty> 
+	   WHEN NOT MATCHED THEN
+	      INSERT (USER_ID, SYS_ID, SYMBOL_P, SYMBOL_L, SYMBOL_A, SYMBOL_T)
+	      VALUES (#USER_ID#, #SYS_ID#, #SYMBOL_P#, #SYMBOL_L#, #SYMBOL_A#, #SYMBOL_T#)
+	</update>
+	<select id="content.etc.etcMapUserGraphicSymbolList" parameterClass="UsvUserMapVO" resultClass="UsvUserMapVO">
+		SELECT * FROM USV_USER_SYMBOL WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#
+	</select>
+	
+	<!-- not available MERGE IN in CLOB -->
+	<insert id="content.etc.etcMapUserRendererInsert" parameterClass="UsvUserMapVO">
+      INSERT INTO USV_USER_RENDERERS (USER_ID, SYS_ID, LAYER_ALIASNAME, RENDERER, MINSCALE, MAXSCALE, ISARROW)
+      VALUES (#USER_ID#, #SYS_ID#, #LAYER_ALIASNAME#, #RENDERER:CLOB#, #MINSCALE#, #MAXSCALE#, #ISARROW#)
+	</insert>
+	<update id="content.etc.etcMapUserRendererUpdate" parameterClass="UsvUserMapVO">
+		UPDATE USV_USER_RENDERERS SET
+			<isNotEmpty removeFirstPrepend="true">
+				<isNotEmpty prepend="," property="RENDERER">RENDERER = #RENDERER:CLOB#</isNotEmpty>
+				<isNotEmpty prepend="," property="MINSCALE">MINSCALE = #MINSCALE#</isNotEmpty>
+				<isNotEmpty prepend="," property="MAXSCALE">MAXSCALE = #MAXSCALE#</isNotEmpty>
+				<isNotEmpty prepend="," property="ISARROW">ISARROW = #ISARROW#</isNotEmpty>
+			</isNotEmpty> 
+		WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID# AND LAYER_ALIASNAME = #LAYER_ALIASNAME#
+	</update>
+    <!-- CLOB 데이터 처리시 resultMap 이용 -->
+    <resultMap id="UserRendererResult" class="UsvUserMapVO">
+        <result property="USER_ID"/>
+        <result property="SYS_ID"/>
+        <result property="LAYER_ALIASNAME"/>
+        <result property="RENDERER" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="MINSCALE"/>
+        <result property="MAXSCALE"/>
+        <result property="ISARROW"/>
+    </resultMap>
+	<select id="content.etc.etcMapUserRendererList" parameterClass="UsvUserMapVO" resultClass="UsvUserMapVO">
+		SELECT * FROM USV_USER_RENDERERS WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#
+	</select>
+	<select id="content.etc.etcMapUserRendererCnt" parameterClass="UsvUserMapVO" resultClass="int">
+		SELECT COUNT(*) FROM USV_USER_RENDERERS WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID# AND LAYER_ALIASNAME = #LAYER_ALIASNAME#
+	</select>
+	<delete id="content.etc.etcMapUserRendererDelete">
+		DELETE FROM USV_USER_RENDERERS WHERE USER_ID = #USER_ID# AND SYS_ID = #SYS_ID# AND LAYER_ALIASNAME = #LAYER_ALIASNAME#
+	</delete>
+</sqlMap>

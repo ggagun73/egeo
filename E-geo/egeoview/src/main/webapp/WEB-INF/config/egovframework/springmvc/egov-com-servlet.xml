@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+ 	<context:component-scan base-package="egovframework, usolver">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+	</context:component-scan>
+
+	<!-- For Pagination Tag -->
+	<bean id="imageRenderer" class="usolver.com.cmm.web.EgovImgPaginationRenderer"/>
+
+	<bean id="paginationManager" class="egovframework.rte.ptl.mvc.tags.ui.pagination.DefaultPaginationManager">
+		<property name="rendererType">
+			<map>
+				<entry key="image" value-ref="imageRenderer"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="webBindingInitializer">
+            <bean class="egovframework.com.cmm.web.EgovBindingInitializer"/>
+        </property>
+    </bean>
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/> egov 3.0 이상 -->
+
+	<!-- -->
+	<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>		
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" p:order="2">
+		<property name="mappings">
+			<props>
+                <prop key="/cmmn/validator.do">urlFilenameViewController</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="urlFilenameViewController" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" /> 
+	
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="webBindingInitializer">
+            <bean class="egovframework.com.cmm.web.EgovBindingInitializer"/>
+        </property>
+    </bean>
+    <!-- ReqeustMapping 과 Controller 클래스 매핑을 위한 annotation mvc 설정 -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping" p:order="1" />
+
+	<bean id="egovWebLogInterceptor" class="usolver.admin.log.wlg.web.EgovWebLogInterceptor" />
+	<bean id="webLogMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+	    <property name="interceptors">
+	      <list>
+	        <ref bean="egovWebLogInterceptor" />
+	      </list>
+	    </property> 
+	</bean>	
+  
+    <!-- IP 정보 기록 및 로그인 체크가 필요한 URL과 로그인 여부를 체크해줄 인터셉터를 등록한다. -->
+    <!-- <mvc:interceptors>
+        <bean class="egovframework.com.cmm.interceptor.IpObtainInterceptor" />
+        <mvc:interceptor>
+            <mvc:mapping path="/**/*.do" />
+            <mvc:exclude-mapping path="/uat/uia/**" />
+            <mvc:exclude-mapping path="/index.do" />
+            <mvc:exclude-mapping path="/EgovLeft.do" />
+            <mvc:exclude-mapping path="/EgovContent.do" />
+            <mvc:exclude-mapping path="/EgovTop.do" />
+            <mvc:exclude-mapping path="/EgovBottom.do" />
+            <mvc:exclude-mapping path="/uat/uia/egovLoginUsr.do" />
+            <mvc:exclude-mapping path="/uat/uia/actionLogin.do" />
+            <bean class="egovframework.com.cmm.interceptor.AuthenticInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors> -->
+    
+	<!-- 상세오류 확인하려면 아래 부분 주석 처리! -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="usolver/com/error/egovError"/>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.springframework.dao.DataAccessException">usolver/com/error/dataAccessFailure</prop>
+				<prop key="org.springframework.transaction.TransactionException">usolver/com/error/dataAccessFailure</prop>
+				<prop key="egovframework.rte.fdl.cmmn.exception.EgovBizException">usolver/com/error/egovBizException</prop>
+				<prop key="org.springframework.web.HttpSessionRequiredException">usolver/com/error/accessDenied</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- for JFile -->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="2"/>
+
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="1"
+		  p:viewClass="org.springframework.web.servlet.view.JstlView"
+		  p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
+
+	<!-- 각종 bean 설정 -->
+	<bean id="excelView" class="usolver.com.cmm.util.ExcelView"></bean>
+	
+	<!-- 프로젝트 설정 추가 항목 -->
+	<!-- MULTIPART RESOLVERS -->
+	<!-- regular spring resolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- <property name="maxUploadSize" value="100000000" />
+		<property name="maxInMemorySize" value="100000000" /> -->
+		<property name="maxUploadSize" value="104857600" /><!-- 100MB -->
+		<property name="maxInMemorySize" value="104857600" />
+	</bean>
+</beans>

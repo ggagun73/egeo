@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AuthorGroup">
+
+    <typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="AuthorGroupVO" type="usolver.admin.author.vo.AuthorGroupVO"/>
+    <typeAlias  alias="AuthorGroup" type="usolver.admin.author.vo.AuthorGroup"/>
+
+    <resultMap id="authorGroup" class="usolver.admin.author.vo.AuthorGroupVO">
+        <result property="userId" column="USER_ID" columnIndex="1"/>
+        <result property="userName" column="USER_NAME" columnIndex="2"/>
+        <result property="authorCode" column="AUTHOR_CODE" columnIndex="3"/>
+        <result property="reqDate" column="REQ_DATE" columnIndex="4"/>
+        <result property="approveDate" column="APPROVE_DATE" columnIndex="5"/>
+        <result property="compAuth" column="COMP_AUTH" columnIndex="6"/>
+        <result property="sysCode" column="SYS_CODE" columnIndex="7"/>
+    </resultMap>
+
+    <select id="authorGroupDAO.selectAuthorGroupList" parameterClass="AuthorGroupVO" resultMap="authorGroup">
+            <![CDATA[ 
+            SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (
+            SELECT A.USER_ID, 
+                     A.USER_NAME, 
+                     B.AUTHOR_CODE, 
+					 TO_CHAR(B.REQ_DATE,'YYYY-MM-DD') AS REQ_DATE,
+					 TO_CHAR(B.APPROVE_DATE,'YYYY-MM-DD') AS APPROVE_DATE,
+					 B.COMP_AUTH,
+					 B.SYS_CODE
+              FROM USV_USERS A LEFT OUTER JOIN USV_USER_AUTHOR B
+                ON A.USER_ID = B.USER_ID
+              AND B.SYS_CODE = 'ROOT' 
+             WHERE 1 = 1    
+              ]]> 
+            <isNotEmpty property="searchKeyword">
+                <isEqual prepend="AND" property="searchCondition" compareValue="1">
+                       A.USER_ID LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+                <isEqual prepend="AND" property="searchCondition" compareValue="2">
+                       A.USER_NM LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+                <isEqual prepend="AND" property="searchCondition" compareValue="3">
+                       B.AUTHOR_CODE LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+            </isNotEmpty>
+            <![CDATA[ 
+                    ) ALL_LIST
+                    )
+             WHERE  RNUM  > #firstIndex#
+               AND  RNUM <= #firstIndex# + #recordCountPerPage#
+             ORDER BY REQ_DATE DESC, APPROVE_DATE DESC
+             ]]>  
+    </select>
+
+    <insert id="authorGroupDAO.insertAuthorGroup" parameterClass="AuthorGroup">
+        <![CDATA[
+            INSERT INTO USV_USER_AUTHOR 
+                  ( USER_ID
+                  , AUTHOR_CODE
+                  , SYS_CODE
+                  , REQ_DATE
+                  )
+           VALUES ( #userId#
+                  , #authorCode#
+                  , #sysCode#
+                  , SYSDATE
+                  )
+        ]]>
+    </insert>
+
+    <insert id="authorGroupDAO.insertAuthorBasic" parameterClass="AuthorGroup">
+        <![CDATA[
+            INSERT INTO USV_USER_AUTHOR 
+                  ( USER_ID
+                  , AUTHOR_CODE
+                  , SYS_CODE
+                  , REQ_DATE
+                  , APPROVE_DATE
+                  , COMP_AUTH
+                  )
+           VALUES ( #userId#
+                  , #authorCode#
+                  , #sysCode#
+                  , SYSDATE
+                  , SYSDATE
+                  ,2
+                  )
+        ]]>
+    </insert>
+    
+    <update id="authorGroupDAO.updateAuthorGroup" parameterClass="AuthorGroup">
+        <![CDATA[
+            UPDATE USV_USER_AUTHOR 
+               SET  APPROVE_DATE = SYSDATE
+                     ,COMP_AUTH = '2'               
+             WHERE USER_ID=#userId#
+             	AND AUTHOR_CODE=#authorCode#
+             	AND SYS_CODE=#sysCode#
+        ]]>
+    </update>
+
+	<update id="authorGroupDAO.approveAuthorGroup" parameterClass="AuthorGroup">
+        <![CDATA[
+            UPDATE USV_USER_AUTHOR 
+               SET  APPROVE_DATE = SYSDATE
+                     ,COMP_AUTH = '2'               
+             WHERE USER_ID=#userId#
+               AND  AUTHOR_CODE=#authorCode#
+               AND  SYS_CODE=#sysCode#
+        ]]>
+    </update>
+    
+    <delete id="authorGroupDAO.deleteAuthorGroup">
+            DELETE FROM USV_USER_AUTHOR 
+             WHERE USER_ID=#userId#
+             	<isNotEmpty property="authorCode">
+               AND  AUTHOR_CODE=#authorCode#
+               </isNotEmpty>
+               <isNotEmpty property="sysCode">
+               AND  SYS_CODE=#sysCode#
+               </isNotEmpty>
+    </delete>
+
+    <select id="authorGroupDAO.selectAuthorGroupListTotCnt" parameterClass="AuthorGroupVO" resultClass="int">
+
+            SELECT COUNT(*) AS totcnt
+              FROM USV_USERS A LEFT OUTER JOIN USV_USER_AUTHOR B
+                ON A.USER_ID = B.USER_ID
+               AND B.SYS_CODE = 'ROOT' 
+             WHERE 1 = 1    
+           <isNotEmpty property="searchKeyword">
+                <isEqual prepend="AND" property="searchCondition" compareValue="1">
+                       A.USER_ID LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+                <isEqual prepend="AND" property="searchCondition" compareValue="2">
+                       A.USER_NM LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+                <isEqual prepend="AND" property="searchCondition" compareValue="3">
+                       B.AUTHOR_CODE LIKE '%'||#searchKeyword#||'%'
+                </isEqual>
+            </isNotEmpty>
+    </select>
+
+</sqlMap>

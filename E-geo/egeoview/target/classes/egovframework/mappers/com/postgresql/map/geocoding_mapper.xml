@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+
+	<select id="selectCentorid" parameterType="map" resultType="egovMap">
+		<![CDATA[
+			SELECT * FROM TN_GEOCODING WHERE PNU = #{PNU}
+		]]>
+	</select>
+	
+	<select id="selectCentoridList" parameterType="list" resultType="egovMap">
+		SELECT * FROM TN_GEOCODING WHERE PNU in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+        	#{item.PNU}
+  		</foreach>
+	</select>
+	
+</mapper>

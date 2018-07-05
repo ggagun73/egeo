@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+	
+	<!--  사용자(로그인) 정보 추출  어디에서 쓰나?? 
+	<select id="selectUserList" parameterType="usolver.com.main.vo.LoginVO" resultType="usolver.com.main.vo.LoginVO">
+		SELECT
+			USER_ID
+			,USER_NAME
+			,USER_DEPT
+			,TO_CHAR(REQ_DATE, 'YYYY-MM-DD') AS REQ_DATE
+			,ENABLED
+			,USER_TEL
+			,USER_DESC
+			,TO_CHAR(PW_DATE, 'YYYY-MM-DD') AS PW_DATE
+		FROM USV_USERS
+	</select>
+	 -->	
+	<select id="checkIdDplct" resultType="int">
+        <![CDATA[
+            SELECT COUNT(1) usedCnt FROM USV_USERS WHERE USER_ID = #{sUserId}
+        ]]>
+    </select>
+    
+	<!-- 패스워드 조회 : 등록 어느것을 쓰는지 확인 필요.. -->	
+	<select id="selectPassword" resultType="usolver.admin.user.vo.UserManageVO">
+        <![CDATA[
+            SELECT
+                    PASSWORD          password 
+            FROM    USV_USERS
+            WHERE   USER_ID=#{userId}
+        ]]>
+    </select>
+   	
+	<insert id="insertUser">
+        <![CDATA[
+            INSERT INTO USV_USERS 
+	    (
+            USER_ID
+			,USER_NAME
+			,USER_DEPT
+			,REQ_DATE
+			,PASSWORD
+			,USER_TEL
+			,USER_DESC
+			,PW_DATE
+			,ENABLED
+        ) 
+        VALUES
+        (
+          	#{userId}
+			,#{userName}
+			,#{userDept}
+			,TO_CHAR(now(), 'YY/MM/DD')
+			,#{password}
+			,#{userTel}
+			,#{userDesc}
+			,TO_CHAR(now(), 'YY/MM/DD')
+			,'1'
+        ) 
+        ]]>
+    </insert>
+    
+	<!-- 사용자정보 수정 -->
+	<update id="updateUser">
+        <![CDATA[
+            UPDATE USV_USERS
+			SET  
+				USER_NAME= #{userName}
+				,USER_DEPT 	= #{userDept}
+				,USER_TEL 	= #{userTel}
+				,USER_DESC 	= #{userDesc}
+			WHERE
+				USER_ID = #{userId}
+        ]]>
+    </update>
+    
+    <!-- 사용자 삭제 -->
+    <delete id="deleteUser">
+        <![CDATA[
+            DELETE FROM USV_USERS 
+            WHERE USER_ID = #{delId}
+        ]]>
+    </delete>
+	
+	<!-- 사용자 암호변경 -->
+	<update id="updatePassword">
+        <![CDATA[
+            UPDATE USV_USERS 
+            SET 
+                   PASSWORD   =  #{password}
+                   ,PW_DATE 	=  TO_CHAR(now(), 'YY/MM/DD')
+            WHERE  USER_ID  = #{userId}
+        ]]>
+    </update>    
+    
+	<!--  EgovUserManagerQL  -->	
+	<select id="selectUserList" parameterType="usolver.admin.user.vo.UserDefaultVO" resultType="egovMap">
+	SELECT * FROM ( SELECT (ROW_NUMBER() OVER()) AS  rn, TB.* FROM (
+	    SELECT
+			USER_ID
+			,USER_NAME
+			,(SELECT DEPT_NAME FROM USV_DEPT WHERE DEPT_CD = USER_DEPT ) AS USER_DEPT
+			,TO_CHAR(REQ_DATE,'YYYY-MM-DD') AS REQ_DATE
+			,PASSWORD
+			,ENABLED
+			,USER_TEL
+			,USER_DESC
+			,TO_CHAR(PW_DATE,'YYYY-MM-DD') AS PW_DATE
+	    FROM    USV_USERS
+        WHERE 1=1
+        	<if test="searchKeyword != null">
+           		AND (USER_ID LIKE '%' ||#{searchKeyword}||'%'  OR USER_NAME LIKE '%' ||#{searchKeyword}|| '%' )
+            </if>
+        ORDER BY REQ_DATE DESC
+        ) TB ) WHERE rn BETWEEN #{firstIndex} + 1 AND #{firstIndex} + #{recordCountPerPage}
+    </select>
+    
+    <select id="selectUserListTotCnt" parameterType="usolver.admin.user.vo.UserDefaultVO" resultType="int">
+            SELECT COUNT(1) totcnt
+            FROM    USV_USERS
+            WHERE 1=1
+            <if test="searchKeyword != null">
+           		AND (USER_ID LIKE '%' ||#{searchKeyword}||'%'  OR USER_NAME LIKE '%' ||#{searchKeyword}|| '%' )
+            </if>
+    </select>
+
+    <select id="selectUser" resultType="usolver.admin.user.vo.UserManageVO" >
+        <![CDATA[
+            SELECT
+           		 USER_ID		as userId
+				,USER_NAME		as userName
+				,USER_DEPT		as userDept
+				,REQ_DATE		as reqDate
+				,PASSWORD		as password
+				,ENABLED		as enabled
+				,USER_TEL		as userTel
+				,USER_DESC		as userDesc
+				,PW_DATE		as pwDate
+        FROM USV_USERS
+            WHERE USER_ID=#{uniqId}
+        ]]>
+    </select>
+    
+    
+    <select id="selectAllUserList" resultType="egovMap">
+		SELECT 
+			USER_ID			as userId
+			,USER_NAME		as userName
+		FROM USV_USERS
+    </select>
+    
+    <select id="selectAllUserListTotCnt" parameterType="usolver.admin.user.vo.UserDefaultVO" resultType="int">
+        SELECT COUNT(1) totcnt
+        FROM    USV_USERS
+    </select>
+    
+    <select id="selectUserFunctionList" parameterType="usolver.admin.user.vo.UserManageVO" resultType="egovMap">
+		<![CDATA[
+                SELECT 
+                	LYR_ID AS "lyrId",
+                	USER_ID AS "userId",
+                	COALESCE(AUTHOR,'VIEW')  AS "author"  
+                FROM  
+                    USV_USER_LAYER
+                WHERE 
+                   	USER_ID = #{userId}		   ]]>
+                 <if test="author != null">
+           			AND COALESCE(AUTHOR,'VIEW') LIKE '%' ||#{author}||'%' 
+            	</if>  	
+	</select>
+	
+	<delete id="deleteDataFunctionList">
+		<![CDATA[                          
+			DELETE FROM USV_USER_LAYER              
+			WHERE USER_ID = #{userId}               
+			   AND AUTHOR =  #{author}
+		]]>                                
+	</delete>
+	
+	<insert id="insertDataFunctionList" parameterType="usolver.admin.user.vo.UserDataVO">
+		INSERT ALL
+			<foreach item="item" index="index" collection="functionList">
+            	INTO USV_USER_LAYER (LYR_ID, USER_ID, AUTHOR)
+            	VALUES (#{item}, #{userId}, #{author} ) 
+   			</foreach>
+		SELECT * FROM dual
+	</insert>
+	
+	<select id="selectUserMenuFunctionList" parameterType="usolver.admin.user.vo.UserDataVO" resultType="egovMap">
+		<![CDATA[
+                SELECT *
+                FROM  
+                    USV_MENU_INFO A, 
+                    (SELECT		MENU_NO 
+                    FROM	USV_USER_MENU 
+                    WHERE USER_ID = #{userId}	 ) B                    
+                WHERE A.MENU_NO = B.MENU_NO
+               ORDER BY A.MENU_NO,  A.MENU_ORDR
+        ]]>
+	</select>
+	
+	<delete id="deleteUserMenuFunctionList">
+		<![CDATA[                          
+			DELETE FROM USV_USER_MENU              
+			WHERE USER_ID = #{userId}                
+		]]>                                
+	</delete>
+	
+	<delete id="deleteAllUserMenu">
+		<![CDATA[                          
+			DELETE FROM USV_USER_MENU             
+		]]>                                
+	</delete>
+	
+	<insert id="insertUserMenuFunctionList" parameterType="usolver.admin.user.vo.UserDataVO">
+		INSERT ALL
+			<foreach item="item" index="index" collection="functionList">
+            	INTO USV_USER_MENU (MENU_NO, USER_ID)
+            	VALUES (#{item}, #{userId} ) 
+   			</foreach>
+		SELECT * FROM dual
+	</insert>	
+</mapper>

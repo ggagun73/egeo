@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MenuCreat">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="menuCreatVO" type="usolver.admin.menu.vo.MenuCreatVO"/>
+	<typeAlias  alias="admDefaultVO" type="usolver.com.cmm.vo.AdmDefaultVO"/>
+	
+	<select id="menuManageDAO.selectMenuFunctionList_D" parameterClass="MenuCreatVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT A.MENU_NO AS "menuNo"
+                FROM  
+                    USV_MENU_INFO A, 
+                    (SELECT		MENU_NO 
+                    FROM	USV_MENU_AUTHOR 
+                    WHERE 
+                    	AUTHOR_CODE = #authorCode# ) B 
+                    
+                WHERE A.MENU_NO = B.MENU_NO
+        ]]>
+	</select>
+	<select id="menuManageDAO.selectMenuFunctionList_D2" parameterClass="MenuCreatVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT 
+					SEQ AS "seq",
+                	AUTHOR_CODE AS "authorCode"
+                FROM  
+                    USV_AUTHOR_LAYER 
+                WHERE 
+                	AUTHOR_CODE = #authorCode#
+        ]]>
+	</select>
+	
+	<select id="menuManageDAO.selectMenuCreatManageList_D" parameterClass="admDefaultVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT * 
+                FROM  
+                    (SELECT rownum rn, TB.* 
+                     FROM 
+			            (SELECT AUTHOR_CODE   AS "authorCode",
+								AUTHOR_NM     AS "authorNm",
+								AUTHOR_DC     AS "authorDc",
+								AUTHOR_CREAT_DE AS "authorCreatDe",
+							   (SELECT COUNT(B.AUTHOR_CODE)
+								FROM   USV_MENU_AUTHOR B
+								WHERE  B.AUTHOR_CODE = A.AUTHOR_CODE ) AS "chkYeoBu"
+						FROM    USV_AUTHOR_INFO A
+						WHERE   A.AUTHOR_CODE like '%'||#searchKeyword#||'%') TB
+
+                    ) 
+                WHERE rn BETWEEN #firstIndex# + 1 AND #firstIndex# + #recordCountPerPage#
+        ]]>
+	</select> 
+
+	<select id="menuManageDAO.selectAllMenuCreatManageList_D" parameterClass="admDefaultVO" resultClass="egovMap">
+		<![CDATA[
+                SELECT *
+				FROM
+					(SELECT rownum rn, TB.*
+				  	FROM
+				    	(SELECT AUTHOR_CODE 	  AS "authorCode",
+				      			AUTHOR_NM   	  AS "authorNm",
+				      			AUTHOR_DC         AS "authorDc",
+				      			AUTHOR_CREAT_DE   AS "authorCreatDe",
+				      			(SELECT COUNT(B.AUTHOR_CODE)
+				      			FROM USV_MENU_AUTHOR B
+				      			WHERE B.AUTHOR_CODE = A.AUTHOR_CODE
+				      			) AS "chkYeoBu"
+				    	FROM USV_AUTHOR_INFO A
+				    	WHERE A.AUTHOR_TYPE = #searchKeyword#
+				    	) TB
+				  	) 
+                WHERE rn BETWEEN #firstIndex# + 1 AND #firstIndex# + #recordCountPerPage#
+        ]]>
+	</select>
+	
+	<select id="menuManageDAO.selectMenuCreatManageTotCnt_S" parameterClass="admDefaultVO" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(AUTHOR_CODE) AS "totcnt"
+			  FROM USV_AUTHOR_INFO
+			 WHERE AUTHOR_CODE like '%'||#searchKeyword#||'%'
+		]]>
+	</select>
+	
+	<select id="menuManageDAO.selectMenuCreatList_D" parameterClass="MenuCreatVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT
+				  A.MENU_NO AS "menuNo"
+				, A.MENU_ORDR AS "menuOrdr"
+				, A.MENU_NM AS "menuNm"
+				, A.UPPER_MENU_NO AS "upperMenuNo"
+			    , (SELECT count(B.MENU_NO) 
+			         FROM USV_MENU_AUTHOR B   
+			        WHERE B.MENU_NO  = A.MENU_NO 
+			          AND B.AUTHOR_CODE = #authorCode#) AS "chkYeoBu"
+			FROM USV_MENU_INFO A
+			WHERE A.MENU_NO > 0
+			ORDER BY A.MENU_ORDR
+		 ]]>
+	</select>
+	
+	<select id="menuManageDAO.selectAllMenuCreatList_D" parameterClass="admDefaultVO" resultClass="egovMap">
+		<![CDATA[
+			SELECT
+			      MENU_NO           AS "menuNo"
+				, MENU_ORDR         AS "menuOrdr"
+				, MENU_NM           AS "menuNm"
+				, UPPER_MENU_NO     AS "upperMenuNo"
+				, MENU_DC           AS "menuDc"
+				, RELATE_IMAGE_PATH AS "relateImagePath"
+				, RELATE_IMAGE_NM   AS "relateImageNm"
+				, PROGRM_FILE_NM    AS "progrmFileNm"
+				, FUNCTION_LIST		AS "functionList"
+				, MENU_ID			AS "menuId"
+				, WIDTH				AS "width"
+				, HEIGHT			AS "height"
+				, INSERT_HEIGHT		AS "insertHeight"
+				, CALL				AS "call"
+				, KEY_COLUMN		AS "keyColumn"
+				, MENU_TYPE			AS "menuType"
+			FROM USV_MENU_INFO 
+			WHERE MENU_NO > 0 
+				AND MENU_NO LIKE #searchKeyword#||'%'
+			ORDER BY MENU_ORDR
+		 ]]>
+	</select>
+
+	<insert id="menuManageDAO.insertMenuCreat_S">
+		<![CDATA[
+			INSERT INTO USV_MENU_AUTHOR ( AUTHOR_CODE ,MENU_NO )
+			VALUES (  #authorCode#, #menuNo# )
+		]]>
+	</insert>
+	
+	<insert id="menuManageDAO.insertMenuFunctionList_S" parameterClass="MenuCreatVO">
+		INSERT ALL
+		<dynamic>
+			<iterate property="functionList">
+				INTO USV_MENU_AUTHOR ( AUTHOR_CODE ,MENU_NO )
+				VALUES (#authorCode#, #functionList[]#)
+			</iterate>
+		</dynamic>
+		SELECT * FROM dual
+	</insert>
+	<insert id="menuManageDAO.insertMenuFunctionList_S2" parameterClass="MenuCreatVO">
+		INSERT ALL
+		<dynamic>
+			<iterate property="functionList">
+				INTO USV_AUTHOR_LAYER ( SEQ, AUTHOR_CODE )
+				VALUES (#functionList[]#, #authorCode#)
+			</iterate>
+		</dynamic>
+		SELECT * FROM dual
+	</insert>
+	
+	<select id="menuManageDAO.selectMenuCreatCnt_S" parameterClass="MenuCreatVO" resultClass="int">
+		<![CDATA[
+			SELECT COUNT(AUTHOR_CODE) AS "totcnt"
+			  FROM USV_AUTHOR_INFO
+			 WHERE AUTHOR_CODE = #authorCode#
+		]]>
+	</select>
+
+	<delete id="menuManageDAO.updateMenuCreat_S">
+		<![CDATA[ 
+		    UPDATE USV_MENU_AUTHOR  
+		       SET MAPNG_CREAT_ID=#mapCreatId# 
+		     WHERE AUTHOR_CODE=#authorCode#
+		]]>                                
+	</delete> 
+
+	<delete id="menuManageDAO.deleteMenuFunctionList_S">
+		<![CDATA[                          
+			DELETE FROM USV_MENU_AUTHOR              
+			WHERE AUTHOR_CODE = #authorCode#                
+		]]>                                
+	</delete>
+	<delete id="menuManageDAO.deleteMenuFunctionList_S2">
+		<![CDATA[                          
+			DELETE FROM USV_AUTHOR_LAYER              
+			WHERE AUTHOR_CODE = #authorCode#                
+		]]>                                
+	</delete>
+
+	<select id="menuManageDAO.selectAuthorByUsr" parameterClass="admDefaultVO" resultClass="MenuCreatVO">
+		<![CDATA[
+		select AUTHOR_CODE AS "authorCode" from USV_AUTHOR_INFO
+		]]>
+	</select>
+	select AUTHOR_CODE AS "authorCode" from COMTNEMPLYRSCRTYESTBS
+		where SCRTY_DTRMN_TRGET_ID =
+			(select ESNTL_ID from COMVNUSERMASTER
+			where user_id = #searchKeyword# )
+	<select id="menuManageDAO.selectUsrByPk" parameterClass="admDefaultVO" resultClass="int">
+		<![CDATA[
+		select count(AUTHOR_CODE) from USV_AUTHOR_INFO
+		]]>
+	</select>
+
+</sqlMap>                            

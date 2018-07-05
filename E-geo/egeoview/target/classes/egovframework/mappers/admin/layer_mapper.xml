@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin">
+
+<select id="selectLayerGroup" resultType="map">
+	SELECT G2_ID, G2_NAME
+	FROM G2V_LAYER
+	WHERE
+		G2_BASEID = -1 AND G2_MAPID = (SELECT g2vlayer.G2_MAPID FROM TN_LYR_INFO tnlyrinfo,G2V_LAYER g2vlayer WHERE g2vlayer.G2_ID = tnlyrinfo.G2_ID and rownum=1)
+</select>
+
+<select id="selectLayer" resultType="map" >
+	SELECT G2_ID, G2_MAPID, G2_TYPE, G2_BASEID, G2_ORDER, G2_NAME
+	FROM G2V_LAYER
+	WHERE
+		G2_TYPE = '1' AND G2_MAPID = (SELECT g2vlayer.G2_MAPID FROM TN_LYR_INFO tnlyrinfo,G2V_LAYER g2vlayer WHERE g2vlayer.G2_ID = tnlyrinfo.G2_ID and rownum=1)
+</select>
+
+<select id="searchSpatialtype" parameterType="String" resultType="String">
+	SELECT b.G2_SPATIAL_TYPE
+	FROM G2S_DATASET a, G2S_GEODATASET b
+	WHERE a.G2_ID = b.G2_DATASETID AND a.G2_NAME = #{value}
+</select>
+
+<select id="selectServiceGroup" resultType="map">
+	SELECT a.G2_ID, a.G2_NAME
+	FROM G2V_LAYER a right outer join tn_lyr_info b on a.g2_id = b.g2_id
+	WHERE
+		a.G2_BASEID = -1 AND a.G2_MAPID = (SELECT g2vlayer.G2_MAPID FROM TN_LYR_INFO tnlyrinfo,G2V_LAYER g2vlayer WHERE g2vlayer.G2_ID = tnlyrinfo.G2_ID and rownum=1)
+	ORDER BY b.lyr_order
+</select>
+
+<select id="selectServiceLayer" parameterType="map" resultType="map">
+	SELECT 
+	  		tnlyrinfo.MAP_ID, 
+	        g2vlayer.G2_BASEID, 
+			tnlyrinfo.G2_ID, 
+			tnlyrinfo.LYR_ID, 
+	        tnlyrinfo.LYR_ENG_NM, 
+	        tnlyrinfo.LYR_KOREAN_NM as "G2_NAME",
+	        tnlyrinfo.LYR_RDL_USE_YN,
+	        tnlyrinfo.LYR_WTL_USE_YN,
+	        tnlyrinfo.LYR_SWL_USE_YN,
+	        tnlyrinfo.LYR_EDIT_YN,
+	        tnlyrinfo.LYR_FTR_CDE,
+	        tnlyrinfo.LYR_ORDER, 
+	       	tnlyrinfo.LYR_ONOFF,  
+	        tnlyrinfo.LYR_TYPE
+	FROM 
+			  TN_LYR_INFO tnlyrinfo INNER JOIN  
+			  (
+			    SELECT  B.G2_BASEID, A.G2_NAME, B.G2_ID AS LAYER_ID, B.G2_NAME AS LAYER_NAME, B.G2_DEFINE
+			    FROM (SELECT * FROM G2V_LAYER WHERE G2_BASEID = -1) A INNER JOIN G2V_LAYER B ON (A.G2_ID = B.G2_BASEID)
+			    ORDER BY A.G2_ORDER, B.G2_ORDER
+			  ) g2vlayer ON (tnlyrinfo.G2_ID = g2vlayer.LAYER_ID) 
+	WHERE
+		1=1
+		<if test="LYR_ID != null">
+			AND LYR_ID = #{LYR_ID}
+		</if>
+		<if test="LYR_RDL_USE_YN != null">
+			AND LYR_RDL_USE_YN = #{LYR_RDL_USE_YN}
+		</if>
+		<if test="LYR_WTL_USE_YN != null">
+			AND LYR_WTL_USE_YN = #{LYR_WTL_USE_YN}
+		</if>
+		<if test="LYR_SWL_USE_YN != null">
+			AND LYR_SWL_USE_YN = #{LYR_SWL_USE_YN}
+		</if>				  
+	ORDER BY tnlyrinfo.LYR_ORDER ASC
+</select>
+
+<insert id="insertServiceLayer" parameterType="map">
+	INSERT INTO TN_LYR_INFO
+				(
+					LYR_ID,
+					LYR_ENG_NM,
+					LYR_KOREAN_NM,
+					LYR_RDL_USE_YN,
+					LYR_WTL_USE_YN,
+					LYR_SWL_USE_YN,
+					G2_ID,
+					LYR_EDIT_YN,
+					LYR_TYPE,
+					LYR_FTR_CDE,
+					MAP_ID,
+					LYR_ORDER,
+					LYR_ONOFF
+				)	
+			VALUES
+				(
+					(SELECT MAX(NVL(LYR_ID,0))+1 FROM TN_LYR_INFO),
+					#{LYR_ENG_NM},
+					#{LYR_KOREAN_NM},
+					#{LYR_RDL_USE_YN},
+					#{LYR_WTL_USE_YN},
+					#{LYR_SWL_USE_YN},
+					#{G2_ID},
+					#{LYR_EDIT_YN},
+					#{LYR_TYPE},
+					#{LYR_FTR_CDE},
+					1,
+					#{LYR_ORDER},
+					#{LYR_ONOFF}
+				)
+</insert>
+
+<update id="updateServiceLayer" parameterType="map">
+	UPDATE TN_LYR_INFO
+	SET
+		LYR_RDL_USE_YN = #{LYR_RDL_USE_YN},
+		LYR_WTL_USE_YN = #{LYR_WTL_USE_YN},
+		LYR_SWL_USE_YN = #{LYR_SWL_USE_YN},
+		LYR_EDIT_YN = #{LYR_EDIT_YN}
+	WHERE
+		LYR_ID = #{LYR_ID}
+</update>
+
+<select id="checkLayerName" parameterType="String" resultType="String">
+	SELECT LYR_ENG_NM
+	FROM TN_LYR_INFO
+	WHERE LYR_ENG_NM LIKE '%'||#{LYR_ENG_NM}||'%' AND rownum=1
+	ORDER BY LYR_ENG_NM
+</select>
+
+<select id="selectRefLayer" parameterType="String" resultType="map">
+	SELECT *
+	FROM TN_EDITREFLYR_INFO
+	WHERE
+		EDITLYR_ENG_NM = #{EDITLYR_ENG_NM}
+</select>
+
+<select id="selectEditLayer" resultType="map">
+	SELECT *
+	FROM TN_LYR_INFO
+	WHERE
+		LYR_EDIT_YN = 1
+</select>
+
+<insert id="insertRefLayer" parameterType="map">
+	INSERT ALL
+	<foreach collection="insertLayer" item="item" index="index">
+		INTO TN_EDITREFLYR_INFO
+		(
+			LYR_ID,
+			EDITLYR_ENG_NM,
+			REFLYR_ENG_NM,
+			EDITLYR_KOREAN_NM,
+			REFLYR_KOREAN_NM,
+			WFS_DRAW
+		)	
+		VALUES
+		(
+			(SELECT MAX(NVL(LYR_ID,0))+1+${index} FROM TN_EDITREFLYR_INFO),
+			#{item.EDITLYR_ENG_NM},
+			#{item.REFLYR_ENG_NM},
+			#{item.EDITLYR_KOREAN_NM},
+			#{item.REFLYR_KOREAN_NM},
+			1
+		)
+	</foreach>
+	SELECT * FROM DUAL
+</insert>
+
+<delete id="deleteRefLayer" parameterType="map">
+	DELETE
+	FROM TN_EDITREFLYR_INFO
+	WHERE
+		LYR_ID IN
+		<foreach collection="deleteLayer" item="item" separator="," open="(" close=")">
+			#{item.LYR_ID}
+		</foreach>
+</delete>
+
+<select id="selectSnapLayer" resultType="map">
+	SELECT *
+	FROM TN_SNAP_INFO
+	WHERE
+		EDITLYR_ENG_NM = #{EDITLYR_ENG_NM}
+</select>
+
+<insert id="insertSnapLayer" parameterType="map">
+	INSERT ALL
+	<foreach collection="insertLayer" item="item" index="index">
+		INTO TN_SNAP_INFO
+		(
+			SNAP_ID,
+			EDITLYR_ENG_NM,
+			SNAPLYR_ENG_NM,
+			SNAP_EDGE,
+			SNAP_VERTEX,
+			SNAP_NODE
+		)	
+		VALUES
+		(
+			(SELECT MAX(NVL(SNAP_ID,0))+1+${index} FROM TN_SNAP_INFO),
+			#{item.EDITLYR_ENG_NM},
+			#{item.SNAPLYR_ENG_NM},
+			#{item.SNAP_EDGE},
+			#{item.SNAP_VERTEX},
+			#{item.SNAP_NODE}
+		)
+	</foreach>
+	SELECT * FROM DUAL
+</insert>
+
+<delete id="deleteSnapLayer" parameterType="map">
+	DELETE
+	FROM TN_SNAP_INFO
+	WHERE
+		SNAP_ID IN
+		<foreach collection="deleteLayer" item="item" separator="," open="(" close=")">
+			#{item.SNAP_ID}
+		</foreach>
+</delete>
+
+<update id="updateSnapLayer" parameterType="map">
+	UPDATE TN_SNAP_INFO
+	SET 
+		SNAP_EDGE = #{SNAP_EDGE},
+		SNAP_VERTEX = #{SNAP_VERTEX},
+		SNAP_NODE = #{SNAP_NODE}
+	WHERE
+		SNAP_ID = #{SNAP_ID}
+</update>
+
+</mapper>

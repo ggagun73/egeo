@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           xmlns:p="http://www.springframework.org/schema/p" 
+           xmlns:context="http://www.springframework.org/schema/context" 
+           xmlns:mvc="http://www.springframework.org/schema/mvc" 
+           xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                                                   http://www.springframework.org/schema/beans/spring-beans.xsd 
+                                                   http://www.springframework.org/schema/mvc 
+                                                   http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+                                                   http://www.springframework.org/schema/context 
+                                                   http://www.springframework.org/schema/context/spring-context.xsd"> 
+
+<!--  이거 설정은 안 먹네.. ㅠㅠ 
+  <bean id="egovWebLogInterceptor" class="usolver.admin.log.wlg.web.EgovWebLogInterceptor">
+  	<property name="permittedURL">
+		<set>
+			<value>/uat/uia/actionLogin.do</value>
+			<value>/uat/uia/egovLoginUsr.do</value>
+		</set>
+	</property>
+  </bean>
+  <bean id="webLogMapping" class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+    <property name="interceptors">
+      <list>
+        <ref bean="egovWebLogInterceptor" />
+      </list>
+    </property> 
+    <property name="urls"> 로그인 후 사용이 가능한 메뉴의 경로를 등록해 준다.  
+	<set>
+		<value>/list/*.do</value>
+		<value>/photo/*.do</value>
+		</set>
+	</property>
+  </bean>	
+-->	
+
+<!-- URL 패턴 체크 : Spring sequrity가 제대로 적용이 안되고.. 위의 bean도 적용이 안되어서 아래에 해당하는 interceptiors를 통해 롤 패턴 체크 
+	  아래에 해당되는 경로에서 실행되는 모든 페이지들은 해당 bean을 통해 패턴체크 한다. 
+	  사용자의 권한에 적용된 패턴인 경우에는 조회되지만 그렇지 않은 경우에는 접근 불가능 하도록 처리함. 
+-->	
+  <mvc:interceptors>
+    <mvc:interceptor>  
+      <mvc:mapping path="/book/**"/>
+      <mvc:mapping path="/register/**"/>
+      <mvc:mapping path="/admin/**"/>
+      <mvc:mapping path="/map/**"/>
+      <mvc:mapping path="/maputil/**"/>
+      <mvc:mapping path="/mapedit/**"/>
+      <mvc:mapping path="/main/**"/>
+      <bean class="usolver.admin.log.wlg.web.EgovWebLogInterceptor"/>
+    </mvc:interceptor>
+ </mvc:interceptors>
+  
+
+	<!--<mvc:view-controller path="/" view-name="index"/>-->
+	<!-- 
+	<bean id="webLogMapping" class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		<property name="interceptors">
+			<list>
+				<ref bean="usvEgovWebLogInterceptor" />
+			</list>
+		</property>
+	</bean> 
+	-->
+    <!-- 1. 세션을 이용한 인증을 사용하는 빈 
+    <bean id="egovUserDetailsSessionService" class="egovframework.com.cmm.service.impl.EgovUserDetailsSessionServiceImpl"/>
+    -->
+	<!--인증된 유저의 LoginVO, 권한, 인증 여부를 확인 할 수있는 서비스 클래스-egovframework.com.cmm.util.EgovUserDetailsHelper 
+    <bean id="egovUserDetailsHelper" class="egovframework.com.cmm.util.EgovUserDetailsHelper">
+        <property name="egovUserDetailsService">
+        	 원하는 bean id를 아래에 ref 태그에 적용한다
+            <ref bean="egovUserDetailsSessionService" />
+        </property>
+    </bean>
+    -->
+</beans>

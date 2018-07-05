@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Common">
+
+	<typeAlias  alias="codeVO" type="usolver.com.cmm.vo.CodeVO"/>
+	<typeAlias  alias="SearchFacilityVO" type="usolver.com.cmm.map.service.vo.SearchFacilityVO"/>
+	<typeAlias  alias="SearchEditHisVO" type="usolver.com.cmm.map.service.vo.SearchEditHisVO"/>
+	<typeAlias  alias="fileInfoVO" type="usolver.com.cmm.vo.FileInfoVO"/>
+	<typeAlias  alias="newIdsVO" type="usolver.com.cmm.vo.NewIDsVO"/>
+	<typeAlias alias="usvBookLogVO" type="usolver.com.cmm.vo.UsvBookLogVO"/>
+
+	<!-- 행정구 코드 추출 -->
+	<select id="common.selectHjdCd" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			SUBSTR(CODE,1,5) AS CODE, VAL
+		FROM MV_DOMAIN
+		WHERE DOMAIN = '행정구'
+		ORDER BY CODE
+	</select>
+	
+	<!-- 행정동 코드 추출 -->
+	<select id="common.selectHjdCde" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			CODE, VAL
+		FROM MV_DOMAIN
+		WHERE DOMAIN = '행정동' AND SUBSTR(CODE,6,5)!='00000'
+			<isNotEmpty prepend="AND" property="CODE"><!-- 행정구 코드 -->
+				SUBSTR(CODE,1,5) = #CODE#
+			</isNotEmpty>
+		ORDER BY VAL
+	</select>
+	
+	
+	<!-- 법정동 코드 추출 -->
+	<select id="common.selectBjdCde" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			CODE, VAL
+		FROM MV_DOMAIN 
+		WHERE DOMAIN = '법정동' AND SUBSTR(CODE,6,5)!='00000'
+			<isNotEmpty prepend="AND" property="CODE"><!-- 법정구 코드 -->
+				<isEqual  property="CODE" compareValue="31000">
+				</isEqual>
+				<isNotEqual property="CODE" compareValue="31000">
+					SUBSTR(CODE,1,5) = CAST(#CODE# AS VARCHAR)
+				</isNotEqual>
+			</isNotEmpty>
+		ORDER BY VAL
+	</select>
+	
+	<!-- 산 코드 추출 -->
+	<select id="common.selectSanCde" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			CODE, VAL
+		FROM MV_DOMAIN
+		WHERE DOMAIN = '산구분'
+			<isNotEmpty prepend="AND" property="CODE"><!-- 산 코드 -->
+				CODE = CAST(#CODE# AS VARCHAR)
+			</isNotEmpty>
+		ORDER BY VAL
+	</select>
+	
+	<!-- 새주소 도로명 추출 -->
+	<select id="common.selectNrdNam" fetchSize="2000" parameterClass="codeVO" resultClass="codeVO">
+		SELECT DISTINCT
+			RN, RN_CD
+		FROM TL_SPRD_MANAGE
+		WHERE RN between 
+		<isNotEmpty property="s_INIT">
+				CAST(#s_INIT# AS VARCHAR)
+		</isNotEmpty>
+		
+		AND
+		<isNotEmpty property="e_INIT">
+				CAST(#s_INIT# AS VARCHAR)
+		</isNotEmpty>
+		
+		ORDER BY RN
+	</select>
+	
+	<!-- 속성 검색 대상 -->
+	<select id="common.selectAttList" parameterClass="SearchFacilityVO" resultClass="SearchFacilityVO">
+		SELECT 
+			a.G2_ID, a.G2_TYPE, a.G2_BASEID, a.G2_ORDER, a.G2_NAME, b.LYR_ENG_NM G2_TABLENAME
+		FROM G2V_LAYER a,TN_LYR_INFO b
+		WHERE G2_MAPID = (SELECT DISTINCT g2vlayer.G2_MAPID FROM TN_LYR_INFO tnlyrinfo,G2V_LAYER g2vlayer WHERE g2vlayer.G2_ID = tnlyrinfo.G2_ID) AND a.G2_ID = b.G2_ID
+		ORDER BY G2_TYPE, G2_ORDER
+	</select>
+	
+	<!-- 속성 검색 필드 목록 -->
+	<select id="common.selectAttFld" parameterClass="SearchFacilityVO" resultClass="SearchFacilityVO">
+		SELECT 
+			G2_TABLENAME, G2_NAME, G2_ALIAS
+		FROM G2S_FIELDINFO
+		WHERE G2_TABLENAME = #G2_TABLENAME#
+	</select>
+	
+	<!-- 속성 검색 필드 목록 -->
+	<select id="common.selectAttFldForGeoServer" parameterClass="SearchFacilityVO" resultClass="SearchFacilityVO">
+		SELECT 
+			TABLENAME AS G2_TABLENAME, FIELDNAME AS G2_NAME, FIELDALIAS AS G2_ALIAS
+		FROM MV_FIELDINFO
+		WHERE TABLENAME = #G2_TABLENAME#
+	</select>
+	
+	<!-- 속성 검색 필드 값 목록 -->
+	<select id="common.selectAttFldVal" parameterClass="SearchFacilityVO" resultClass="SearchFacilityVO">
+		SELECT DISTINCT
+			$G2_NAME$ VAL
+		FROM $G2_TABLENAME$
+		<![CDATA[ 
+			LIMIT 50
+		]]>	 
+		<isNotEmpty property="G2_ID_MAP" prepend="AND">
+			FID IN
+			<iterate property="G2_ID_MAP" open="(" close=")" conjunction=",">
+				#G2_ID_MAP[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 속성 검색 필드 값 검색 -->
+	<select id="common.selectAttResult" parameterClass="SearchFacilityVO" resultClass="SearchFacilityVO">
+		$QUERY$
+		<isNotEmpty property="G2_ID_MAP" prepend="AND" >
+			FID IN
+			<iterate property="G2_ID_MAP" open="(" close=")" conjunction=",">
+				#G2_ID_MAP[]#
+			</iterate>
+		</isNotEmpty>
+	</select>
+	
+	<!-- 편집 이력 조회 -->
+	<select id="common.selectEditHis" parameterClass="SearchEditHisVO" resultClass="SearchEditHisVO">
+		SELECT A.G2_ID, B.G2_DATASETID, A.G2_VERSION, A.G2_STATE, B.G2_USER, A.G2_DATA, A.G2_DATE, B.G2_BEGINE, B.G2_END, B.G2_REMARK
+		FROM $TABLENAME_EDIT$ A,
+		(SELECT * FROM G2S_EDITHISTORY 
+		WHERE G2_DATASETID = 
+		(SELECT G2_ID FROM G2S_DATASET 
+		WHERE G2_NAME = #TABLENAME#)) B
+		WHERE A.G2_VERSION = B.G2_VERSION
+		<isNotEmpty prepend="AND" property="G2_USER">
+			G2_USER = #G2_USER#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 상수민원종류 조회 -->
+	<select id="common.selectAplCde" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			CODE, VAL
+		FROM MV_DOMAIN
+		WHERE DOMAIN = '상수민원종류'
+			<isNotEmpty prepend="AND" property="CODE"><!-- 재배작물 코드 -->
+				CODE = CAST(#CODE# AS VARCHAR)
+			</isNotEmpty>
+		ORDER BY CODE
+	</select>
+	
+	<!-- 공통 코드 추출 -->
+	<select id="common.selectCd" parameterClass="codeVO" resultClass="codeVO">
+		SELECT * FROM fn_domainlist(#CONTENT_ID#, #CODE_ID#) AS f(domain varchar, code varchar, val varchar) ORDER BY VAL		
+	</select>
+		
+	<!-- MV_DOMAIN 에서  코드 추출 -->
+	<select id="common.selectCdByDomain" parameterClass="codeVO" resultClass="codeVO">
+		SELECT 
+			CODE, VAL
+		FROM MV_DOMAIN
+		WHERE DOMAIN = #DOMAIN#
+		ORDER BY VAL
+	</select>
+	
+	<!-- 신규 등록시 OBJECTID 추출 : FN_OID 함수가 없어서.. 구냥 이미지 등록하는 것으로 변경해 봅니다. 필요하면.. 생각하자..  -->
+	<select id="common.getObjectId" parameterClass="codeVO" resultClass="String">
+		SELECT DECODE( MAX(IMG_IDN),null,'001',LPAD(MAX(IMG_IDN)+1,3,'0') ) FROM WTT_IMGE_ET
+	</select>
+	
+	<!-- 공사번호로 OBJECTID 가져오기 -->
+	<select id="common.getConsMaOID" parameterClass="hashMap" resultClass="String" remapResults="true">
+		SELECT OBJECTID FROM $TYPE$_CONS_MA WHERE CNT_NUM=#CNT_NUM#
+	</select>
+	
+	<!-- 테이블과 필드명으로 MAX값 추출  -->
+	<select id="common.getNewIDs1" parameterClass="newIdsVO" resultClass="String" remapResults="true">
+	SELECT NVL(MAX($FIELD_NAME$) + 1, '1') AS RESULT FROM $TABLE_NAME$
+	</select>
+	<!-- 테이블과 필드명, 연도로 MAX값 추출  -->
+	<select id="common.getNewIDs2" parameterClass="newIdsVO" resultClass="String" remapResults="true">
+	SELECT NVL (MAX ($FIELD_NAME$) + 1, TO_CHAR (SYSDATE, 'yyyy') || LPAD (1, $LPAD$, '0'))
+	FROM $TABLE_NAME$
+	WHERE SUBSTR ($FIELD_NAME$, 1, 4) = TO_CHAR (SYSDATE, 'yyyy')
+	</select>
+	<!-- 테이블과 필드명, 연도, 접두사 MAX값 추출  -->
+	<select id="common.getNewIDs3" parameterClass="newIdsVO" resultClass="String" remapResults="true">
+	SELECT #LEADINGCHAR# ||
+	NVL (TO_CHAR (  MAX (SUBSTR ($FIELD_NAME$, LENGTH (#LEADINGCHAR#) + 1, 4 + $LPAD$))+ 1),
+	TO_CHAR(SYSDATE, 'yyyy') || LPAD (1, $LPAD$, '0'))
+	FROM $TABLE_NAME$
+	WHERE SUBSTR ($FIELD_NAME$, 1, 4 + LENGTH (#LEADINGCHAR#)) = #LEADINGCHAR# || TO_CHAR(SYSDATE, 'yyyy')
+	</select>
+	
+	<!-- 테이블과 필드명, 연도/월로 MAX값 추출  -->
+	<select id="common.getNewIDs4" parameterClass="newIdsVO" resultClass="String" remapResults="true">
+	SELECT NVL (MAX ($FIELD_NAME$) + 1, TO_CHAR (SYSDATE, 'yyyyMM') || LPAD (1, $LPAD$, '0'))
+	FROM $TABLE_NAME$
+	WHERE SUBSTR ($FIELD_NAME$, 1, 6) = TO_CHAR (SYSDATE, 'yyyyMM')
+	</select>
+	
+	<!-- 하위대장 일련번호 MAX값 추출  -->
+	<select id="common.getMaxID" parameterClass="newIdsVO" resultClass="String" remapResults="true">
+	SELECT NVL (MAX ($MAX_FIELD$), 0) + 1 AS RESULT
+	FROM $TABLE_NAME$
+	WHERE $MASTER_FIELD1$ = #MASTER_FIELD1_VAL#
+	<isNotEmpty prepend="AND" property="MASTER_FIELD2">
+		$MASTER_FIELD2$ = #MASTER_FIELD2_VAL#
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="MASTER_FIELD3">
+		$MASTER_FIELD3$ = #MASTER_FIELD3_VAL#
+	</isNotEmpty>
+	</select>
+	
+	<select id="common.getNewAddr" parameterClass="hashMap" resultClass="String">
+	SELECT distinct(b.rn || ',' || a.buld_mnnm || ',' || a.buld_slno || ',' || a.buld_nm) newaddr
+	  FROM tl_spbd_buld a LEFT JOIN tl_sprd_manage b ON a.rn_cd = b.rn_cd
+	 WHERE a.sig_cd || a.emd_cd || a.li_cd = #BJD_CDE#
+	   AND a.mntn_yn = #OLD_SAN#
+	   AND a.lnbr_mnnm = #OLD_BON#
+	   AND a.lnbr_slno = #OLD_BUB# 
+	   LIMIT 1
+	</select>
+	
+	<select id="common.getGdbFields" parameterClass="hashMap" resultClass="hashmap">
+	SELECT fieldname, datatype, defaultvalue
+	  FROM mv_fieldinfo
+	 WHERE tablename = #TABLENAME#
+	</select>
+	
+	<update id="common.setLayerAttr" parameterClass="hashMap">
+	UPDATE $TABLENAME$
+	   SET $UPDATESQL$
+	 WHERE objectid = $OBJECTID$
+	</update>
+	
+	<!-- <delete id="common.deleteRWS_HT" parameterClass="imgeEtVO">
+	DECLARE BEGIN
+	DELETE FROM RDT_PRSV_DT WHERE FTR_CDE=#FTR_CDE# AND FTR_IDN=#FTR_IDN#;
+	DELETE FROM WTT_WUTL_HT WHERE FTR_CDE=#FTR_CDE# AND FTR_IDN=#FTR_IDN#;
+	DELETE FROM SWT_SUTL_HT WHERE FTR_CDE=#FTR_CDE# AND FTR_IDN=#FTR_IDN#;
+	END;
+	</delete>
+ -->
+	<insert id="common.InsertBookLog" parameterClass="usvBookLogVO">
+	INSERT INTO USV_BOOK_LOG
+	VALUES (
+		(SELECT NVL(MAX(LOG_IDN) + 1, 1) FROM USV_BOOK_LOG),
+		(SELECT NVL(MAX(LOG_NUM) + 1, 1) FROM USV_BOOK_LOG WHERE TAG_ALS=#TAG_ALS# AND TAG_IDN=#TAG_IDN#),
+		#SYS_TYP#,
+		#TAG_NAM#,
+		#TAG_ALS#,
+		#TAG_IDN#,
+		#CUD_CDE#,
+		#COL_NAM#,
+		#COL_ALS#,
+		#BEF_VAL#,
+		#AFT_VAL#,
+		#CHG_UID#,
+		#CHG_NAM#,
+		#CHG_DPT#,
+		#CHG_UDT#,
+		SYSDATE
+	)
+	</insert>
+	
+	<sql id="usvBookLogSearchCd">
+		<![CDATA[ WHERE (INSTR(TAG_IDN, '_') >= 0 OR SUBSTR(TAG_IDN, 0, 2)  IN ('RD', 'SA', 'SB')) ]]>
+		<isNotEmpty prepend="AND" property="SYS_TYP">
+			SYS_TYP = #SYS_TYP#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="TAG_NAM">
+			TAG_NAM = #TAG_NAM#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="TAG_ALS">
+			TAG_ALS = #TAG_ALS#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="TAG_IDN">
+			TAG_IDN LIKE '%' || #TAG_IDN# || '%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="CHG_UID">
+			CHG_UID = #CHG_UID#
+		</isNotEmpty>
+		<isEqual prepend="AND" property="COUNTBYTYPE" compareValue="MONTH">
+			TO_CHAR(CHG_YMD, 'YYYYMM') = TO_CHAR(SYSDATE, 'YYYYMM')
+		</isEqual>
+		<isEqual prepend="AND" property="COUNTBYTYPE" compareValue="YEAR">
+			TO_CHAR(CHG_YMD, 'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+		</isEqual>
+	</sql>
+	<select id="common.usvBookLogTagAls" parameterClass="usvBookLogVO" resultClass="usvBookLogVO">
+		SELECT TAG_NAM, TAG_ALS FROM USV_BOOK_LOG
+		<![CDATA[ WHERE INSTR(TAG_IDN, '-') <= 0 ]]>
+		<isNotEmpty prepend="AND" property="SYS_TYP">
+			SYS_TYP = #SYS_TYP#
+		</isNotEmpty>
+		GROUP BY TAG_NAM, TAG_ALS ORDER BY TAG_ALS
+	</select>
+	<select id="common.usvBookLogListCnt" parameterClass="usvBookLogVO" resultClass="int">
+		SELECT COUNT(*) totcnt
+		FROM USV_BOOK_LOG
+		<include refid="usvBookLogSearchCd" />
+	</select>
+	<select id="common.usvBookLogList" parameterClass="usvBookLogVO" resultClass="usvBookLogVO">
+	SELECT * FROM 
+		(SELECT (ROW_NUMBER() OVER())  AS rnum, m.* FROM
+			(SELECT (ROW_NUMBER() OVER()) , log_idn, log_num,
+				   DECODE(sys_typ, 'road', '도로', 'water', '상수', 'sewer', '하수') sys_typ,
+				   tag_nam, tag_als,
+			       DECODE(INSTR (tag_idn, '_'), 0, tag_idn, SUBSTR (tag_idn, INSTR (tag_idn, '_') + 1)) tag_idn,
+			       DECODE(cud_cde, 'C', '추가', 'U', '수정', 'D', '삭제', 'I', '도형추가', 'E', '도형삭제') cud_cde,
+			       col_nam, col_als, bef_val, aft_val, 
+			       chg_uid, chg_nam, chg_dpt, chg_udt, chg_ymd
+			  FROM usv_book_log
+			  <include refid="usvBookLogSearchCd" />
+			  ORDER BY $orderByColumn$ $orderByType$)
+		 m)
+		
+		<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	<select id="common.getFieldAliasByFieldNameForGeoServer" parameterClass="hashMap" resultClass="String">
+		SELECT FIELDALIAS FROM MV_FIELDINFO WHERE FIELDNAME = #FIELDNAME#
+		<isNotEmpty prepend="AND" property="TABLENAME">
+			 TABLENAME = #TABLENAME#
+		</isNotEmpty>
+		LIMIT 1
+	</select>
+</sqlMap>

@@ -1,0 +1,483 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="Board">
+
+	<typeAlias alias="noticeVO" type="egovframework.admin.board.vo.NoticeVO"/>
+	
+	<!-- ============================== 공지사항 ============================== -->
+	
+	<select id="content.board.List" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM, D.*, F.IDX FILE_NAME
+					FROM USV_NOTICE_BOARD D, (SELECT IDX FROM USV_ATTACHMENT GROUP BY IDX) F
+					WHERE D.IDX = F.IDX(+) AND D.DEL_YN = 'N'
+					<isNotEmpty property="SEARCH_VALUE">
+						<isEqual compareValue="BODY_TEXT" prepend="AND" property="SELECT_CODE">
+							BODY_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+						<isEqual compareValue="TITLE_TEXT" prepend="AND" property="SELECT_CODE">
+							TITLE_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+					</isNotEmpty>
+					<!-- <isNotEmpty prepend="AND" property="MANAGE_CODE">
+						MANAGE_CODE = #MANAGE_CODE#
+					</isNotEmpty> -->
+					
+					ORDER BY D.IDX DESC
+				) M
+			 )
+			 
+		 <![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.board.boardFileList" parameterClass="NoticeVO" resultClass="NoticeVO">
+		SELECT COUNT (*)
+			FROM USV_ATTACHMENT
+			WHERE 1=1
+			
+			<isNotEmpty prepend="AND" property="IDX">
+			  	#IDX#
+			</isNotEmpty>
+	</select>
+	
+	<select id="content.board.View" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * FROM USV_NOTICE_BOARD
+			WHERE IDX = #IDX#
+	</select>
+	
+	<update id="content.board.hitCnt" parameterClass="noticeVO">
+		UPDATE USV_NOTICE_BOARD 
+				SET 
+					HIT=HIT+1
+				WHERE 
+					IDX=#IDX#
+	</update>
+	
+	<insert id="content.board.insert" parameterClass="noticeVO">
+		INSERT INTO USV_NOTICE_BOARD (
+			IDX
+			,MANAGE_CODE
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_NOTICE_BOARD)
+			,#MANAGE_CODE#
+			,#TITLE_TEXT#
+			,#BODY_TEXT#
+			,#WRITE_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#EDIT_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+		)
+	</insert>
+	
+	<select id="content.board.maxBoard" parameterClass="NoticeVO" resultClass="int">
+			SELECT (NVL(MAX(IDX),0)+1)  FROM USV_NOTICE_BOARD
+	</select>
+	
+	<select id="content.board.countBoard" parameterClass="NoticeVO" resultClass="int">
+
+		SELECT COUNT(*) 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_NOTICE_BOARD D
+					WHERE 1=1
+						AND
+							DEL_YN = 'N'
+					<isNotEmpty property="SEARCH_VALUE">
+						<isEqual compareValue="BODY_TEXT" prepend="AND" property="SELECT_CODE">
+							BODY_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+						<isEqual compareValue="TITLE_TEXT" prepend="AND" property="SELECT_CODE">
+							TITLE_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+					</isNotEmpty>
+					<!-- <isNotEmpty prepend="AND" property="MANAGE_CODE">
+						MANAGE_CODE = #MANAGE_CODE#
+					</isNotEmpty> -->
+					
+					ORDER BY ROWNUM DESC
+				) M
+			 )
+			 
+	</select>
+	
+	<select id="content.board.Edit" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * FROM USV_NOTICE_BOARD
+			WHERE IDX = #IDX#
+	</select>
+	<update id="content.board.editBoard" parameterClass="NoticeVO">
+			<![CDATA[
+			UPDATE USV_NOTICE_BOARD 
+				SET 
+					MANAGE_CODE=#MANAGE_CODE#
+					,TITLE_TEXT=#TITLE_TEXT#
+					,BODY_TEXT=#BODY_TEXT#
+					,EDIT_ID=#EDIT_ID#
+					,EDIT_DATE=SYSDATE
+				WHERE 
+					IDX=#IDX#
+			]]>
+	</update>
+	
+	<update id="content.board.deleteBoard" parameterClass="NoticeVO">
+			<![CDATA[
+			UPDATE USV_NOTICE_BOARD 
+				SET 
+					DEL_YN='Y'
+				WHERE 
+					IDX=#IDX#
+			]]>
+	</update>
+	
+	<insert id="content.board.insertBoardFile" parameterClass="NoticeVO">
+		 INSERT INTO USV_ATTACHMENT 
+		 (
+		 	  FILE_NO
+		 	  , FILE_NAME
+		 	  , FILE_PATH
+		 	  , IDX
+		 )
+		 VALUES ( 
+			 (SELECT NVL(MAX(FILE_NO),0)+1 FROM USV_ATTACHMENT)
+			 ,#FILE_NAME# 
+			 ,#FILE_PATH#
+			 ,<isNotEmpty property="IDX">
+			  	#IDX#
+			  </isNotEmpty>
+			  <isEmpty  property="IDX">
+			  	(SELECT NVL(MAX(IDX),0)+1 FROM USV_NOTICE_BOARD)
+			  </isEmpty>
+		 )
+	</insert>
+	
+	<update id="content.board.deleteFileBoard" parameterClass="NoticeVO">
+	UPDATE USV_ATTACHMENT
+		SET DEL_YN = 'Y'
+		WHERE 1=1
+		<isNotEmpty prepend="AND" property="FILE_NO">
+			FILE_NO IN ($FILE_NO$)
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="IDX">
+				IDX = #IDX# 
+		</isNotEmpty>
+	</update>
+	
+	<select id="content.board.boardFileCnt" parameterClass="noticeVO" resultClass="int">
+			SELECT 
+				COUNT(*)
+			FROM USV_ATTACHMENT
+			WHERE 1=1 
+				AND 
+					DEL_YN='N' 
+				AND 
+					IDX = #IDX#
+	</select>
+	
+	<select  id="content.board.boardFileDetail" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * 
+			FROM USV_ATTACHMENT 
+			WHERE DEL_YN='N'
+			<isNotEmpty prepend="AND" property="IDX">
+				IDX = #IDX# 
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="FILE_NO">
+				FILE_NO = #FILE_NO# 
+			</isNotEmpty>
+	</select>
+	
+	
+	<!-- ============================== 자료실 ============================== -->
+	
+	<select id="content.board.referList" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT ROWNUM, D.*, F.IDX FILE_NAME
+					FROM USV_REFER_ROOM D, (SELECT IDX FROM USV_ATTACHMENT GROUP BY IDX) F
+					WHERE D.IDX = F.IDX(+) AND D.DEL_YN = 'N'
+					<isNotEmpty property="SEARCH_VALUE">
+						<isEqual compareValue="BODY_TEXT" prepend="AND" property="SELECT_CODE">
+							BODY_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+						<isEqual compareValue="TITLE_TEXT" prepend="AND" property="SELECT_CODE">
+							TITLE_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+					</isNotEmpty>
+					<!-- <isNotEmpty prepend="AND" property="MANAGE_CODE">
+						MANAGE_CODE = #MANAGE_CODE#
+					</isNotEmpty> -->
+					
+					START WITH D.REFNUM = 0
+					CONNECT BY PRIOR D.IDX = D.REFNUM
+					ORDER SIBLINGS BY D.IDX DESC
+				) M
+			 )
+			 
+		 <![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="content.board.referFileList" parameterClass="NoticeVO" resultClass="NoticeVO">
+		SELECT COUNT (*)
+			FROM USV_ATTACHMENT
+			WHERE 1=1
+			
+			<isNotEmpty prepend="AND" property="IDX">
+			  	#IDX#
+			</isNotEmpty>
+	</select>
+	
+	<select id="content.board.referView" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * FROM USV_REFER_ROOM
+			WHERE IDX = #IDX#
+	</select>
+	
+	<update id="content.board.hitCntRefer" parameterClass="noticeVO">
+		UPDATE USV_REFER_ROOM 
+				SET 
+					HIT=HIT+1
+				WHERE 
+					IDX=#IDX#
+	</update>
+	
+	<insert id="content.board.insertRefer" parameterClass="noticeVO">
+		INSERT INTO USV_REFER_ROOM (
+			IDX
+			,MANAGE_CODE
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			,#MANAGE_CODE#
+			,#TITLE_TEXT#
+			,#BODY_TEXT#
+			,#WRITE_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#WRITE_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+		)
+	</insert>
+	
+	<select id="content.board.maxRefer" parameterClass="NoticeVO" resultClass="int">
+			SELECT (NVL(MAX(IDX),0)+1)  FROM USV_REFER_ROOM
+	</select>
+	
+	<select id="content.board.countRefer" parameterClass="NoticeVO" resultClass="int">
+
+		SELECT COUNT(*) 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_REFER_ROOM D
+					WHERE 1=1
+						AND
+							DEL_YN = 'N'
+					<isNotEmpty property="SEARCH_VALUE">
+						<isEqual compareValue="BODY_TEXT" prepend="AND" property="SELECT_CODE">
+							BODY_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+						<isEqual compareValue="TITLE_TEXT" prepend="AND" property="SELECT_CODE">
+							TITLE_TEXT LIKE '%$SEARCH_VALUE$%'
+						</isEqual>
+					</isNotEmpty>
+					<!-- <isNotEmpty prepend="AND" property="MANAGE_CODE">
+						MANAGE_CODE = #MANAGE_CODE#
+					</isNotEmpty> -->
+					
+					ORDER BY ROWNUM DESC
+				) M
+			 )
+			 
+	</select>
+	
+	<select id="content.board.EditRefer" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * FROM USV_REFER_ROOM
+			WHERE IDX = #IDX#
+	</select>
+	<update id="content.board.editReferUpdate" parameterClass="NoticeVO">
+			<![CDATA[
+			UPDATE USV_REFER_ROOM 
+				SET 
+					TITLE_TEXT=#TITLE_TEXT#
+					,BODY_TEXT=#BODY_TEXT#
+					,EDIT_ID=#EDIT_ID#
+					,EDIT_DATE=SYSDATE
+				WHERE 
+					IDX=#IDX#
+			]]>
+	</update>
+	
+	<update id="content.board.deleteRefer" parameterClass="NoticeVO">
+			<![CDATA[
+			UPDATE USV_REFER_ROOM 
+				SET 
+					DEL_YN='Y'
+				WHERE 
+					IDX=#IDX#
+			]]>
+	</update>
+	
+	<insert id="content.board.insertReferFile" parameterClass="NoticeVO">
+		 INSERT INTO USV_ATTACHMENT 
+		 (
+		 	  FILE_NO
+		 	  , FILE_NAME
+		 	  , FILE_PATH
+		 	  , IDX
+		 )
+		 VALUES ( 
+			 (SELECT NVL(MAX(FILE_NO),0)+1 FROM USV_ATTACHMENT)
+			 ,#FILE_NAME# 
+			 ,#FILE_PATH#
+			 ,<isNotEmpty property="IDX">
+			  	#IDX#
+			  </isNotEmpty>
+			  <isEmpty  property="IDX">
+			  	(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			  </isEmpty>
+		 )
+	</insert>
+	
+	<update id="content.board.deleteFileRefer" parameterClass="NoticeVO">
+			UPDATE USV_ATTACHMENT
+				SET 
+					DEL_YN = 'Y'
+				WHERE 
+					FILE_NO IN ($FILE_NO$)
+	</update>
+	
+	<select id="content.board.referFileCnt" parameterClass="noticeVO" resultClass="int">
+			SELECT 
+				COUNT(*)
+			FROM USV_ATTACHMENT
+			WHERE 1=1 
+				AND 
+					DEL_YN='N' 
+				AND 
+					IDX = #IDX#
+	</select>
+	
+	<select  id="content.board.referFileDetail" parameterClass="noticeVO" resultClass="noticeVO">
+		<![CDATA[ 
+		SELECT * 
+			FROM USV_ATTACHMENT 
+			WHERE 
+				IDX = #IDX# 
+			AND 
+				DEL_YN='N'
+		]]>
+	
+	</select>
+	
+	<select id="content.main.latesBbs" parameterClass="noticeVO" resultClass="noticeVO">
+		
+		SELECT * 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_NOTICE_BOARD D
+					
+					WHERE 1=1 AND DEL_YN = 'N'
+					
+					ORDER BY IDX DESC
+				) M
+				<![CDATA[ WHERE ROWNUM <= 7 ]]>
+			 )
+		
+	</select>
+	
+	<select id="content.main.latesRef" parameterClass="noticeVO" resultClass="noticeVO">
+		
+		SELECT * 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_REFER_ROOM D
+					
+					WHERE 1=1 AND DEL_YN = 'N'
+					
+					<!-- ORDER BY IDX DESC -->
+					START WITH D.REFNUM = 0
+					CONNECT BY PRIOR D.IDX = D.REFNUM
+					ORDER SIBLINGS BY D.IDX DESC
+				) M
+				<![CDATA[ WHERE ROWNUM <= 7 ]]>
+			 )
+		
+	</select>
+	
+	<!-- 답글 part -->
+	
+<!-- 	<update id="content.board.updateSortNo" parameterClass="NoticeVO">
+			UPDATE USV_REFER_ROOM
+				SET 
+					SORT_NO = SORT_NO-1
+		<![CDATA[ WHERE  
+					IDX < #TEMP_IDX#
+		]]>
+	</update>
+ -->	
+	<insert id="content.board.insertReply" parameterClass="noticeVO">
+		INSERT INTO USV_REFER_ROOM (
+			IDX
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+			,REFNUM
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			,#TITLE_TEXT#
+			,#BODY_TEXT#
+			,#WRITE_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#WRITE_ID#
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#REFNUM#
+		)
+	</insert>
+	
+	<select id="content.board.replyView" parameterClass="noticeVO" resultClass="noticeVO">
+		SELECT * FROM USV_REFER_ROOM
+			WHERE IDX = #IDX#
+	</select>
+	
+</sqlMap>

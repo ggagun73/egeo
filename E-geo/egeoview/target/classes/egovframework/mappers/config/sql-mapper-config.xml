@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+<!--    <settings> 
+        <setting name="cacheEnabled"              value="true"/>  
+        <setting name="lazyLoadingEnabled"        value="false"/>  
+        <setting name="multipleResultSetsEnabled" value="true"/>  
+        <setting name="useColumnLabel"            value="true"/>  
+        <setting name="useGeneratedKeys"          value="false"/>  
+        <setting name="defaultExecutorType"       value="SIMPLE"/>  
+        <setting name="defaultStatementTimeout"   value="25000"/>  
+    </settings> -->
+    
+	<typeAliases>
+		<typeAlias alias="LoginVO" type="usolver.com.main.vo.LoginVO" />
+		<typeAlias alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap" />
+		<typeAlias alias="lyrInfoSerarchVO" type="usolver.com.cmm.map.service.vo.LyrInfoDefaultVO" />
+		<typeAlias alias="lyrInfoVO" type="usolver.com.cmm.map.service.vo.LyrInfoVO" />
+		<typeAlias alias="LyrEditMidSaveVO" type="usolver.com.cmm.map.service.vo.LyrEditMidSaveVO" />
+		<typeAlias alias="SearchEditHisVO" type="usolver.com.cmm.map.service.vo.SearchEditHisVO" />
+		<typeAlias alias="userMemoVO" type="usolver.com.cmm.map.service.vo.UserMemoVO" />
+		<typeAlias alias="MemoVO" type="usolver.com.cmm.map.service.vo.MemoVO" />
+		<typeAlias alias="MarkerVO" type="usolver.com.cmm.map.service.vo.MarkerVO" />
+		<typeAlias alias="memoGroupVO" type="usolver.com.cmm.map.service.vo.MemoGroupVO" />
+		<typeAlias alias="memoFileInfoVO" type="usolver.com.cmm.map.service.vo.MemoFileInfoVO" />
+		<typeAlias alias="memoHistVO" type="usolver.com.cmm.map.service.vo.MemoHistVO" />		
+		<typeAlias alias="LyrEditRefVO" type="usolver.com.cmm.map.service.vo.LyrEditRefVO" />
+		<typeAlias alias="LyrEditSnapInfoVO" type="usolver.com.cmm.map.service.vo.LyrEditSnapInfoVO" />
+		<typeAlias alias="LyrEditSchemaInfoVO" type="usolver.com.cmm.map.service.vo.LyrEditSchemaInfoVO" />		
+		<typeAlias alias="SearchBLDGVO" type="usolver.com.cmm.map.service.vo.SearchBLDGVO" />
+		<typeAlias alias="SearchJUSOVO" type="usolver.com.cmm.map.service.vo.SearchJUSOVO" />	
+		<typeAlias alias="SearchNEWJUSOVO" type="usolver.com.cmm.map.service.vo.SearchNEWJUSOVO" />
+		<typeAlias alias="UserLyrStyleVO" type="usolver.com.cmm.map.service.vo.UserLyrStyleVO" />	
+		<typeAlias alias="SubjectVO" type="usolver.com.cmm.map.service.vo.SubjectVO" />
+		<typeAlias alias="SubjectFileInfoVO" type="usolver.com.cmm.map.service.vo.SubjectFileInfoVO" />
+		<typeAlias alias="SubjectFileTotVO" type="usolver.com.cmm.map.service.vo.SubjectFileTotVO" />
+		<typeAlias alias="SubjectLayerVO" type="usolver.com.cmm.map.service.vo.SubjectLayerVO" />
+		<typeAlias alias="UserFavVO" type="usolver.com.cmm.map.service.vo.UserFavVO" />
+		
+	</typeAliases> 
+	
+ 	<mappers>
+	    
+	    <!-- <mapper resource="egovframework/mappers/book/register_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/book/addInfo_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/book/book_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/book/statistic_mapper.xml"/> -->
+	    
+	   <!--  <mapper resource="egovframework/mappers/book/postgresql/register_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/book/postgresql/book_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/book/postgresql/statistic_mapper.xml"/> -->
+	    
+	    <!--관리자--> 
+	    <!-- <mapper resource="egovframework/mappers/admin/postgresql/log_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/admin/postgresql/author_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/postgresql/board_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/postgresql/code_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/admin/postgresql/program_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/postgresql/role_mapper.xml"/> 
+ 	    <mapper resource="egovframework/mappers/admin/postgresql/user_mapper.xml"/>
+ 	    <mapper resource="egovframework/mappers/admin/postgresql/menu_mapper.xml"/>
+ 	    <mapper resource="egovframework/mappers/admin/postgresql/layer_mapper.xml"/> -->
+ 	    
+ 	    
+ 	    
+ 	    
+ 	    
+	    
+	    <mapper resource="egovframework/mappers/book/register_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/book/book_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/book/statistic_mapper.xml"/>
+	    
+	    <!--관리자--> 
+	    <mapper resource="egovframework/mappers/admin/log_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/admin/author_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/board_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/code_mapper.xml"/>
+	    <mapper resource="egovframework/mappers/admin/program_mapper.xml"/> 
+	    <mapper resource="egovframework/mappers/admin/role_mapper.xml"/> 
+ 	    <mapper resource="egovframework/mappers/admin/user_mapper.xml"/>
+ 	    <mapper resource="egovframework/mappers/admin/menu_mapper.xml"/>
+ 	    <mapper resource="egovframework/mappers/admin/layer_mapper.xml"/>
+	</mappers>
+
+</configuration>

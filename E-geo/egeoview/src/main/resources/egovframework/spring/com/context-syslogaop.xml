@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<!--  System Log Aspect -->
+	<bean id="editlog" class="usolver.admin.log.elg.service.EditLogAspect" />
+
+	<aop:config>
+		<aop:aspect id="editLogAspect" ref="editlog">
+			<!--  insert로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * usolver.book..impl.*Impl.insert*(..))" method="logInsert" />
+			<!--  update로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * usolver.book..impl.*Impl.update*(..))" method="logUpdate" />
+			<!--  delete로 시작되는 service Method -->
+			<aop:around pointcut="execution(public * usolver.book..impl.*Impl.delete*(..))" method="logDelete" />
+			<!--  select로 시작되는 service Method  너무 많다.. ㅠㅠ 
+			<aop:around pointcut="execution(public * usolver..impl.*Impl.select*(..))" method="logSelect" />  -->
+		</aop:aspect>
+	</aop:config>
+
+</beans>

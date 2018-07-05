@@ -1,0 +1,25 @@
+@charset "utf-8";
+.stripMapToolbar
+      {
+        position:absolute; 
+        right:240px;
+        bottom:7px;
+        color:#000;
+        z-index:50;
+        background-color:white;
+        border: solid 1px #7EABCD;
+        padding-top:8px;
+        padding-left:10px;
+        padding-right:8px;
+        font-size:small;
+        color:peru;
+        
+        /*slight shadow effect added for browsers that support this functionality*/
+        -o-border-radius: 10px;
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+         box-shadow: 4px 4px 8px #adadad;
+        -webkit-box-shadow: 4px 4px 8px #adadad;
+        -moz-box-shadow: 4px 4px 8px #adadad;
+        -o-box-shadow: 4px 4px 8px #adadad;
+      }

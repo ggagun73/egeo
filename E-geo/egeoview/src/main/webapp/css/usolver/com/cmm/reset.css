@@ -1,0 +1,142 @@
+@charset "utf-8";
+
+@font-face { 
+ font-family:'NanumGothic';
+ src: url('./NanumGothic.eot'); 
+ src: url('./NanumGothic.eot?') format('eot'),
+      url('./NanumGothic.woff') format('woff'); 
+}
+
+@font-face { 
+ font-family:'NanumGothic';
+ src: url('./NanumGothicBold.eot'); 
+ src: url('./NanumGothicBold.woff') format('woff');
+        font-weight:bold; 
+} 
+
+* { font-family:"NanumGothic", 돋움, Sans-serif !important ; }
+
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code, button,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend, frameset, frameborder, frame, img,
+table, caption, tbody, tfoot, thead, tr, th, td { margin: 0; padding: 0; border: 0; outline: 0; font-family:"Dotum", 돋움, Dotum, Arial, Sans-serif; }
+
+
+html {overflow-y:scroll; height:100%;}
+body {height:100%; color:#666; font-family:'돋움', Dotum, Arial, sans-serif; font-size:75%;}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {  border-collapse: collapse;  border-spacing: 0; }
+
+input, select, textarea {vertical-align: middle; font-size: 12px; color:#6c6c6c; }
+textarea {vertical-align: middle; font-size: 12px; color:#6c6c6c; border:1px solid #c7c7c7; line-height:19px;}
+fieldset{ border:none; }
+.select { line-height:23px; height:23px; padding-left:3px; border:1px solid #b8b8b8; color:#6c6c6c; background-color:#fff; }
+.input { line-height:20px; height:20px; padding-left:4px; padding-right:3px; border:1px solid #b8b8b8; color:#6c6c6c; background-color:#fff; }
+.input2 { line-height:20px; height:20px; padding-left:4px; padding-right:0px; border:1px solid #b8b8b8; color:#6c6c6c; background-color:#fff; }
+li{list-style:none; }
+ul{list-style:none; }
+
+img { vertical-align:middle; border:0px; }
+
+
+/* Font Style */
+body,td,div		{	font-size: 12px; color:#505050; line-height:16px; }
+a:link			{	color:#6c6c6c; text-decoration:none; }
+a:hover			{	color:#6c6c6c; text-decoration:none; }
+a:active		{	color:#6c6c6c; text-decoration:none; }
+a:visited		{	color:#6c6c6c; text-decoration:none; }
+
+.blue			{	color:#3f8cd4;}
+.orange			{	color:#ff6c00;}
+.red			{	color:#fe2828;}
+.black			{	color:#000000;}
+.gray			{	color:#949494;}
+.white			{	color:#FFFFFF;}
+.bold			{	font-weight:bold;}
+.f11			{	font-size:11px;}
+.FL				{   float:left; }
+.FR				{   float:right; }
+
+address {font-style:normal;}
+hr {clear:both; display:none;}
+caption, legend {font-size:0; height:0; line-height:0; overflow:hidden; visibility:hidden; width:0;}
+.hidden {font-size:0; height:0; line-height:0; overflow:hidden; position:absolute; visibility:hidden; width:0;}
+h2.hidden {display:none;}
+
+
+/*common */
+.al {text-align:left !important;}
+.ac {text-align:center !important;}
+.ar {text-align:right !important;}
+
+
+
+/* Table ************************************************************************************/
+.TableBx									{ float:left; width:100%; height:450px; padding:0 0 10px 0; overflow-x:auto; overflow-y:auto;}
+.Table_list									{ float:left; width:100%; table-layout:fixed; padding:0 0 0px 0; }
+.Table_list table							{ width:100%; border-bottom:1px #a7a7a7 solid; table-layout: fixed; min-width:770px;}
+.Table_list table th						{ text-align:center; font-weight: bold; padding:5px 0 5px 0; line-height:18px; Color:#5f5f5f; background:url("../images/th_bg.gif") repeat-x;  border-top:1px #a7a7a7 solid; border-left:1px #b3b3b3 solid; border-right:1px #b3b3b3 solid; border-bottom:1px #b3b3b3 solid; text-align:center; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list table td						{ border-left:1px #e8e8e8 solid; border-right:1px #e8e8e8 solid; border-bottom:1px #dfdfdf solid; color: #5d5d5d; line-height:18px; padding:5px 5px 5px 5px; text-align:center; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list table td.Num					{ color:#279ee2;}
+.Table_list table td.Bg_hover				{ background-color:#fef9e3; border-bottom:1px #f6ca1a solid; color:#f77516; }
+.Table_list table td.left					{ text-align:left; padding-left:10px; }
+
+
+.Table_list2								{ float:left; width:100%; table-layout:fixed; padding:0 0 0px 0; }
+.Table_list2 table							{ width:100%; border-bottom:1px #a7a7a7 solid; table-layout: fixed; }
+.Table_list2 table th						{ text-align:left; font-weight: bold; padding:5px 5px 5px 13px; line-height:18px; Color:#5f5f5f; background:url("../images/th_bg.gif") repeat-x;  border-top:1px #a7a7a7 solid; border-left:1px #b3b3b3 solid; border-right:1px #b3b3b3 solid; border-bottom:1px #b3b3b3 solid; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list2 table td						{ border-left:1px #e8e8e8 solid; border-right:1px #e8e8e8 solid; border-bottom:1px #dfdfdf solid; color: #5d5d5d; line-height:18px; padding:5px 5px 5px 13px; text-align:left; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list2 table td.Bg_hover				{ background-color:#fef9e3; border-bottom:1px #f6ca1a solid; color:#f77516; }
+
+
+.Table_list3								{ float:left; width:100%; table-layout:fixed; padding:0 0 0px 0; }
+.Table_list3 table							{ width:100%; border-bottom:1px #a7a7a7 solid; table-layout: fixed; }
+.Table_list3 table th						{ text-align:center; font-weight: bold; padding:3px 5px 3px 5px; line-height:18px; Color:#5f5f5f; background:url("../images/th_bg.gif") repeat-x;  border-top:1px #a7a7a7 solid; border-left:1px #b3b3b3 solid; border-right:1px #b3b3b3 solid; border-bottom:1px #b3b3b3 solid; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list3 table td						{ border-left:1px #e8e8e8 solid; border-right:1px #e8e8e8 solid; border-bottom:1px #dfdfdf solid; color: #5d5d5d; line-height:18px; padding:3px 5px 3px 5px; text-align:center; vertical-align:middle; letter-spacing:-0.05em;}
+.Table_list3 table td.Bg_hover				{ background-color:#fef9e3; border-bottom:1px #f6ca1a solid; color:#f77516; }
+
+
+
+.Table_LBx									{ float:left; width:100%; padding:0 0 10px 0;}
+.Table_left									{ float:left; width:100%; table-layout:fixed; padding:0 0 0px 0; border-top:1px solid #9f9f9f; }
+.Table_left table							{ width:100%; table-layout:fixed; }
+.Table_left table th						{ text-align:left; font-weight: bold; padding:5px 5px 5px 10px; background-color:#f6f6f6; line-height:17px; Color:#5f5f5f; border:1px solid #e3e2e2; vertical-align:middle; letter-spacing:-0.05em; }
+.Table_left table td						{ border:1px solid #e3e2e2; line-height:17px; padding:5px 5px 5px 10px; text-align:left; vertical-align:middle; letter-spacing:-0.05em;}
+
+
+
+
+/* Paging */
+.PagingBx { float:left; width:100%; padding:15px 0 10px 0; }
+.Paging_tx { float:left; width:160px; font-size:11px; padding:0 0 0 0; height:20px; color:#7e7e7e; }
+.Paging_tx span { color:#ff5a00; font-weight:bold; }
+
+ul.pages {float:right; }
+ul.pages li { float:left; }
+ul.pages li img { vertical-align:middle; padding:0 2px 0 2px;}
+ul.pages li.pages_tx { padding:0 6px 0 6px; }
+
+
+
+/* btn ************************************************************************************/
+.Btn_pd {float:left; width:100%; padding:0 0 0px 0;}
+.Btn_pd2 {float:right; padding:0 0 5px 0;}
+.Btn_R {float:right;}
+.Btn { float:left; padding-right:3px}
+a.Btn_01:link,a.Btn_01:visited{display:block; float:left; height:24px; line-height:13px; font-weight:bold; padding:8px 14px 0 14px; cursor:pointer; border-top:1px #cdcdcd solid; border-left:1px #cdcdcd solid; border-right:1px #bdbdbd solid; border-bottom:1px #bdbdbd solid; color:#4c4c4c; font-weight:bold; background:url("../images/bt_bg1.gif") repeat-x; letter-spacing:-0.05em;}
+a.Btn_01:hover{color:#1a99e2;}
+a.Btn_02:link,a.Btn_02:visited{display:block; float:left; height:14px; line-height:14px; font-weight:bold; padding:7px 14px 8px 14px; cursor:pointer; border-top:1px #178fd3 solid; border-left:1px #178fd3 solid; border-right:1px #0c7fc0 solid; border-bottom:1px #0c7fc0 solid; color:#fff; font-weight:bold; background-color:#229de3; letter-spacing:-0.05em;}
+a.Btn_02:hover{background-color:#0578c2;}
+a.Btn_03:link,a.Btn_03:visited{display:block; float:left; height:21px; line-height:13px; font-weight:bold; padding:5px 17px 0 17px; cursor:pointer; border-top:1px #cdcdcd solid; border-left:1px #cdcdcd solid; border-right:1px #bdbdbd solid; border-bottom:1px #bdbdbd solid; color:#4c4c4c; font-weight:bold; background:url("../images/bt_bg1.gif") repeat-x; letter-spacing:-0.05em;}
+a.Btn_03:hover{color:#1a99e2;}
+
+
+
+
+

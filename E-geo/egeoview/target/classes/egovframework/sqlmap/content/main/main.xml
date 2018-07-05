@@ -1,0 +1,362 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+
+<sqlMap namespace="main">
+	<typeAlias  alias="loginVO" type="usolver.com.main.vo.LoginVO"/>
+	<typeAlias alias="UsvUserSystemVO" type="usolver.com.main.vo.UsvUserSystemVO"/>
+	<typeAlias alias="UsvUserCompVO" type="usolver.com.main.vo.UsvUserCompVO"/>
+	<typeAlias alias="UsvLogUserVO" type="usolver.com.main.vo.UsvLogUserVO"/>
+	<typeAlias alias="UsvLogPrintVO" type="usolver.com.main.vo.UsvLogPrintVO"/>
+	
+	<insert id="main.UsvUserInsert" parameterClass="loginVO">
+	INSERT INTO usv_users(user_id, user_name, user_dept, user_dept_m_upper, req_date)
+	VALUES (#USER_ID#, #USER_NAME#, #USER_DEPT#, #USER_DEPT_M_UPPER#, SYSDATE)
+	</insert>
+	
+	<!--  사용자(로그인) 정보 추출 -->
+	<select id="common.selectUsers" parameterClass="loginVO" resultClass="loginVO">
+		SELECT
+			*
+		FROM USV_USERS
+		WHERE  USER_ID = #USER_ID#
+		<isNotEmpty prepend="AND" property="USER_NAME">
+			USER_NAME = #USER_NAME#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="USER_DEPT">
+			USER_DEPT = #USER_DEPT#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="USER_DEPT_M_UPPER">
+			USER_DEPT_M_UPPER = #USER_DEPT_M_UPPER#
+		</isNotEmpty>
+	</select>
+	
+	<update id="common.UsvUserUpdate" parameterClass="loginVO">
+	UPDATE usv_users 
+	SET user_dept = #USER_DEPT#, user_dept_m_upper = #USER_DEPT_M_UPPER#
+	WHERE user_id = #USER_ID#
+	</update>
+	
+	<!--  사용자 시스템권한 목록 추출 -->
+	<select id="common.selectUserSystem" parameterClass="loginVO" resultClass="loginVO">
+		<![CDATA[
+			SELECT
+				USER_ID, SYS_ID, SYS_AUTH
+			FROM USV_USER_SYSTEM
+			WHERE  USER_ID = #USER_ID#
+		]]>
+	</select>
+	
+	<!-- 사용자 편집권한 목록 추출 -->
+	<select id="common.selectUserComp" parameterClass="loginVO" resultClass="String">
+		SELECT 
+			PROG_ID
+		FROM USV_USER_COMP
+		WHERE USER_ID = #USER_ID# AND COMP_AUTH=2 AND PROG_ID IS NOT NULL
+		ORDER BY SEQ
+	</select>
+	
+	<update id="main.UsvUserSystemProcWrite" parameterClass="UsvUserSystemVO">
+	MERGE INTO usv_user_system
+	   USING DUAL
+	   ON (user_id = #USER_ID# AND sys_id = #SYS_ID#)
+	   WHEN MATCHED THEN
+	      UPDATE
+	         SET sys_auth = #SYS_AUTH#, approve_time = SYSDATE
+	   WHEN NOT MATCHED THEN
+	      INSERT (seq, user_id, sys_id, sys_auth, request_time)
+	      VALUES ((SELECT MAX (seq)
+	                 FROM usv_user_system) + 1, #USER_ID#, #SYS_ID#, #SYS_AUTH#, SYSDATE)
+	</update>
+	
+	<select id="main.GetUsvLogUserMaxLogIdn" resultClass="int">
+	SELECT NVL (MAX (LOG_IDN), 0) + 1 FROM USV_LOG_USER
+	</select>
+	
+	<insert id="main.UsvLogUserInsert" parameterClass="UsvLogUserVO">
+	INSERT INTO usv_log_user
+	            (log_date,
+	             log_idn, user_id, user_name,
+	             user_dept, user_dept_m_upper, sys_id, com_name, com_addr, con_time, discon_time,
+	             connecting_time
+	            )
+	     VALUES (
+	     		 TO_CHAR (SYSDATE, 'yyyyMMdd'),
+	             #LOG_IDN#, #USER_ID#, #USER_NAME#,
+	             #USER_DEPT#, #USER_DEPT_M_UPPER#, #SYS_ID#, #COM_NAME#, #COM_ADDR#, SYSDATE, SYSDATE,0
+	            )
+	</insert>
+	
+	<update id="main.LogoutWrite">
+	DECLARE BEGIN
+		UPDATE usv_log_user
+	    SET discon_time = SYSDATE, connecting_time = (SYSDATE - con_time) * 60 * 60 * 24
+	    WHERE LOG_IDN = #LOG_IDN#;
+	    
+		<isNotEmpty property="EXTENT">
+		MERGE INTO USV_USER_CONFIG
+		USING DUAL
+	    ON (USER_ID = #USER_ID# AND SYS_ID = #SYS_ID#)
+	    WHEN MATCHED THEN
+	   		UPDATE SET 
+	   			EXTENT = #EXTENT#,
+	   			LAYERS = #LAYERS#,
+	   			VISIBLES = #VISIBLES# 
+	   	WHEN NOT MATCHED THEN
+			INSERT (USER_ID,SYS_ID,EXTENT,LAYERS,VISIBLES)
+			VALUES (#USER_ID#,#SYS_ID#,#EXTENT#,#LAYERS#,#VISIBLES#);
+		</isNotEmpty>
+	END;
+	</update>
+	
+	<select id="main.GetUsvUserSystem" parameterClass="UsvUserSystemVO" resultClass="UsvUserSystemVO">
+	SELECT REPLACE (REPLACE (sys_id, '도관리시스템', ''), '관리시스템', '') sys_id
+	  FROM usv_user_system
+	 WHERE user_id = #USER_ID#
+	   AND sys_auth IN (1, 2)
+	   AND sys_id IN ('도로관리시스템', '상수도관리시스템', '하수도관리시스템')
+	</select>
+	
+	<select id="main.GetUsvUserComponentBook" parameterClass="UsvUserCompVO" resultClass="UsvUserCompVO">
+	SELECT a.seq seq, a.sys_type sys_type, a.category category,  a.prog_id prog_id, a.caption caption,
+	         DECODE (a.prog_id, b.prog_id, 1, 0) comp_auth
+	    FROM (SELECT   *
+	              FROM usv_component
+	             WHERE sys_type IN (
+	                               SELECT SUBSTR (sys_id, 1, 2)
+	                                 FROM usv_user_system
+	                                WHERE user_id = #USER_ID#
+	                                      AND sys_auth IN (1, 2))
+	          ORDER BY seq) a,
+	         (SELECT *
+	            FROM usv_user_comp
+	           WHERE user_id = #USER_ID#) b
+	   WHERE a.prog_id = b.prog_id(+) and a.caption=b.caption(+)
+	ORDER BY a.seq
+	</select>
+	
+	<select id="main.GetUsvUserComponentCategory" parameterClass="UsvUserCompVO" resultClass="UsvUserCompVO">
+	SELECT   CATEGORY, MAX (seq) seq, MAX (sys_type) sys_type
+	    FROM usv_component
+	GROUP BY SYS_TYPE, CATEGORY
+	ORDER BY seq
+	</select>
+	
+	<delete id="main.UsvUserComponentDelete" parameterClass="UsvUserCompVO">
+		DELETE FROM usv_user_comp 
+		WHERE user_id = #USER_ID#
+	</delete>
+	
+	<insert id="main.UsvUserComponentInsert" parameterClass="UsvUserCompVO">
+	INSERT INTO usv_user_comp
+	   SELECT seq_usv_user_comp.NEXTVAL, #USER_ID#, sys_type, CATEGORY, prog_id,
+	          caption, SYSDATE,
+	          <isEmpty property="APPROVE_TIME" >NULL</isEmpty>
+	          <isNotEmpty property="APPROVE_TIME">SYSDATE</isNotEmpty> 
+			, #COMP_AUTH#
+	     FROM usv_component
+	    WHERE seq IN ($SEQS$)
+	</insert>
+	
+	<select id="manage.userList" parameterClass="UsvUserSystemVO" resultClass="UsvUserSystemVO">
+	<![CDATA[
+	SELECT *
+	  FROM (SELECT ROWNUM rnum, m.*
+	          FROM (SELECT   us.user_id, us.user_name, us.user_dept,
+	                         TO_CHAR (us.request_time,
+	                                  'yyyy-MM-dd'
+	                                 ) request_time,
+	                         TO_CHAR (us.approve_time,
+	                                  'yyyy-MM-dd'
+	                                 ) approve_time,
+	                         us.approve_state,
+	                         CASE
+	                            WHEN c.cnt > 0
+	                               THEN us.sys_id || ' 관리'
+	                            ELSE CASE
+	                            WHEN us.sys_id = '운영자시스템'
+	                               THEN us.sys_id
+	                            WHEN us.sys_id = '편집시스템'
+	                               THEN us.sys_id
+	                            ELSE us.sys_id || ' 조회'
+	                         END
+	                         END book_edit
+	                    FROM (SELECT u.user_id, u.user_name, u.user_dept,
+	                                 s.sys_id, s.request_time, s.approve_time,
+	                                 s.sys_auth approve_state
+	                            FROM usv_users u, usv_user_system s
+	                           WHERE u.user_id = s.user_id(+)
+	                             AND sys_id IN
+	                                    ('도로관리시스템', '상수도관리시스템',
+	                                     '하수도관리시스템', '운영자시스템', '편집시스템')
+    ]]>
+    					
+    					<isNotEmpty prepend="AND" property="SEARCH_VALUE">
+							<isEqual property="SEARCH_FLAG" compareValue="USER_NAME">
+								u.user_name LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+							<isEqual property="SEARCH_FLAG" compareValue="USER_ID">
+								u.user_id LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+							<isEqual property="SEARCH_FLAG" compareValue="USER_DEPT">
+								u.user_dept LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+    					</isNotEmpty>
+	<![CDATA[
+	                                     ) us,
+	                         (SELECT   user_id, sys_type, COUNT (*) cnt
+	                              FROM usv_user_comp
+	                          GROUP BY user_id, sys_type) c
+	                   WHERE us.user_id = c.user_id(+)
+	                     AND REPLACE (REPLACE (us.sys_id, '도관리시스템', ''), '관리시스템', '') = c.sys_type(+)
+    ]]>
+    					<isNotEmpty prepend="AND" property="BOOK_EDIT">
+							<isEqual property="BOOK_EDIT" compareValue="ROAD_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '도로관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="WATER_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '상수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="SEWER_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '하수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="ROAD_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '도로관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="WATER_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '상수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="SEWER_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '하수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="ADMIN">
+								<![CDATA[ us.sys_id = '운영자시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="EDITOR">
+								<![CDATA[ us.sys_id = '편집시스템' ]]>
+							</isEqual>
+						</isNotEmpty>
+	                ORDER BY request_time DESC) m)
+	<![CDATA[ WHERE rnum <= #lastIndex# and rnum > #firstIndex# ]]>
+	</select>
+	
+	<select id="manage.userListCnt" parameterClass="UsvUserSystemVO" resultClass="int">
+	<![CDATA[
+	SELECT COUNT (*)
+	  FROM (SELECT   u.user_id, s.sys_id
+	            FROM usv_users u, usv_user_system s
+	           WHERE u.user_id = s.user_id(+)
+	             AND sys_id IN
+	                    ('도로관리시스템', '상수도관리시스템', '하수도관리시스템', '운영자시스템', '편집시스템')
+    ]]>
+    					<isNotEmpty prepend="AND" property="SEARCH_VALUE">
+							<isEqual property="SEARCH_FLAG" compareValue="USER_NAME">
+								u.user_name LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+							<isEqual property="SEARCH_FLAG" compareValue="USER_ID">
+								u.user_id LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+							<isEqual property="SEARCH_FLAG" compareValue="USER_DEPT">
+								u.user_dept LIKE '%' || #SEARCH_VALUE# || '%'
+							</isEqual>
+    					</isNotEmpty>
+	<![CDATA[
+	                    ) us,
+	       (SELECT   user_id, sys_type, COUNT (*) cnt
+	            FROM usv_user_comp
+	        GROUP BY user_id, sys_type) c
+	 WHERE us.user_id = c.user_id(+)
+	   AND REPLACE (REPLACE (us.sys_id, '도관리시스템', ''), '관리시스템', '') = c.sys_type(+)
+    ]]>
+    					<isNotEmpty prepend="AND" property="BOOK_EDIT">
+							<isEqual property="BOOK_EDIT" compareValue="ROAD_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '도로관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="WATER_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '상수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="SEWER_VIEW">
+								<![CDATA[ c.cnt is null AND us.sys_id = '하수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="ROAD_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '도로관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="WATER_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '상수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="SEWER_EDIT">
+								<![CDATA[ c.cnt > 0 AND us.sys_id = '하수도관리시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="ADMIN">
+								<![CDATA[ us.sys_id = '운영자시스템' ]]>
+							</isEqual>
+							<isEqual property="BOOK_EDIT" compareValue="EDITOR">
+								<![CDATA[ us.sys_id = '편집시스템' ]]>
+							</isEqual>
+						</isNotEmpty>
+	</select>
+	
+	<select id="manage.userDetail" parameterClass="UsvUserSystemVO" resultClass="UsvUserSystemVO">
+	SELECT u.user_id, u.user_name, u.user_dept, s.sys_id, s.sys_auth, fn_aes_dec(u.user_pw) USER_PW,
+	       TO_CHAR(s.request_time, 'yyyy-MM-dd HH24:MI:SS') request_time,
+	       TO_CHAR(s.approve_time, 'yyyy-MM-dd HH24:MI:SS') approve_time
+	  FROM usv_user_system s, usv_users u
+	 WHERE s.user_id = u.user_id(+) AND u.user_id = #USER_ID#
+	 	AND s.sys_id IN ('도로관리시스템', '상수도관리시스템', '하수도관리시스템', '운영자시스템', '편집시스템')
+	</select>
+	
+	<update id="main.UsvUserSystemInit" parameterClass="UsvUserSystemVO">
+	DECLARE BEGIN
+	UPDATE usv_user_system SET sys_auth=#SYS_AUTH#, approve_time=NULL
+	WHERE user_id=#USER_ID# AND SYS_ID IN ('도로관리시스템', '상수도관리시스템', '하수도관리시스템', '운영자시스템', '편집시스템');
+	
+	<isNotEmpty property="USER_PW">
+	UPDATE usv_users SET user_pw=fn_aes_enc(#USER_PW#) WHERE user_id=#USER_ID#;
+	</isNotEmpty>
+	END;
+	</update>
+	
+	<insert id="main.UsvLogPrintInsert" parameterClass="UsvLogPrintVO">
+	INSERT INTO USV_LOG_PRINT
+			(
+			SEQ,
+			USER_ID,
+			SYS_ID,
+			COM_NAME,
+			COM_ADDR,
+			USER_NAME,
+			USER_DEPT,
+			USER_DEPT_M_UPPER,
+			PRINT_TIME,
+			PRINT_TYPE,
+			PRINT_LAYERS,
+			PRINT_SIZE,
+			PRINT_TITLE,
+			PRINT_SCALE,
+			MINX,
+			MAXX,
+			MINY,
+			MAXY
+			)
+		VALUES
+			(
+			(SELECT NVL(MAX(SEQ), 1)+1 FROM USV_LOG_PRINT),
+			#USER_ID#,
+			#SYS_ID#,
+			#COM_NAME#,
+			#COM_ADDR#,
+			#USER_NAME#,
+			#USER_DEPT#,
+			#USER_DEPT_M_UPPER#,
+			SYSDATE,
+			#PRINT_TYPE#,
+			#PRINT_LAYERS#,
+			#PRINT_SIZE#,
+			#PRINT_TITLE#,
+			#PRINT_SCALE#,
+			#MINX#,
+			#MAXX#,
+			#MINY#,
+			#MAXY#
+			)
+	</insert>
+</sqlMap>

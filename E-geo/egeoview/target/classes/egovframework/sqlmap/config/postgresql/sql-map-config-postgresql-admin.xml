@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+		
+	<sqlMap resource="egovframework/sqlmap/admin/postgresql/EgovAuthorGroup_SQL_Postgresql.xml"/>
+    <sqlMap resource="egovframework/sqlmap/admin/postgresql/EgovAuthorRoleManage_SQL_Postgresql.xml"/>  
+
+   	<!-- <sqlMap resource="egovframework/sqlmap/admin/EgovMainMenu_SQL_Oracle.xml"/>	
+	<sqlMap resource="egovframework/sqlmap/admin/EgovMenuCreat_SQL_Oracle.xml"/> -->
+	<!-- <sqlMap resource="egovframework/sqlmap/admin/EgovMenuManage_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/admin/EgovProgrmManage_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/admin/EgovProgrmManageDtl_SQL_Oracle.xml"/>	 -->
+	<sqlMap resource="egovframework/sqlmap/admin/postgresql/EgovRoleManage_SQL_Postgresql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/admin/postgresql/EgovRolesHierarchyManage_SQL_Postgresql.xml"/>
+	
+	<sqlMap resource="egovframework/sqlmap/admin/postgresql/EgovLoginLog_SQL_Postgresql.xml"/>
+	<!-- <sqlMap resource="egovframework/sqlmap/admin/EgovSysLog_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/admin/EgovUserManage_SQL_Oracle.xml"/>
+	<sqlMap resource="egovframework/sqlmap/admin/EgovWebLog_SQL_Oracle.xml"/>  -->
+
+</sqlMapConfig>

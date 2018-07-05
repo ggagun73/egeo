@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+	
+	<!-- ============================== 공지사항 ============================== -->
+	
+	<select id="selectNoticeBoardList" parameterType="usolver.admin.board.vo.NoticeVO"  resultType="usolver.admin.board.vo.NoticeVO">
+		SELECT * 		
+		FROM (
+		       SELECT  ROWNUM RNUM, M.*
+			   FROM (
+					SELECT
+						ROWNUM, D.*, F.IDX FILE_NAME
+					FROM USV_NOTICE D, (SELECT IDX FROM USV_ATTACHMENT GROUP BY IDX) F
+					WHERE D.IDX = F.IDX(+) AND D.DEL_YN = 'N'
+						<if test='searchKeyword != null'>
+							AND ( BODY_TEXT LIKE '%${searchKeyword}%' OR TITLE_TEXT LIKE '%${searchKeyword}%' OR WRITE_ID = '%${searchKeyword}%' )
+						</if>
+					ORDER BY D.IDX DESC
+				) M
+			 )			 
+		 <![CDATA[  
+		 		 WHERE  RNUM  > #{firstIndex}
+               		AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+          ]]>
+	</select>
+		
+	<select id="selectNoticeBoardView" parameterType="usolver.admin.board.vo.NoticeVO"  resultType="usolver.admin.board.vo.NoticeVO">
+		SELECT IDX
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,TO_CHAR(REGIST_DATE, 'YYYY-MM-DD') AS REGIST_DATE
+			,EDIT_ID
+			,TO_CHAR(EDIT_DATE, 'YYYY-MM-DD') AS EDIT_DATE		
+			,HIT			 
+		 FROM USV_NOTICE
+			WHERE IDX = #{IDX}
+	</select>
+	
+	<update id="updateNoticeBoardHit" parameterType="usolver.admin.board.vo.NoticeVO">
+		UPDATE USV_NOTICE 
+				SET 
+					HIT = HIT+1
+				WHERE 
+					IDX = #{IDX}
+	</update>
+	
+	<insert id="insertNoticeBoard" parameterType="usolver.admin.board.vo.NoticeVO">
+		INSERT INTO USV_NOTICE (
+			IDX
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_NOTICE)
+			,#{TITLE_TEXT  			, jdbcType=VARCHAR}
+			,#{BODY_TEXT 	 		, jdbcType=VARCHAR}
+			,#{WRITE_ID 		 		, jdbcType=VARCHAR}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#{EDIT_ID  				, jdbcType=VARCHAR}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+		)
+	</insert>
+	
+	<select id="selectNoticeBoardMaxIdx" parameterType="usolver.admin.board.vo.NoticeVO" resultType="int">
+			SELECT (NVL(MAX(IDX),0)+1)  FROM USV_NOTICE
+	</select>
+	
+	<select id="selectNoticeBoardCount" parameterType="usolver.admin.board.vo.NoticeVO" resultType="int">
+		SELECT COUNT(*) 		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_NOTICE D
+					WHERE 1=1
+						AND
+							DEL_YN = 'N'
+						<if test='searchKeyword != null'>
+							AND ( BODY_TEXT LIKE '%${searchKeyword}%' OR TITLE_TEXT LIKE '%${searchKeyword}%' OR WRITE_ID = '%${searchKeyword}%' )
+						</if>
+					ORDER BY ROWNUM DESC
+				) M
+			 )
+	</select>
+		
+	<update id="updateNoticeBoard" parameterType="usolver.admin.board.vo.NoticeVO">
+			<![CDATA[
+			UPDATE USV_NOTICE
+				SET 
+					TITLE_TEXT=#{TITLE_TEXT}
+					,BODY_TEXT=#{BODY_TEXT}
+					,EDIT_ID=#{EDIT_ID}
+					,EDIT_DATE=SYSDATE
+				WHERE 
+					IDX = #{IDX}
+			]]>
+	</update>
+	
+	<update id="updateNoticeBoardDel" parameterType="usolver.admin.board.vo.NoticeVO">
+			<![CDATA[
+			UPDATE USV_NOTICE
+				SET 
+					DEL_YN='Y'
+				WHERE 
+					IDX=#{IDX}
+			]]>
+	</update>
+	
+	<insert id="insertAttachment" parameterType="usolver.admin.board.vo.NoticeVO">
+		 INSERT INTO USV_ATTACHMENT 
+		 (
+		 	  FILE_NO
+		 	  , FILE_NAME
+		 	  , FILE_PATH
+		 	  , IDX
+		 )
+		 VALUES ( 
+			 (SELECT NVL(MAX(FILE_NO),0)+1 FROM USV_ATTACHMENT)
+			 ,#{FILE_NAME} 
+			 ,#{FILE_PATH}
+			 ,<if test='IDX != null' >
+			  	#{IDX}
+			 </if>
+			 <if test='IDX == null' >
+			  	(SELECT NVL(MAX(IDX),0)+1 FROM USV_NOTICE_BOARD)
+			  </if>
+		 )
+	</insert>
+	
+	<update id="updateAttachmentDel" parameterType="usolver.admin.board.vo.NoticeVO">
+		UPDATE USV_ATTACHMENT
+			SET DEL_YN = 'Y'
+			WHERE 1=1
+			<if test='FILE_NO != null' >
+				AND FILE_NO IN (${FILE_NO})
+			</if>
+			<if test='IDX != null' >
+				AND	IDX = #{IDX}
+			</if>
+	</update>
+	
+	<select id="selectAttachmentCount" parameterType="usolver.admin.board.vo.NoticeVO" resultType="int">
+			SELECT 
+				COUNT(*)
+			FROM USV_ATTACHMENT
+			WHERE 1=1 
+				AND 
+					DEL_YN='N' 
+				AND 
+					IDX = #{IDX}
+	</select>
+	
+	<select  id="selectAttachmentView" parameterType="usolver.admin.board.vo.NoticeVO" resultType="usolver.admin.board.vo.NoticeVO">
+		SELECT * 
+			FROM USV_ATTACHMENT 
+			WHERE DEL_YN='N'
+			<if test='IDX != null' >
+				AND IDX = #{IDX} 
+			</if>
+			<if test='FILE_NO != null' >
+			    AND	FILE_NO = #{FILE_NO}
+			</if>
+	</select>
+	
+	
+	<!-- ============================== 자료실 ============================== -->
+	
+	<select id="selectReferRoomList" parameterType="usolver.admin.board.vo.NoticeVO" resultType="usolver.admin.board.vo.NoticeVO">
+		SELECT * 
+		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT ROWNUM, D.*, F.IDX FILE_NAME
+					FROM USV_REFER_ROOM D, (SELECT IDX FROM USV_ATTACHMENT GROUP BY IDX) F
+					WHERE D.IDX = F.IDX(+) AND D.DEL_YN = 'N'
+						<if test='SEARCH_VALUE != null  and SELECT_CODE == "BODY_TEXT"' >
+							AND BODY_TEXT LIKE '%${SEARCH_VALUE}%'
+						</if>
+						<if test='SEARCH_VALUE != null and SELECT_CODE == "TITLE_TEXT"' >
+							AND TITLE_TEXT LIKE '%${SEARCH_VALUE}%'
+						</if>
+						<if test='SEARCH_VALUE != null and SELECT_CODE == "MANAGE_CODE"' >
+							AND  MANAGE_CODE = #{MANAGE_CODE}
+						</if>
+					START WITH D.REFNUM = 0
+					CONNECT BY PRIOR D.IDX = D.REFNUM
+					ORDER SIBLINGS BY D.IDX DESC
+				) M
+			 )
+			 
+		 <![CDATA[ WHERE rnum <= #{lastIndex} and rnum > #{firstIndex} ]]>
+	</select>
+	
+	<select id="selectReferRoomView" parameterType="usolver.admin.board.vo.NoticeVO" resultType="usolver.admin.board.vo.NoticeVO">
+		SELECT * FROM USV_REFER_ROOM
+			WHERE IDX = #{IDX}
+	</select>
+	
+	<update id="updateReferRoomHit" parameterType="usolver.admin.board.vo.NoticeVO">
+		UPDATE USV_REFER_ROOM 
+				SET 
+					HIT=HIT+1
+				WHERE 
+					IDX=#{IDX}
+	</update>
+	
+	<insert id="insertReferRoom" parameterType="usolver.admin.board.vo.NoticeVO">
+		INSERT INTO USV_REFER_ROOM (
+			IDX
+			,MANAGE_CODE
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			,#{MANAGE_CODE}
+			,#{TITLE_TEXT}
+			,#{BODY_TEXT}
+			,#{WRITE_ID}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#{WRITE_ID}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+		)
+	</insert>
+	
+	<select id="selectReferRoomMaxIdx" parameterType="usolver.admin.board.vo.NoticeVO" resultType="int">
+			SELECT (NVL(MAX(IDX),0)+1)  FROM USV_REFER_ROOM
+	</select>
+	
+	<select id="selectReferRoomCount" parameterType="usolver.admin.board.vo.NoticeVO" resultType="int">
+		SELECT COUNT(*) 		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_REFER_ROOM D
+					WHERE 1=1
+						AND
+							DEL_YN = 'N'
+						<if test='SEARCH_VALUE != null  and SELECT_CODE == "BODY_TEXT"' >
+							AND BODY_TEXT LIKE '%${SEARCH_VALUE}%'
+						</if>
+						<if test='SEARCH_VALUE != null and SELECT_CODE == "TITLE_TEXT"' >
+							AND TITLE_TEXT LIKE '%${SEARCH_VALUE}%'
+						</if>
+						<if test='SEARCH_VALUE != null and SELECT_CODE == "MANAGE_CODE"' >
+							AND  MANAGE_CODE = #{MANAGE_CODE}
+						</if>
+					ORDER BY ROWNUM DESC
+				) M
+			 )
+			 
+	</select>
+		
+	<update id="updateReferRoom" parameterType="usolver.admin.board.vo.NoticeVO">
+			<![CDATA[
+			UPDATE USV_REFER_ROOM 
+				SET 
+					TITLE_TEXT=#{TITLE_TEXT}
+					,BODY_TEXT=#{BODY_TEXT}
+					,EDIT_ID=#{EDIT_ID}
+					,EDIT_DATE=SYSDATE
+				WHERE 
+					IDX=#{IDX}
+			]]>
+	</update>
+	
+	<update id="updateReferRoomDel" parameterType="usolver.admin.board.vo.NoticeVO">
+			<![CDATA[
+			UPDATE USV_REFER_ROOM 
+				SET 
+					DEL_YN='Y'
+				WHERE 
+					IDX=#{IDX}
+			]]>
+	</update>
+	
+	<insert id="insertReferRoomAttachment" parameterType="usolver.admin.board.vo.NoticeVO">
+		 INSERT INTO USV_ATTACHMENT 
+		 (
+		 	  FILE_NO
+		 	  , FILE_NAME
+		 	  , FILE_PATH
+		 	  , IDX
+		 )
+		 VALUES ( 
+			 (SELECT NVL(MAX(FILE_NO),0)+1 FROM USV_ATTACHMENT)
+			 ,#{FILE_NAME} 
+			 ,#{FILE_PATH}
+			 ,<if test='IDX != null'>
+			  	#{IDX}
+			  </if>
+			  <if test='IDX == null'>
+			  	(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			  </if>
+		 )
+	</insert>
+	
+		
+	<select id="selectNoticeBoardIntro" parameterType="usolver.admin.board.vo.NoticeVO" resultType="usolver.admin.board.vo.NoticeVO">		
+		SELECT * 		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.IDX
+						,D.TITLE_TEXT
+						,D.BODY_TEXT
+						,D.WRITE_ID
+						,D.HIT
+						,TO_CHAR(D.REGIST_DATE,'YYYY-MM-DD') AS REGIST_DATE
+						,D.EDIT_ID
+						,TO_CHAR(D.EDIT_DATE,'YYYY-MM-DD') AS EDIT_DATE
+						,D.DEL_YN
+					FROM USV_NOTICE D					
+					WHERE 1=1 AND DEL_YN = 'N'					
+					ORDER BY IDX DESC
+				) M
+				<![CDATA[ WHERE ROWNUM <= 7 ]]>
+			 )
+		
+	</select>
+	
+	<select id="selectReferRoomIntro" parameterType="usolver.admin.board.vo.NoticeVO" resultType="usolver.admin.board.vo.NoticeVO">	
+		SELECT * 		
+		FROM (
+		       SELECT  ROWNUM rnum, M.*
+			   FROM (
+					SELECT
+						ROWNUM
+						,D.*
+					FROM USV_REFER_ROOM D					
+					WHERE 1=1 AND DEL_YN = 'N'					
+					<!-- ORDER BY IDX DESC -->
+					START WITH D.REFNUM = 0
+					CONNECT BY PRIOR D.IDX = D.REFNUM
+					ORDER SIBLINGS BY D.IDX DESC
+				) M
+				<![CDATA[ WHERE ROWNUM <= 7 ]]>
+			 )
+		
+	</select>
+	
+	<!-- 답글 part -->
+
+	<insert id="insertReferRoomReply" parameterType="usolver.admin.board.vo.NoticeVO">
+		INSERT INTO USV_REFER_ROOM (
+			IDX
+			,TITLE_TEXT
+			,BODY_TEXT
+			,WRITE_ID
+			,REGIST_DATE
+			,EDIT_ID
+			,EDIT_DATE
+			,REFNUM 
+		)
+		VALUES (
+			(SELECT NVL(MAX(IDX),0)+1 FROM USV_REFER_ROOM)
+			,#{TITLE_TEXT}
+			,#{BODY_TEXT}
+			,#{WRITE_ID}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#{WRITE_ID}
+			,TO_CHAR(SYSDATE, 'YYYYMMDD')
+			,#{REFNUM}
+		)
+	</insert> 
+		
+</mapper>

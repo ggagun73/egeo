@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+	
+	  <select id="selectCodeDomainList" parameterType="usolver.admin.code.vo.CodeManageVO" resultType="egovMap">
+        <![CDATA[    
+            SELECT * FROM 
+            (
+	            SELECT 'G2S_DOMAINS' TABLE_NAME, '공통코드' AS TABLE_ALIAS, G2_ID, G2_NAME		   	
+	              FROM G2S_DOMAINS
+	              UNION ALL
+	            SELECT 'USV_DOMAINS' TABLE_NAME, '관리코드' AS TABLE_ALIAS, G2_ID, G2_NAME		   	
+	              FROM USV_DOMAINS  
+	         ) A
+	         WHERE 1=1
+        ]]>       
+        	<if test='searchKeyword != null '>
+                AND G2_NAME LIKE '%'||#{searchKeyword}||'%'
+            </if>
+        <![CDATA[                  
+            ORDER BY G2_NAME ASC
+         ]]>                  
+    </select>
+    
+    <select id="selectCodeList" parameterType="usolver.admin.code.vo.CodeManageVO" resultType="egovMap">
+        <![CDATA[    
+            SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (
+          		SELECT 'G2S_CODEDDOMAINS' CODE_TABLE, G2_DOMAINID, G2_CODE, G2_VALUE		   	
+	              FROM G2S_CODEDDOMAINS
+	              UNION ALL
+	            SELECT 'USV_CODEDDOMAINS' CODE_TABLE, G2_DOMAINID, G2_CODE, G2_VALUE		   	
+	              FROM USV_CODEDDOMAINS  
+              ) ALL_LIST
+              WHERE 1=1      
+        ]]>                     
+            <if test='g2DomainId != null ' >
+               AND ALL_LIST.G2_DOMAINID = #{g2DomainId}
+            </if>
+            <if test='TABLENAME != null ' >
+               AND SUBSTR(ALL_LIST.CODE_TABLE,0,3) = SUBSTR(#{TABLENAME},0,3)
+            </if>
+        <![CDATA[                  
+            ORDER BY convert(ALL_LIST.G2_CODE,'ISO2022-KR')  ASC
+           )
+           WHERE  RNUM  > #{firstIndex}
+              AND  RNUM <= #{firstIndex} + #{recordCountPerPage}
+        ]]>                  
+    </select>
+
+    <select id="selectCodeCnt" parameterType="usolver.admin.code.vo.CodeManageVO"  resultType="int">
+
+            SELECT COUNT(*) totcnt
+            FROM (
+            	SELECT 'G2S_CODEDDOMAINS' CODE_TABLE, G2_DOMAINID, G2_CODE, G2_VALUE		   	
+	              FROM G2S_CODEDDOMAINS
+	              UNION ALL
+	            SELECT 'USV_CODEDDOMAINS' CODE_TABLE, G2_DOMAINID, G2_CODE, G2_VALUE		   	
+	              FROM USV_CODEDDOMAINS  
+            )
+            WHERE 1=1
+             <if test='g2DomainId != null ' >
+               AND G2_DOMAINID = #{g2DomainId}
+            </if>
+    </select>
+    
+    <select id="selectCodeDCheck"  parameterType="usolver.admin.code.vo.CodeManageVO"  resultType="int">
+        <![CDATA[
+            SELECT  COUNT(*) totcnt
+              FROM ${CODETABLE}
+             WHERE G2_CODE = #{g2Code}    
+                AND G2_DOMAINID = #{g2DomainId}    
+        ]]>
+    </select>
+	
+	<select id="selectCodeDetail"  parameterType="usolver.admin.code.vo.CodeManageVO"  resultType="egovMap">
+        <![CDATA[
+            SELECT  *
+              FROM ${CODETABLE}
+             WHERE 1=1   
+         ]]>
+             <if test='g2Code != null ' >    
+                AND G2_CODE = #{g2Code}    
+              </if>
+              <if test='g2DomainId != null ' >
+                AND G2_DOMAINID = #{g2DomainId}
+              </if>      
+    </select>
+    
+	
+    <insert id="insertCodeDomain" parameterType="usolver.admin.code.vo.CodeManageVO">
+        <![CDATA[
+            INSERT INTO ${TABLENAME}
+                   (G2_ID,   G2_NAME )
+            VALUES ((SELECT (NVL(MAX(G2_ID),0)+1)  FROM ${TABLENAME}),  #{g2Name} )
+        ]]>
+    </insert>     
+
+    <insert id="insertCode" parameterType="usolver.admin.code.vo.CodeManageVO">
+        <![CDATA[
+            INSERT INTO ${CODETABLE}
+                   (G2_DOMAINID,   G2_CODE,  G2_VALUE )
+            VALUES (#{g2DomainId} ,#{g2Code},  #{g2Value} )
+        ]]>
+    </insert>
+ 
+     <update id="updateCodeDomain" parameterType="usolver.admin.code.vo.CodeManageVO">
+            UPDATE ${TABLENAME}
+                 SET G2_NAME = #{g2Name}
+             WHERE G2_ID = #{g2Id}
+    </update>    
+       
+    <update id="updateCode" parameterType="usolver.admin.code.vo.CodeManageVO">
+            UPDATE ${CODETABLE}
+               SET G2_CODE = #{g2NewCode},
+                    G2_VALUE = #{g2Value}                    
+             WHERE  G2_DOMAINID = #{g2DomainId}    AND  G2_CODE = #{g2Code}
+    </update>    
+    
+    <delete id="deleteCodeDomain" parameterType="usolver.admin.code.vo.CodeManageVO">
+        <![CDATA[
+            DELETE FROM ${TABLENAME}
+             WHERE G2_ID = #{g2Id}
+        ]]>
+    </delete>  
+
+    <delete id="deleteCode" parameterType="usolver.admin.code.vo.CodeManageVO">
+        <![CDATA[
+            DELETE FROM ${CODETABLE}
+             WHERE G2_DOMAINID = #{g2DomainId}    ]]>
+             <if test='g2Code != null ' >
+             	AND  G2_CODE = #{g2Code}
+        	</if>
+    </delete> 
+    
+</mapper>

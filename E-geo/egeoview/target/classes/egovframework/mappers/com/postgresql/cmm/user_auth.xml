@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	
+	<!--  사용자(로그인) 정보 추출 -->
+	<select id="selectUsers" parameterType="loginVO" resultType="loginVO">
+		<![CDATA[
+			SELECT 
+				*
+			FROM 
+				USV_USERS 
+			WHERE 
+					USER_ID = #{USER_ID} 
+        ]]>
+	</select>
+	
+	<!-- 사용자 정보찾기 -->
+	<select id="getUserInfo" parameterType="usolver.com.main.vo.LoginVO"  resultType="usolver.com.main.vo.LoginVO">
+		SELECT USER_ID
+			,USER_NAME
+			,USER_DEPT
+			,TO_CHAR(REQ_DATE, 'YYYY-MM-DD') AS REQ_DATE
+			,ENABLED
+			,USER_TEL
+			,USER_DESC
+			,TO_CHAR(PW_DATE, 'YYYY-MM-DD') AS PW_DATE
+		 FROM USV_USERS
+		WHERE USER_ID = #{USER_ID}
+	</select>
+	
+	
+	<insert id="userInsert">		<!--  사용자 등록.. -->
+	    INSERT INTO USV_USERS 
+	    (
+            USER_ID
+			,USER_NAME
+			,USER_DEPT
+			,REQ_DATE
+			,PASSWORD
+			,USER_TEL
+			,USER_DESC
+			,PW_DATE
+			,ENABLED
+        ) 
+        VALUES
+        (
+          	#{USER_ID 		}
+			,#{USER_NAME  , jdbcType=VARCHAR}
+			,#{USER_DEPT 	, jdbcType=VARCHAR}
+			,SYSDATE
+			,#{PASSWORD 	, jdbcType=VARCHAR}
+			,#{USER_TEL		, jdbcType=VARCHAR}
+			,#{USER_DESC 	, jdbcType=VARCHAR}
+			,SYSDATE
+			,'1'
+        ) 
+	</insert>
+	
+	
+	<!-- 사용자정보 수정 -->
+	<update id="userUpdate">
+		UPDATE USV_USERS
+		SET  
+			USER_NAME= #{USER_NAME , jdbcType=VARCHAR}
+			,USER_DEPT 	= #{USER_DEPT   , jdbcType=VARCHAR}
+			,USER_TEL 	= #{USER_TEL     , jdbcType=VARCHAR}
+			,USER_DESC 	= #{USER_DESC   , jdbcType=VARCHAR}
+		WHERE
+			USER_ID = #{USER_ID}
+	</update>
+	
+	
+	<update id="updatePW">
+	    UPDATE USV_USERS 
+	    SET
+	    	PASSWORD = #{PASSWORD} 	,PW_DATE = SYSDATE
+	   	WHERE  USER_NAME = #{USER_NAME}  AND USER_ID = #{USER_ID}	
+	</update>
+	
+		
+	<!-- 사용자등록 - 아이디중복체크 -->
+	<select id="idDDCheck" parameterType="usolver.com.main.vo.LoginVO" resultType="hashmap">
+	    SELECT USER_ID
+		FROM USV_USERS
+     	WHERE USER_ID = #{USER_ID} 
+	</select>
+	
+	
+	<select id="getPWData" parameterType="usolver.com.main.vo.LoginVO" resultType="hashmap">
+	    SELECT PASSWORD, PW_DATE 
+	     FROM USV_USERS
+	    WHERE USER_ID=#{USER_ID}
+	</select>
+</mapper>

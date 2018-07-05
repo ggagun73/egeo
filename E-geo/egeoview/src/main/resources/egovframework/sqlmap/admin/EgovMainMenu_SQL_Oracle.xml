@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MainMenu">
+
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="menuManageVO" type="usolver.admin.menu.vo.MenuManageVO"/>
+	<typeAlias  alias="comDefaultVO" type="egovframework.com.cmm.ComDefaultVO"/>
+	<!--부서별 권한은 우선 제외
+		AND    A.AUTHOR_CODE = (SELECT C.AUTHOR_CODE from COMTNEMPLYRSCRTYESTBS C WHERE  C.SCRTY_DTRMN_TRGET_ID = #tmpUniqId#)
+	  -->
+	<select id="menuManageDAO.selectMainMenuHead" parameterClass="MenuManageVO" resultClass="egovMap">
+		<![CDATA[ 
+            SELECT   DISTINCT
+			      B.MENU_NO           AS "menuNo"
+				, B.MENU_ORDR         AS "menuOrdr"
+				, B.MENU_NM           AS "menuNm"
+				, B.UPPER_MENU_NO     AS "upperMenuNo"
+				, B.MENU_DC           AS "menuDc"
+				, B.RELATE_IMAGE_PATH AS "relateImagePath"
+				, B.RELATE_IMAGE_NM   AS "relateImageNm"
+				, B.PROGRM_FILE_NM    AS "progrmFileNm"
+				, (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "URL"
+				, B.MENU_ID
+				, B.WIDTH
+				, B.HEIGHT
+				, B.INSERT_HEIGHT
+				, B.CALL
+				, B.KEY_COLUMN
+				, B.MENU_TYPE
+				, B.FUNCTION_LIST
+			FROM USV_MENU_AUTHOR A, USV_MENU_INFO B 
+			WHERE  B.Menu_NO > 0 
+			AND    A.MENU_NO  = B.MENU_NO 		]]> 
+			<isNotEmpty prepend="AND" property="authorCode">   
+                     <![CDATA[   AUTHOR_CODE = #authorCode#  ]]>
+            </isNotEmpty>	
+			ORDER BY B.MENU_NO, B.MENU_ORDR  ASC 
+		
+	</select>
+	
+	<select id="menuManageDAO.selectMainMenu" parameterClass="HashMap" resultClass="egovMap">
+		<![CDATA[ 
+            SELECT   DISTINCT
+			      B.MENU_NO           AS "menuNo"
+				, B.MENU_ORDR         AS "menuOrdr"
+				, B.MENU_NM           AS "menuNm"
+				, B.UPPER_MENU_NO     AS "upperMenuNo"
+				, B.MENU_DC           AS "menuDc"
+				, B.RELATE_IMAGE_PATH AS "relateImagePath"
+				, B.RELATE_IMAGE_NM   AS "relateImageNm"
+				, B.PROGRM_FILE_NM    AS "progrmFileNm"
+				, (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "URL"
+				, B.MENU_ID
+				, B.WIDTH
+				, B.HEIGHT
+				, B.INSERT_HEIGHT
+				, B.CALL
+				, B.KEY_COLUMN
+				, B.MENU_TYPE
+				, B.FUNCTION_LIST
+			FROM USV_MENU_AUTHOR A, USV_MENU_INFO B 
+			WHERE  B.MENU_NO > 0 
+			AND    A.MENU_NO  = B.MENU_NO 								]]>
+			<iterate property="paramList"	  open=" AND  AUTHOR_CODE IN (" close=")" conjunction="," >
+					 #paramList[]#
+			</iterate>
+			ORDER BY B.MENU_NO, B.MENU_ORDR  ASC 
+		
+	</select>
+	
+
+	<select id="menuManageDAO.selectMainMenuLeft" parameterClass="MenuManageVO" resultClass="egovMap">
+		<![CDATA[ 
+			SELECT
+			       B.MENU_NO           AS "menuNo"
+				 , B.MENU_ORDR         AS "menuOrdr"
+				 , B.MENU_NM           AS "menuNm"
+				 , B.UPPER_MENU_NO     AS "upperMenuNo"
+				 , B.RELATE_IMAGE_PATH AS "relateImagePath"
+				 , B.RELATE_IMAGE_NM   AS "relateImageNm"
+				 , (SELECT C.URL FROM USV_PROGRM C WHERE B.PROGRM_FILE_NM = C.PROGRM_FILE_NM) AS "chkURL"	
+			FROM   USV_MENU_AUTHOR A, USV_MENU_INFO B
+			WHERE  A.MENU_NO  = B.MENU_NO 
+			ORDER BY B.MENU_ORDR
+		]]> 
+	</select>
+
+	<select id="menuManageDAO.selectLastMenuURL" parameterClass="MenuManageVO" resultClass="String">
+		<![CDATA[ 
+			SELECT URL 
+			FROM   USV_PROGRM
+			WHERE  PROGRM_FILE_NM = (SELECT PROGRM_FILE_NM FROM USV_MENU_INFO  WHERE MENU_NO = #menuNo#)
+		]]> 
+	</select>
+
+	<select id="menuManageDAO.selectLastMenuNo" parameterClass="MenuManageVO" resultClass="int">
+		<![CDATA[ 
+			select MIN(MENU_NO) 
+			from   USV_MENU_INFO
+			where  UPPER_MENU_NO = #menuNo#
+			and    MENU_ORDR =
+			      (select MIN(MENU_ORDR) 
+			       from USV_MENU_AUTHOR A, USV_MENU_INFO B
+			       where A.MENU_NO = B.MENU_NO
+			       AND   B.UPPER_MENU_NO = #menuNo#)
+		]]> 
+	</select>
+
+	<select id="menuManageDAO.selectLastMenuNoCnt" parameterClass="MenuManageVO" resultClass="int">
+		<![CDATA[ 
+			select count(MENU_NO) 
+			from   USV_MENU_INFO
+			where  UPPER_MENU_NO = #menuNo#
+			and    MENU_ORDR =
+			      (select MIN(MENU_ORDR) 
+			       from USV_MENU_AUTHOR A, USV_MENU_INFO B
+			       where A.MENU_NO = B.MENU_NO
+			       AND   B.UPPER_MENU_NO = #menuNo#)
+		]]> 
+	</select>
+</sqlMap>                            

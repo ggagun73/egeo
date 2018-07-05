@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	
+	<!-- 주제도 그룹 정보 -->
+	<select id="selectTMapGroupInfo" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT SUBMAP_CL_ID AS "id", SUBMAP_CL_NM AS "name", SUBMAP_CL_ORDR AS "seq" FROM TN_SUBMAP_CL WHERE SUBMAP_CL_NM = '기본도'
+        ]]>
+	</select>
+	
+	<!-- 주제도 정보 -->
+	<select id="selectTMapInfo" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT SUBMAP_ID AS "id", SUBMAP_NM AS "name", SUBMAP_CL_ID AS "group" , SUBMAP_ORDR AS "seq" FROM TN_SUBMAP WHERE SUBMAP_NM = '기본도'
+        ]]>
+	</select>
+	
+	<!-- 레이어 그룹 정보 -->
+	<select id="selectLyrGroupInfo" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT a.G2_ID AS "id", a.G2_NAME AS "name", a.G2_MAPID "mapId" 
+			FROM G2V_LAYER a right outer join tn_lyr_info b on a.g2_id = b.g2_id
+			WHERE
+				a.G2_BASEID = -1 AND a.G2_MAPID = (SELECT g2vlayer.G2_MAPID FROM TN_LYR_INFO tnlyrinfo,G2V_LAYER g2vlayer WHERE g2vlayer.G2_ID = tnlyrinfo.G2_ID LIMIT 1)
+			ORDER BY b.lyr_order
+        ]]>
+	</select>
+	
+	<!-- 레이어 그룹 정보_FROM TN_USER_LAYERGROUP -->
+	<select id="selectLyrGroupInfoNew" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT 
+			  GROUP_ID AS "id", 
+			  GROUP_NAME AS "name", 
+			  USER_ID "mapId" 	  
+			FROM TN_USER_LAYERGROUP
+			WHERE USER_ID ='COMMON'
+			ORDER BY GROUP_ID 
+        ]]>
+	</select>
+	
+	<!-- 레이어 정보  -->
+	<select id="selectLyrInfo" parameterType="egovMap" resultType="egovMap">
+		<![CDATA[
+			SELECT 
+			  		tnlyrinfo.MAP_ID as "tmapid", 
+			        g2vlayer.GROUP_ID as "layerGroup", 
+			        g2vlayer.GROUP_NAME AS "groupName", 
+					tnlyrinfo.LYR_ID AS "id", 
+			        tnlyrinfo.LYR_ENG_NM AS "table", 
+			        tnlyrinfo.LYR_KOREAN_NM AS "theme",
+					tnlyrinfo.LYR_KOREAN_NM AS "alias", 
+			        tnlyrinfo.LYR_ORDER AS "seq", 
+			       	tnlyrinfo.LYR_ONOFF as "show",  
+			        tnlyrinfo.LYR_TYPE as "layerType"
+			FROM 
+					  TN_LYR_INFO tnlyrinfo INNER JOIN  
+					  (
+					    SELECT  B.G2_BASEID AS GROUP_ID, A.G2_NAME AS GROUP_NAME, B.G2_ID AS LAYER_ID, B.G2_NAME AS LAYER_NAME, B.G2_DEFINE
+					    FROM (SELECT * FROM G2V_LAYER WHERE G2_BASEID = -1) A INNER JOIN G2V_LAYER B ON (A.G2_ID = B.G2_BASEID)
+					    ORDER BY A.G2_ORDER, B.G2_ORDER
+					  ) g2vlayer ON (tnlyrinfo.G2_ID = g2vlayer.LAYER_ID) 
+						  
+			ORDER BY tnlyrinfo.LYR_ORDER ASC
+        ]]>
+	</select>
+	
+	<!-- 특정 ID로 조회 가능한 모든 레이어 정보 -->
+	<select id="selectAllLyrByUser" parameterType="String" resultType="egovMap">
+	<![CDATA[
+      SELECT 
+      	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername, TLI.LYR_WTL_USE_YN wtluse,  TLI.LYR_SWL_USE_YN swluse,  TLI.LYR_RDL_USE_YN rdluse 
+      FROM TN_LYR_INFO TLI, USV_USER_LAYER UUL
+      WHERE TLI.LYR_ID = UUL.LYR_ID 
+      AND UUL.USER_ID=#{USER_ID}
+      AND UUL.AUTHOR='VIEW'
+    ]]>
+	</select>	
+	
+	<!-- 특정 ID로 편집 가능한 모든 레이어 정보 -->
+	<select id="selectAllEditLyrByUser" parameterType="String" resultType="egovMap">
+	<![CDATA[
+      SELECT 
+      	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername, TLI.LYR_WTL_USE_YN wtluse,  TLI.LYR_SWL_USE_YN swluse,  TLI.LYR_RDL_USE_YN rdluse 
+      FROM TN_LYR_INFO TLI, USV_USER_LAYER UUL
+      WHERE TLI.LYR_ID = UUL.LYR_ID 
+      AND UUL.USER_ID=#{USER_ID}
+      AND UUL.AUTHOR='EDIT'
+    ]]>
+	</select>	
+	
+	<!-- 특정 ID로 조회 가능한 상수 레이어 정보 -->
+	<select id="selectWaterLyrByUser" parameterType="String" resultType="egovMap">
+	<![CDATA[
+      SELECT 
+      	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_USER_LAYER UUL
+      WHERE TLI.LYR_ID = UUL.LYR_ID 
+      AND UUL.USER_ID=#{USER_ID}
+      AND UUL.AUTHOR='VIEW'
+      AND TLI.LYR_WTL_USE_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 ID로 조회 가능한 하수 레이어 정보 -->
+	<select id="selectSewerLyrByUser" parameterType="String" resultType="egovMap">
+	<![CDATA[
+      SELECT 
+      	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_USER_LAYER UUL
+      WHERE TLI.LYR_ID = UUL.LYR_ID 
+      AND UUL.USER_ID=#{USER_ID}
+      AND UUL.AUTHOR='VIEW'
+      AND TLI.LYR_SWL_USE_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 ID로 조회 가능한 도로 레이어 정보 -->
+	<select id="selectRoadLyrByUser" parameterType="String" resultType="egovMap">
+	<![CDATA[
+      SELECT 
+      	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_USER_LAYER UUL
+      WHERE TLI.LYR_ID = UUL.LYR_ID 
+      AND UUL.USER_ID=#{USER_ID}
+      AND UUL.AUTHOR='VIEW'
+      AND TLI.LYR_RDL_USE_YN='1'
+    ]]>
+	</select>			
+	
+	<!-- 특정 권한으로 접근 가능한 모든 레이어 정보 -->
+	<select id="selectAllLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername, TLI.LYR_WTL_USE_YN wtluse,  TLI.LYR_SWL_USE_YN swluse,  TLI.LYR_RDL_USE_YN rdluse
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND	( 
+      	UAL.AUTHOR_CODE='ROLE_WATER_MAP_VIEW' 
+      	OR UAL.AUTHOR_CODE='ROLE_SEWER_MAP_VIEW' 
+      	OR UAL.AUTHOR_CODE='ROLE_ROAD_MAP_VIEW'
+      	)
+    ]]>
+	</select>			
+	
+	<!-- 특정 권한으로 접근 가능한 상수 레이어 정보 -->
+	<select id="selectWaterLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_WATER_MAP_VIEW'
+      AND TLI.LYR_WTL_USE_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 권한으로 접근 가능한 하수 레이어 정보 -->
+	<select id="selectSewerLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_SEWER_MAP_VIEW'
+      AND TLI.LYR_SWL_USE_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 권한으로 접근 가능한 도로 레이어 정보 -->
+	<select id="selectRoadLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_ROAD_MAP_VIEW'
+      AND TLI.LYR_RDL_USE_YN='1'
+    ]]>
+	</select>		
+	
+	<!-- 특정 권한으로 편집 가능한 상수 레이어 정보 -->
+	<select id="selectEditWaterLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_WATER_MAP_EDIT'
+      AND TLI.LYR_WTL_USE_YN='1'
+      AND TLI.LYR_EDIT_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 권한으로 편집 가능한 하수 레이어 정보 -->
+	<select id="selectEditSewerLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_SEWER_MAP_EDIT'
+      AND TLI.LYR_SWL_USE_YN='1'
+      AND TLI.LYR_EDIT_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 특정 권한으로 편집 가능한 도로 레이어 정보 -->
+	<select id="selectEditRoadLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND UAL.AUTHOR_CODE='ROLE_ROAD_MAP_EDIT'
+      AND TLI.LYR_RDL_USE_YN='1'
+      AND TLI.LYR_EDIT_YN='1'
+    ]]>
+	</select>
+	
+	<!-- 특정 권한으로 편집 가능한 모든 레이어 정보 -->
+	<select id="selectAllEditLyrByAuthor" parameterType="egovMap" resultType="egovMap">
+	<![CDATA[
+	  SELECT 
+	  	TLI.LYR_ENG_NM tablename, TLI.LYR_KOREAN_NM layername, TLI.LYR_WTL_USE_YN wtluse,  TLI.LYR_SWL_USE_YN swluse,  TLI.LYR_RDL_USE_YN rdluse
+      FROM TN_LYR_INFO TLI, USV_AUTHOR_LAYER UAL
+      WHERE TLI.LYR_ID = UAL.LYR_ID 
+      AND	( 
+      	UAL.AUTHOR_CODE='ROLE_WATER_MAP_EDIT' 
+      	OR UAL.AUTHOR_CODE='ROLE_SEWER_MAP_EDIT' 
+      	OR UAL.AUTHOR_CODE='ROLE_ROAD_MAP_EDIT'
+      	) 
+      AND TLI.LYR_EDIT_YN='1'
+    ]]>
+	</select>	
+	
+	<!-- 사용자 초기 영역 갱신 -->
+	<update id="updateMapInitExtent" parameterType="LoginVO">
+		<![CDATA[
+			UPDATE USV_USERS 
+			SET
+				INIT_EXTENT = #{INIT_EXTENT}				 
+			WHERE
+				USER_ID = #{USER_ID}
+        ]]>
+	</update>
+</mapper>

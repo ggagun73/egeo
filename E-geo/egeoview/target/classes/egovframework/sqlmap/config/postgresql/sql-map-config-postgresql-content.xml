@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- Common -->
+	<sqlMap resource="egovframework/sqlmap/com/cmm/common_code_Postgresql.xml"/>
+	
+	<!-- Map -->
+	<sqlMap resource="egovframework/sqlmap/content/etc/map_sear_dt.xml"/>
+	
+
+</sqlMapConfig>

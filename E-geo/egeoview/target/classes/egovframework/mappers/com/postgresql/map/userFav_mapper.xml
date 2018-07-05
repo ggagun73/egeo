@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">
+	<select id="selectFavGroup" parameterType="map" resultType="map">
+		SELECT *
+		FROM TN_USER_FAVGROUP
+		WHERE USER_ID = #{USER_ID} OR USER_ID = 'common'
+	</select>
+	
+	<insert id="insertFavGroup" parameterType="map">
+		INSERT INTO TN_USER_FAVGROUP (USER_ID,GROUP_NAME) 
+        VALUES (#{USER_ID},#{GROUP_NAME})
+	</insert>
+	
+	<update id="updateFavGroup" parameterType="map">
+		UPDATE TN_USER_FAVGROUP
+		SET
+			GROUP_NAME = #{GROUP_NAME_NEW}
+		WHERE
+			USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME}
+	</update>
+	
+	<delete id="deleteFavGroup" parameterType="map">
+		DELETE
+		FROM TN_USER_FAVGROUP
+		WHERE USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME}
+	</delete>
+	
+	<select id="selectFav" parameterType="UserFavVO" resultType="UserFavVO">
+		SELECT *
+		FROM TN_USER_FAV
+		WHERE
+		<if test="USER_ID != 'common'">
+			USER_ID = #{USER_ID} AND
+		</if>
+		<if test="FAV_NAME != null">
+			FAV_NAME LIKE '%'||#{FAV_NAME}||'%'  AND
+		</if>
+			GROUP_NAME = #{GROUP_NAME}
+	</select>
+	
+	<insert id="insertFav" parameterType="UserFavVO">
+		INSERT INTO TN_USER_FAV (USER_ID, GROUP_NAME, FAV_ID, FAV_NAME, FAV_CONTENT, FAV_G2DATA, FAV_IMG, FAV_EXTENT) 
+        VALUES (#{USER_ID}, #{GROUP_NAME},(SELECT NVL(MAX(FAV_ID),0)+1 FROM TN_USER_FAV WHERE USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME}),#{FAV_NAME}, #{FAV_CONTENT}, #{FAV_G2DATA}, #{FAV_IMG}, 0)
+	</insert>
+	
+	<update id="updateFav" parameterType="UserFavVO">
+		UPDATE TN_USER_FAV
+		SET
+			<if test="GROUP_NAME_NEW != null">
+				GROUP_NAME = #{GROUP_NAME_NEW}
+			</if>
+			<if test="FAV_NAME != null">
+				FAV_NAME = #{FAV_NAME},
+			</if>
+			<if test="FAV_CONTENT != null">
+				FAV_CONTENT = #{FAV_CONTENT},
+			</if>
+			<if test="FAV_G2DATA != null">
+				FAV_G2DATA = #{FAV_G2DATA},
+			</if>
+			<if test="FAV_IMG != null">
+				FAV_IMG = #{FAV_IMG},
+			</if>
+		WHERE
+			USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME}
+			<if test="FAV_ID != 0 and FAV_ID != null">
+				AND FAV_ID = #{FAV_ID}
+			</if>
+	</update>
+	
+	<delete id="deleteFav" parameterType="UserFavVO">
+		DELETE
+		FROM TN_USER_FAV
+		WHERE USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME}
+			<if test="FAV_ID != 0 and FAV_ID != null">
+				AND FAV_ID = #{FAV_ID}
+			</if> 
+	</delete>
+	
+	<select id="selectFavExtent" parameterType="UserFavVO" resultType="UserFavVO">
+		SELECT FAV_G2DATA
+		FROM TN_USER_FAV
+		WHERE USER_ID = #{USER_ID} AND FAV_EXTENT = 1
+	</select>
+	
+	<update id="initFavExtent" parameterType="UserFavVO">
+		UPDATE TN_USER_FAV
+		SET FAV_EXTENT = 0
+		WHERE
+			USER_ID = #{USER_ID}
+	</update>
+	
+	<update id="updateFavExtent" parameterType="UserFavVO">
+		UPDATE TN_USER_FAV
+		SET FAV_EXTENT = #{FAV_EXTENT}
+		WHERE
+			USER_ID = #{USER_ID} AND GROUP_NAME = #{GROUP_NAME} AND FAV_ID = #{FAV_ID}
+	</update>
+</mapper>

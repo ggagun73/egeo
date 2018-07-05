@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="book">
+	<!-- 필드 정보 조회 -->
+	<select id="bookColumnList" parameterType="String" resultType="map">
+		SELECT *
+		FROM USV_FIELDINFO
+		WHERE G2_TABLENAME = #{TABLENAME}
+	</select>
+
+	<!-- 코드 정보 조회 -->
+	<select id="usvFieldCode" parameterType="map" resultType="map">
+		SELECT
+		D.G2_NAME, F.G2_NAME FIELDNAME
+		FROM USV_FIELDINFO F, G2S_DOMAINS D
+		WHERE 1=1
+		AND F.G2_TABLENAME = #{TABLENAME}
+		AND D.FID = F.G2_DOMAIN
+	</select>
+
+	<!-- 목록 조회 -->
+	<select id="selectBookG2List" parameterType="map" resultType="egovMap">
+		SELECT
+		FID,
+		<foreach collection="selectColumnsList" item="item" index="index"
+			separator=", ">
+			${item}
+		</foreach>
+		FROM (
+		SELECT (ROW_NUMBER() OVER()) AS  rnum, M.*
+		FROM (
+		SELECT
+		(ROW_NUMBER() OVER()) ,D.*
+		FROM ${TABLENAME} D
+		WHERE 1=1
+		<if test="searchColumnsList != null">
+			<foreach collection="searchColumnsList" item="item" index="index">
+				${item}
+			</foreach>
+		</if>
+		ORDER BY ${OrderByColumn} ${OrderByType}
+		) AS M
+		) AS TBL 
+		<![CDATA[ LIMIT #{lastIndex} - #{firstIndex}  OFFSET #{firstIndex} ]]>
+	</select>
+
+	<!-- 목록 조회 총 데이터수(total count) -->
+	<select id="selectBookListCnt" parameterType="map" resultType="int">
+		SELECT COUNT(*) totcnt
+		FROM ${TABLENAME}
+	</select>
+
+	<!-- 상세 조회 -->
+	<select id="bookDetail" parameterType="map" resultType="egovMap">
+		SELECT *
+		FROM ${TABLENAME}
+		WHERE
+		FID = #{FID}
+	</select>
+	
+	<!-- 상세 조회 코드 값 포함-->
+	<select id="bookDetailAll" parameterType="map" resultType="egovMap">
+		SELECT 
+		<foreach collection="selectColumnsList" item="item" index="index" separator=", ">
+			${item}
+		</foreach>
+		FROM ${TABLENAME}
+		WHERE
+		FID = #{FID}
+	</select>
+	
+	<!-- 삭제 -->
+	<delete id="bookDelete" parameterType="map">
+		DELETE FROM ${TABLENAME}
+		WHERE
+		<foreach collection="FID" item="item" separator="OR" index="index">
+			FID = #{item}
+		</foreach>
+	</delete>
+	
+	<!-- 등록 -->
+	<insert id="bookInsert">  
+		INSERT INTO ${TABLENAME}(FID, 
+		<foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			${item}
+		 </foreach>
+		values((SELECT NVL(MAX(FID)+1,1) FROM ${TABLENAME}), 
+		<foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			#{${item}, jdbcType=VARCHAR} 
+		 </foreach>
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="bookUpdate">
+		UPDATE ${TABLENAME}
+		SET 
+		 <foreach collection="updateColumnsList" item="item" index="index"  separator=", ">
+			${item}
+		 </foreach>
+		WHERE FID = #{FID}
+	</update>
+	
+	<!-- 테이블 조회 -->
+	<select id="bookSubDetail" parameterType="map" resultType="map">
+		SELECT
+		<choose>
+			<when test="selectColumnsList != null">
+				<foreach collection="selectColumnsList" item="item" index="index" separator=", ">
+					${item}
+				</foreach>
+			</when>
+			<otherwise>
+			*
+			</otherwise>
+		</choose>
+		
+		FROM ${TABLENAME}
+		WHERE 1=1
+		<foreach collection="searchColumnsList" item="item" index="index">
+			${item}
+		</foreach>
+	</select>
+	
+	<!-- 공통 목록 조회 -->
+	<select id="selectBookList" parameterType="map" resultType="egovMap">
+		SELECT
+			<foreach collection="selectColumnsList" item="item" index="index" separator=", ">
+				${item}
+			</foreach>
+		FROM (
+			SELECT (ROW_NUMBER() OVER()) AS rnum, M.*
+			FROM (
+				SELECT
+					(ROW_NUMBER() OVER()) ,D.*
+				FROM ${TABLENAME} D
+				WHERE 1=1
+				<if test="searchColumnsList != null">
+					<foreach collection="searchColumnsList" item="item" index="index">
+						${item}
+					</foreach>
+				</if>
+				ORDER BY ${OrderByColumn} ${OrderByType}
+				) AS M
+			) AS TBL
+		<![CDATA[ LIMIT #{lastIndex} - #{firstIndex}  OFFSET #{firstIndex} ]]>
+	</select>
+	
+	<!-- 도면/사진 상세 조회 -->
+	<select id="bookImgeDetail" parameterType="map" resultType="egovMap">
+		SELECT *
+		FROM ${TABLENAME}
+		WHERE
+		IMG_IDN = #{IMG_IDN}
+	</select>
+	
+	<!-- 파일명을 추출함 (조합) -->
+	<select id="bookImgeFileNameFtr" parameterType="map" resultType="String">
+		SELECT
+			FTR_CDE||'_'||FTR_IDN||'_'||LPAD(IMG_IDN,3,'0') AS FLE_NAM
+		FROM ${TABLENAME}
+		WHERE IMG_IDN = ${IMG_IDN}
+	</select>
+	<select id="bookImgeFileNameCnt" parameterType="map" resultType="String">
+		SELECT
+			CNT_NUM||'_'||LPAD(IMG_IDN,3,'0') AS FLE_NAM
+		FROM ${TABLENAME}
+		WHERE IMG_IDN = ${IMG_IDN}
+	</select>
+	
+	<!-- 도면/사진 업데이트 -->
+	<update id="bookImgeUpdate" parameterType="map">
+		UPDATE ${TABLENAME}
+		SET 
+			<foreach collection="selectColumnsList" item="item" index="index" separator=", ">
+				${item}
+			</foreach>
+			<if test = "FLE_NAM != null and !FLE_NAM.equals('')">
+			,FLE_NAM = #{FLE_NAM} 
+			</if>
+		WHERE  IMG_IDN = #{IMG_IDN}
+	</update>
+	
+	<!-- 도면/사진 관리번호 생성 -->
+	<select id="bookImgeIdn" parameterType="map" resultType="String">
+		SELECT 
+			CASE
+				WHEN  MAX(IMG_IDN) = null
+				THEN '001'
+				ELSE LPAD(MAX(IMG_IDN)+1,3,'0')
+				END AS MAX_IDN 
+		FROM ${TABLENAME}
+		
+	</select>
+	
+	<!-- 도면/사진 등록 -->
+	<insert id="bookInsertAll" >  
+		INSERT INTO ${TABLENAME}( 
+		<foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			${item}
+		 </foreach>
+		values( 
+		<foreach collection="insertColumnsList" item="item" index="index" separator=", " close=")">
+			#{${item}, jdbcType=VARCHAR} 
+		 </foreach>
+	</insert>
+	
+	<!-- 도면/사진 삭제 -->
+	<delete id="bookImgeDelete" >
+		<![CDATA[
+			DELETE FROM ${TABLENAME} 
+			WHERE IMG_IDN = #{IMG_IDN}
+		]]>
+	</delete>
+</mapper>

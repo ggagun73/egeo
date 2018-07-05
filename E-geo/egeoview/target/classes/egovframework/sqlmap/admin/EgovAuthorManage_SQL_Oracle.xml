@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="AuthorManage">
+
+    <typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+    <typeAlias  alias="AuthorManageVO" type="usolver.admin.author.vo.AuthorManageVO"/>
+    <typeAlias  alias="AuthorManage" type="usolver.admin.author.vo.AuthorManage"/>
+
+    <resultMap id="author" class="usolver.admin.author.vo.AuthorManageVO">
+        <result property="authorCode" column="AUTHOR_CODE" columnIndex="1"/>
+        <result property="authorNm" column="AUTHOR_NM" columnIndex="2"/>
+        <result property="authorDc" column="AUTHOR_DC" columnIndex="3"/>
+        <result property="authorCreatDe" column="AUTHOR_CREAT_DE" columnIndex="4"/>
+    </resultMap>     
+
+    <resultMap id="authorUser" class="usolver.admin.author.vo.AuthorManageVO">
+        <result property="userId" column="USER_ID" columnIndex="1"/>
+        <result property="authorCode" column="AUTHOR_CODE" columnIndex="2"/>
+        <result property="sysCode" column="SYS_CODE" columnIndex="3"/>
+        <result property="reqDate" column="REQ_DATE" columnIndex="4"/>
+        <result property="approveDate" column="APPROVE_DATE" columnIndex="5"/>
+        <result property="compAuth" column="COMP_AUTH" columnIndex="6"/>
+        <result property="authorOrdr" column="AUTHOR_ORDR" columnIndex="7"/>
+        <result property="authorNm" column="AUTHOR_NM" columnIndex="8"/>
+        <result property="regYn" column="REG_YN" columnIndex="9"/>
+    </resultMap>
+    
+    <!-- <select id="authorManageDAO.selectAuthorList" parameterClass="AuthorManageVO" resultMap="author">
+        <![CDATA[
+            SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (
+
+            SELECT
+                   AUTHOR_CODE, AUTHOR_NM, AUTHOR_DC, AUTHOR_CREAT_DE
+              FROM USV_AUTHOR_INFO
+             WHERE 1=1
+        ]]>              
+            <isEqual prepend="AND" property="searchCondition" compareValue="1">
+                AUTHOR_NM LIKE '%'||#searchKeyword#||'%'
+            </isEqual>
+        <![CDATA[            
+            ORDER BY AUTHOR_ORDR ASC
+
+                    ) ALL_LIST
+                    )
+             WHERE  RNUM  > #firstIndex#
+               AND  RNUM <= #firstIndex# + #recordCountPerPage#
+        ]]>                 
+        
+       
+    </select> -->
+	
+	<select id="authorManageDAO.selectAuthorList" parameterClass="AuthorManageVO"  resultClass="egovMap">
+        <![CDATA[
+        SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (           
+			            SELECT AUTHOR_CODE
+								,AUTHOR_CREAT_DE
+								,AUTHOR_DC
+								,AUTHOR_NM
+								,AUTHOR_ORDR
+								,AUTHOR_TYPE
+			            FROM USV_AUTHOR_INFO		    
+			            ]]>        	
+					    WHERE 1=1
+					     <isNotEmpty prepend="AND" property="authorType">
+					               AUTHOR_NM LIKE '%'||#searchKeyword#||'%'
+					     </isNotEmpty>
+			        <![CDATA[            
+           					 ORDER BY AUTHOR_ORDR ASC
+                  ) ALL_LIST
+              )
+             WHERE  RNUM  > #firstIndex#
+               AND  RNUM <= #firstIndex# + #recordCountPerPage#
+        ]]>                 
+    </select>
+    
+    <select id="authorManageDAO.selectAuthorUserList" parameterClass="AuthorManageVO" resultMap="authorUser">
+        <![CDATA[
+        SELECT  * 
+              FROM  (
+            SELECT ROWNUM RNUM, ALL_LIST.* 
+              FROM  (           
+			            SELECT  B.USER_ID
+			            		  ,A.AUTHOR_CODE
+			            		  ,B.SYS_CODE
+			            		  ,TO_CHAR(B.REQ_DATE, 'YYYY-MM-DD') AS REQ_DATE
+			            		  ,TO_CHAR(B.APPROVE_DATE, 'YYYY-MM-DD') AS APPROVE_DATE
+			            		  ,B.COMP_AUTH
+			            		  ,A.AUTHOR_ORDR
+			            		  ,A.AUTHOR_NM
+			            		  ,DECODE(B.APPROVE_DATE,NULL,DECODE(B.REQ_DATE,NULL,'0','1'),'2')  REG_YN
+			            FROM USV_AUTHOR_INFO A 
+			            		LEFT OUTER JOIN  USV_USER_AUTHOR B
+								ON A.AUTHOR_CODE = B.AUTHOR_CODE		     ]]>       
+					             <isNotEmpty prepend="AND" property="searchKeyword">
+					                 B.USER_ID = #searchKeyword#
+					            </isNotEmpty>
+					             <isNotEmpty prepend="AND" property="sysCode">
+					                 B.SYS_CODE = #sysCode#
+					            </isNotEmpty>
+					    WHERE 1=1
+					     <isNotEmpty prepend="AND" property="authorType">
+					                 A.AUTHOR_TYPE = #authorType#
+					     </isNotEmpty>
+			        <![CDATA[            
+           					 ORDER BY AUTHOR_ORDR ASC
+                    	) ALL_LIST
+              )
+             WHERE  RNUM  > #firstIndex#
+               AND  RNUM <= #firstIndex# + #recordCountPerPage#
+        ]]>                 
+    </select>
+    
+    <insert id="authorManageDAO.insertAuthor" parameterClass="AuthorManage">
+        <![CDATA[
+            INSERT INTO USV_AUTHOR_INFO 
+                  ( AUTHOR_CODE
+                  , AUTHOR_NM
+                  , AUTHOR_DC
+                  , AUTHOR_CREAT_DE )
+           VALUES ( #authorCode#
+                  , #authorNm#
+                  , #authorDc#
+                  , SYSDATE)
+        ]]>  
+    </insert>
+
+    <update id="authorManageDAO.updateAuthor" parameterClass="AuthorManage">
+        <![CDATA[
+            UPDATE USV_AUTHOR_INFO 
+               SET AUTHOR_NM=#authorNm#
+                 , AUTHOR_DC=#authorDc#
+             WHERE AUTHOR_CODE=#authorCode#
+        ]]>
+    </update>
+    
+    <delete id="authorManageDAO.deleteAuthor">
+        <![CDATA[
+            DELETE FROM USV_AUTHOR_INFO 
+             WHERE AUTHOR_CODE=#authorCode#
+        ]]>
+    </delete>
+    
+    <select id="authorManageDAO.selectAuthor" resultMap="author">
+        <![CDATA[
+            SELECT AUTHOR_CODE, AUTHOR_NM, AUTHOR_DC, AUTHOR_CREAT_DE
+              FROM USV_AUTHOR_INFO 
+             WHERE AUTHOR_CODE=#authorCode#
+        ]]>
+    </select>
+    
+    <select id="authorManageDAO.selectAuthorListTotCnt" parameterClass="AuthorManageVO" resultClass="int">
+            SELECT COUNT(*) totcnt
+            FROM USV_AUTHOR_INFO
+            WHERE 1=1
+            <isNotEmpty prepend="AND" property="searchKeyword">
+                AUTHOR_NM LIKE '%'||#searchKeyword#||'%'
+            </isNotEmpty>
+    </select>
+    
+    <select id="authorManageDAO.selectAuthorAllList" parameterClass="AuthorManageVO" resultMap="author">
+            SELECT
+                   AUTHOR_CODE, AUTHOR_NM, AUTHOR_DC, AUTHOR_CREAT_DE
+              FROM USV_AUTHOR_INFO
+    </select>
+    
+    	<!--  시스템 정보를 이것으로 대처?  -->
+    <select id="authorManageDAO.selectAuthorSystem" parameterClass="AuthorManage"  resultMap="authorUser">
+            SELECT  USER_ID, AUTHOR_CODE, SYS_CODE, REQ_DATE, APPROVE_DATE, COMP_AUTH, AUTHOR_ORDR
+              FROM USV_USER_AUTHOR
+            WHERE COMP_AUTH = '2'  
+                AND AUTHOR_CODE IN ('ROLE_WATER', 'ROLE_SEWER', 'ROLE_ROAD')
+                AND USER_ID = #userId#
+            ORDER BY AUTHOR_ORDR ASC
+    </select>	
+    	
+</sqlMap>

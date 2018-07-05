@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="statistic">
+
+	<!--  총괄부현황 공통조건-->
+	<sql id="TotalSearchCd">	
+		<if test="!COLUMN.equals('ALL')">
+			<if test ="WHERE != null and !WHERE.equals('')">
+				AND ${COLUMN} = #{WHERE}
+			</if>
+		</if>
+	</sql>
+		
+	<!-- 상수도대장 총괄부현황 : 상수관로 : 취수관, 도수관, 송수관, 배수관, 공업용수관-->
+	<select id="wtlPipeLmStatList" parameterType="usolver.book.vo.StatisticVO" resultType="hashmap">
+	SELECT t.code code, NVL (m.pip_len, 0) pip_len
+	  FROM (SELECT code, val
+	          FROM TABLE (fn_g2s_domainlist ('WTL_PIPE_LM', 'SAA_CDE'))) AS t,
+	       (SELECT   saa_cde, SUM (pip_len) pip_len
+	            FROM wtl_pipe_lm
+	           WHERE saa_cde != ' '
+	             AND saa_cde IN ('SAA001', 'SAA002', 'SAA003', 'SAA004', 'SAA010')
+	             <include refid="TotalSearchCd" />	
+	        GROUP BY saa_cde
+	        ORDER BY saa_cde) AS m
+	 WHERE t.code = m.saa_cde(+)
+	</select>
+	<!-- 상수도대장 총괄부현황 : 급수관로 : 급수관, 소방관-->
+	<select id="wtlSplyLsStatList" parameterType="usolver.book.vo.StatisticVO" resultType="hashmap">
+	SELECT t.code code, NVL (m.pip_len, 0) pip_len
+	  FROM (SELECT code, val
+	          FROM TABLE (fn_g2s_domainlist ('WTL_SPLY_LS', 'SAA_CDE'))) AS t,
+	       (SELECT   saa_cde,
+	                   SUM (pip_len) pip_len
+	            FROM wtl_sply_ls
+	           WHERE saa_cde != ' '
+	             AND saa_cde IN ('SAA005', 'SAA020')
+	             <include refid="TotalSearchCd" />	
+	        GROUP BY saa_cde
+	        ORDER BY saa_cde) AS m
+	 WHERE t.code = m.saa_cde(+)
+	</select>
+	<!-- 상수도대장 총괄부현황 : 변류시설-->
+	<select id="wtlValvPsStatList" parameterType="usolver.book.vo.StatisticVO" resultType="hashmap">
+	SELECT t.code code, NVL (m.cnt, 0) cnt
+	  FROM (SELECT code, val
+	          FROM TABLE (fn_g2s_domainlist ('WTL_VALV_PS', 'FTR_CDE'))) AS t,
+	       (SELECT   ftr_cde, COUNT(*) cnt
+	            FROM wtl_valv_ps
+	           WHERE ftr_cde != ' '
+	             AND ftr_cde IN ('SA200', 'SA201', 'SA202', 'SA203', 'SA204','SA2005','SA2007')
+	             <include refid="TotalSearchCd" />	
+	        GROUP BY ftr_cde
+	        ORDER BY ftr_cde) AS m
+	 WHERE t.code = m.ftr_cde(+)	
+	</select>
+	
+	<!-- 총괄부현황 : 건수 -->
+	<select id="registerTotalStat" parameterType="usolver.book.vo.StatisticVO" resultType="int">
+	SELECT	
+		<if test="RESULTTYPE.equals('COUNT')">
+			 NVL(COUNT (*), 0) 
+		</if>
+		<if test="!RESULTTYPE.equals('COUNT')">
+			 NVL(SUM(${RESULTTYPE}), 0) 
+		</if>				
+	FROM ${TABLENAME} WHERE 1=1 ${SUBQUERY} <include refid="TotalSearchCd" />	
+	</select>
+	
+	<!-- *************************************************************************
+	**************************** 통계현황****************************
+	************************************************************************* -->
+	<!-- 시설물 통계현황 -->
+	<select id="registerStatList" parameterType="usolver.book.vo.StatisticVO" resultType="hashmap"  flushCache="true">
+	SELECT   ${COLUMN}
+	    FROM ( ${LEFTQUERY} ) t
+	         ${SUBQUERY}
+	   WHERE 1=1 ${WHERE}
+	GROUP BY ROLLUP (${ROLLUP})
+	</select>
+	
+</mapper>

@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="usolver.com.cmm.dao.CommonMapper">	
+		
+	<!-- 위치찾기 : 건물 정보  -->
+	<select id="selectBldgList" parameterType="SearchBLDGVO" resultType="SearchBLDGVO">
+		<![CDATA[
+			SELECT FID, FTR_CDE, BLD_NAM, DBL_NAM, AAA_CDE, AAB_CDE, BJD_CDE, HJD_CDE, SAN_CDE, FAC_NUM, FAD_NUM, NRD_NAM, NFC_NUM, 
+        			 NFD_NUM, BLD_HIT
+			FROM BML_BLDG_AS
+		 ]]>       
+        <where>
+			<if test="BJD_CDE != null">
+				BJD_CDE like '%' || #{BJD_CDE} || '%'	
+			</if>
+			<if test="BLD_NAM != null">
+				AND BLD_NAM like '%' || #{BLD_NAM}	|| '%'			
+			</if>				
+		</where>
+		<![CDATA[			
+			ORDER BY BLD_NAM 
+        ]]>
+	</select>	
+	
+	<!-- 위치찾기 : 주소 정보  -->
+	<select id="selectJusoList" parameterType="SearchJUSOVO" resultType="SearchJUSOVO">
+		<![CDATA[
+			SELECT DISTINCT FID, BJD_NAM, JIBUN
+			FROM
+			  (SELECT ROWNUM AS ROW_SEQ, L.BJD_NAM, A.PNU, A.JIBUN, A.FID
+			  FROM
+			    (SELECT FID, PNU, JIBUN
+			    FROM LP_PA_CBND A			
+		 ]]>       
+        <where>
+			<if test="BJD_CDE != null">
+				SUBSTR(PNU, 1, 11) LIKE '%' || #{BJD_CDE} || '%'				
+			</if>
+			<if test="BONBUN != null">					
+				AND SUBSTR(PNU, 12, 4) LIKE '%' || #{BONBUN} || '%'					
+			</if>	
+			<if test="BOOBUN != null">				
+				AND SUBSTR(PNU, 16, 4) LIKE '%' || #{BOOBUN} || '%'	
+			</if>
+			<if test="SAN != null">
+				AND SUBSTR(PNU, 11, 1) LIKE '%' || #{SAN} || '%'
+			</if>
+		</where>
+		<![CDATA[			
+			ORDER BY PNU
+			    ) A,
+			    CMT_LGAR_MA L
+			  WHERE SUBSTR(A.PNU, 1, 10) = L.BJD_CDE
+			  )
+			ORDER BY BJD_NAM, JIBUN
+        ]]>
+	</select>		
+	<!-- 위치찾기 : 도로명 정보  -->
+	<select id="selectNewJusoList_rn" parameterType="SearchNEWJUSOVO" resultType="map">
+		<![CDATA[
+			SELECT B.FID, B.BULD_NM, B.BULD_NM_DC, B.BULD_MNNM, B.BULD_SLNO, M.RN, M.REP_CN,M.RBP_CN
+			FROM TL_SPRD_MANAGE M,
+				(SELECT DISTINCT *
+				FROM TL_SPBD_BULD 			
+		 ]]>       
+        <where>
+			<if test="RN_CD != null">
+				AND RN_CD = #{RN_CD}			
+			</if>
+			<if test="BONBUN != null">					
+				AND BULD_MNNM LIKE '%' || #{BONBUN} || '%'					
+			</if>	
+			<if test="BOOBUN != null">				
+				<!-- AND SUBSTR(ZIP, INSTR(ZIP, '-', 1, 1)+1) LIKE '%' || #{BOOBUN} || '%' -->
+				AND BULD_SLNO LIKE '%' || #{BOOBUN} || '%'	
+			</if>					
+		</where>
+		<![CDATA[	
+				) B WHERE B.RN_CD = M.RN_CD 		
+			ORDER BY BULD_NM  
+        ]]>
+	</select>	
+	<!-- 위치찾기 : 건물명 정보  -->
+	<select id="selectNewJusoList_bd" parameterType="SearchNEWJUSOVO" resultType="SearchNEWJUSOVO">
+		<![CDATA[
+			SELECT DISTINCT FID, BULD_NM, BULD_NM_DC, BULD_MNNM, BULD_SLNO, SIG_CD
+			FROM TL_SPBD_BULD			
+		 ]]>       
+        <where>
+			<if test="HJD_CD != null">
+				AND SIG_CD = #{HJD_CD}			
+			</if> 
+			<if test="BJD_CD != null">
+				AND EMD_CD = SUBSTR(#{BJD_CD}, 6, 3)			
+			</if>
+			<if test="BULD_NM != null">					
+				AND BULD_NM LIKE '%' || #{BULD_NM} || '%'					
+			</if>	
+		</where>
+		<![CDATA[			
+			ORDER BY BULD_NM  
+        ]]>
+	</select>
+</mapper>

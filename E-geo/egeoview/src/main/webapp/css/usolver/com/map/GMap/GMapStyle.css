@@ -1,0 +1,231 @@
+/*
+ * GPopup padding 5px �뿉�꽌 0px 濡� �닔�젙
+ */
+.olPopupContent {
+    padding:0px;
+    overflow: hidden;
+}
+
+/*
+ * 嫄곕━ 諛� Style
+ */
+ 
+.olControlScaleLine {
+		left: 10px;
+		bottom: 15px;
+		font-size: xx-small;
+}
+.olControlScaleLineBottom {
+		border: solid 2px black;
+		border-bottom: none;
+		margin-top:-2px;
+		text-align: center;
+}
+.olControlScaleLineTop {
+	 	border: solid 2px black;
+		border-top: none;
+		text-align: center;
+}
+
+/*
+ * feature 遺꾪븷,蹂묓빀 Style
+ */
+div.olControlMergeFeature {
+	padding:6px;
+	vertical-align: middle;
+	border: 1px solid #ff8000;
+	background: #ffffff;
+	color: #000000; 
+	overflow : hidden;
+	width:152px;
+	height:100px;
+} 
+
+div.olControlSnapInfo {
+	padding:6px;
+	vertical-align: middle;
+	color: #8F85FF;
+	font:11px/18px 留묒�怨좊뵓;
+	width:100px;
+	height:35px;
+}
+
+.popTitle {
+	font-weight:bold; margin:0 0 3px 0;	display:block; padding:2px; background:#dddddd;
+}
+
+/*
+ * 嫄곕━, 硫댁쟻 痢≪젙 Style
+ */
+div.olControlMeasurePopup {
+	text-align:center;
+	vertical-align: middle;
+	border: 1px solid #ff8000;
+	background: #ffffff;
+	color: #000000;
+	font:11px/18px 留묒�怨좊뵓;
+	overflow : hidden;
+	height:20px;
+}
+
+
+div.olControlMeasurePopupDefault {
+	width:60px;
+}
+
+div.olControlMeasurePopupStart {
+	width:36px;
+}
+
+div.olControlMeasurePopupMove {
+	width:98px;
+}
+
+div.olControlMeasurePopupEnd {
+	width:98px;
+}
+
+div.olControlMeasurePopupDefaultPoly {
+	width:70px;
+}
+
+div.olControlMeasurePopupMovePoly {
+	width:108px;
+}
+
+
+div.olControlMeasurePopupEndPoly {
+	width:108px;
+}
+
+span.MeasureColor {
+	color: #ec1313;
+}
+
+/*
+ * �씤�뜳�뒪 留� �뒪���씪
+ */
+.olIndexMap {
+	position: absolute;
+	background-color : white;
+	right: 10px;
+	top: 50px;
+	width: 230px;
+	height: 200px;
+	z-index: 999;
+	border : solid 2px #4169E1;
+	
+	
+	-moz-border-radius: 4px; 
+	-webkit-border-radius: 4px; 
+	border-radius: 4px;
+}
+
+/*
+ * Handler Box �뒪���씪
+ */
+.olHandlerBoxZoomBox {
+    border: 2px solid red;
+    position: absolute;
+    background-color: white;
+    opacity: 0.50;
+    font-size: 1px;
+    filter: alpha(opacity=50);
+}
+
+
+
+
+
+
+/* 洹몃━湲� �룄援� �뀓�뒪�듃 �엯�젰 李� �뒪���씪
+ *  <div class="olControlDrawInputText">
+		<textarea class="olControlDrawInputTextArea"></textarea>
+		<img class='olControlDrawInputTextConfirm' src='/images/GMap/Draw/btn_submit.gif' alt='�솗�씤' title='�솗�씤' />
+		<img class='olControlDrawInputTextCancel' src='/images/GMap/Draw/btn_close.gif' alt='�떕湲�' title='�떕湲�' />
+	</div>
+ */
+
+.olControlDrawInputText {
+	position : relative;
+	width : 360px;
+	border : 1px solid #768349;
+	background-color : white;
+	margin-left : 1px;
+	z-index : 999;
+	overflow : hidden;
+}
+
+.olControlDrawInputText .olControlDrawInputTextArea {
+	width:310px;
+	height:50px
+}
+
+.olControlDrawInputText .olControlDrawInputTextConfirm {
+	position:absolute;
+	bottom:1px;
+	right:2px;
+}
+
+.olControlDrawInputText .olControlDrawInputTextCancel {
+	position:absolute;
+	top:2px;
+	right:2px;
+}
+
+
+/* 洹몃━湲� �룄援� �뀓�뒪�듃 李� �뒪���씪
+ *  <div class='olControlDrawText'></div> 
+ */
+
+.olControlDrawText {
+	padding : 3px 5px;
+	background : #ffffff;
+	font-family : dotum;
+	font-size : 12px;
+	color : #000000;
+	cursor : pointer;
+}
+
+.olControlDrawText.on {
+	border : 1px solid #0000ff;
+}
+
+/* .olControlDrawText.off {
+	border : 1px solid #000000;
+}
+ */
+
+
+.GPanZoomBar {
+	right : 100px;
+}
+
+
+.acssAttr {
+	 position:absolute;
+	 left:0px;
+	 right:0px;
+	 width:80px;
+	 height:40px;
+	 z-index:999;
+	 background-color:#ffffff;
+	 border:1px solid #000000;
+	 padding:5px;
+	 color:#666;
+	 display:none;
+}
+
+.acssAttr span.titLyr {
+	color : #0000ff;
+}
+
+.acssAttr span.tit {
+	color : #497cc9;
+}
+
+
+
+
+
+
