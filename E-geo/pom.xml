@@ -493,11 +493,11 @@
             <version>5.1.31</version>
         </dependency>
         
-		<dependency>
+		<!--<dependency>
 		  <groupId>com</groupId>
 		  <artifactId>ginno.geoframe</artifactId>
 		  <version>3.1.20150625</version>
-		</dependency>
+		</dependency>-->
 		
 		<dependency>
 			<groupId>net.sf.json-lib</groupId>
