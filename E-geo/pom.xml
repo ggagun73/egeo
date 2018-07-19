@@ -41,7 +41,7 @@
         </repository>
         <repository>
             <id>muhanIT</id>
-            <url>http://192.168.0.201:8081/nexus/content/repositories/thirdparty/</url>
+            <url>http://www.muhanit.kr:8081/nexus/content/repositories/thirdparty/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
