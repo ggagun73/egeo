@@ -60,6 +60,44 @@
 	
   </dependencies>
   <build>
-    <finalName>egeoview</finalName>
+  <plugins>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+        	<execution>
+                <id>copy-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>copy</goal> 
+                </goals>
+                <configuration>
+	                <outputDirectory>/</outputDirectory>
+	                <overWriteIfNewer>true</overWriteIfNewer>
+           		</configuration>
+            </execution>
+            <execution>
+                <id>copy-war</id>
+                <phase>install</phase>
+                <goals>
+                    <goal>copy</goal>
+                </goals>
+                <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                            <groupId>muhanIT</groupId>
+                            <artifactId>egeoview</artifactId>
+                            <version>1.0</version>
+                            <type>war</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>/</outputDirectory>
+                            <destFileName>egeoview.war</destFileName>
+                        </artifactItem>
+                    </artifactItems>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+    </plugins>
   </build>
 </project>
