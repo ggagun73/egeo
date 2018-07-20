@@ -60,7 +60,23 @@
 	
   </dependencies>
   <build>
-  <plugins>
+  <build>
+        <!-- ROOT.war 가 생성된다. -->
+        <finalName>egeoview</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+ 
+                <configuration>
+                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                    <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+  <!-- <plugins>
        <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -98,6 +114,6 @@
             </execution>
         </executions>
     </plugin>
-    </plugins>
+    </plugins> -->
   </build>
 </project>
