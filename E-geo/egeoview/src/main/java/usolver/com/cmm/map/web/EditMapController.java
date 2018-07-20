@@ -29,7 +29,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
-import GeoFrame.Base.Io.aMemoryStreamReader;
+/*import GeoFrame.Base.Io.aMemoryStreamReader;
 import GeoFrame.Base.Io.aMemoryStreamWriter;
 import GeoFrame.Base.Lang.aValueFactory;
 import GeoFrame.Base.Lang.aiPoint;
@@ -37,7 +37,7 @@ import GeoFrame.Data.GEODATA_TYPE;
 import GeoFrame.Data.GeoShape.aGeometryFactory;
 import GeoFrame.Data.GeoShape.aiGeometry;
 import GeoFrame.Data.LocalEdit.aEditFactory;
-import GeoFrame.Data.LocalEdit.aiInfoEditHistory;
+import GeoFrame.Data.LocalEdit.aiInfoEditHistory;*/
 import egovframework.rte.psl.dataaccess.util.EgovMap;
 import oracle.sql.BLOB;
 import usolver.com.cmm.map.service.LyrEditService;
@@ -623,7 +623,7 @@ public class EditMapController {
 		int coordScale = commonService.getCoordScale(request.getParameter("g2_dataHouse"));
 		
 		
-		if(editG2data.containsKey("G2_DATA")) {
+		/*if(editG2data.containsKey("G2_DATA")) {
 			BLOB blob = (BLOB)editG2data.get("G2_DATA");
 			aMemoryStreamWriter outstream = new aMemoryStreamWriter();
 			int start = 1;
@@ -673,7 +673,7 @@ public class EditMapController {
             editG2data.put("G2_SHAPETYPE",shapeType.toString().split("_")[1]);
             editG2data.put("G2_DATA", g2data);
             reader.close();
-		}
+		}*/
 		model.addAttribute("g2data", editG2data);
 		return "jsonView";
 	}
