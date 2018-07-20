@@ -60,7 +60,6 @@
 	
   </dependencies>
   <build>
-  <build>
         <!-- ROOT.war 가 생성된다. -->
         <finalName>egeoview</finalName>
         <plugins>
@@ -75,7 +74,7 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+ 
   <!-- <plugins>
        <plugin>
         <groupId>org.apache.maven.plugins</groupId>
