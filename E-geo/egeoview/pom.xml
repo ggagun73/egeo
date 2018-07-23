@@ -41,7 +41,7 @@
 	    <version>2.6.2</version>
 	</dependency>
 	
-	<!-- oracle 10g driver -->
+	<!-- oracle 10g driver
 	<dependency>
         <groupId>ojdbc</groupId>
         <artifactId>ojdbc</artifactId>
@@ -56,8 +56,20 @@
         <version>1</version>
         <scope>system</scope>
         <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/Extern.jar</systemPath>
-    </dependency>
+    </dependency> -->
 	
+	<dependency>
+	  <groupId>com.oracle</groupId>
+	  <artifactId>ojdbc5</artifactId>
+	  <version>11.2.0.3</version>
+	</dependency>
+	
+	<dependency>
+	  <groupId>ginno</groupId>
+	  <artifactId>extern</artifactId>
+	  <version>1</version>
+	</dependency>
+
   </dependencies>
   <build>
         <!-- ROOT.war 가 생성된다. -->
